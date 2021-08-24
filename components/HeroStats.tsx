@@ -23,7 +23,7 @@ export default function HeroStats({ hashRate, stakers, staked }: { hashRate: num
               </div>
               <div className="flex flex-col border-t border-blue p-6 text-center sm:border-0 sm:border-l">
                 <dt className="order-2 mt-2 text-lg leading-6 font-medium text-blue-light">
-                  Totak EDEN Staked
+                  Total EDEN Staked
                 </dt>
                 <dd className="order-1 text-5xl font-extrabold text-blue">
                   {staked.toLocaleString()}
