@@ -20,7 +20,7 @@ function translateProducer(producer: string) {
   }
 }
 
-export default function Blocks({ blocks }: {blocks: [{number: number, author: string, timestamp: number}]}) {
+export default function Blocks({ blocks }: {blocks: {number: number, author: string, timestamp: number}[]}) {
   const timeAgo = useMemo(() => new TimeAgo('en-US'), []);
 
   const shapedBlocks = useMemo(() => blocks.map(block => { return {
@@ -57,7 +57,7 @@ export default function Blocks({ blocks }: {blocks: [{number: number, author: st
                   </th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-green">
+              <tbody className="divide-y divide-blue-light">
                 {shapedBlocks.map((block) => (
                   <tr key={block.number}>
                     <td className="px-6 py-4 whitespace-nowrap">
