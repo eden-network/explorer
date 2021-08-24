@@ -18,7 +18,7 @@ export default function Header() {
             <div className="flex-shrink-0">
               <Link href="/"><a><Image src={logo} width={103} /></a></Link>
             </div>
-            <div className="hidden lg:block lg:ml-6">
+            <div className="lg:block lg:ml-6">
               <div className="flex space-x-4">
                 {/*<Link href="/blocks"><a className={router.route === '/blocks' ? selectedButton : unselectedButton}>Blocks</a></Link>*/}
                 <Link href="/stakers"><a className={router.route === '/stakers' ? selectedButton : unselectedButton}>Stakers</a></Link>
