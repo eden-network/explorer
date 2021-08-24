@@ -22,9 +22,9 @@ export default function StakedDistributionSummary({ data, staked, stakers, topSt
       <dl className="mt-5 grid grid-cols-1 rounded-lg bg-green overflow-hidden shadow divide-y divide-blue-light md:grid-cols-5 md:divide-y-0 md:divide-x">
         {stats.map((item) => (
           <div key={item.name} className="px-1 py-2 sm:p-3">
-            <dt className="text-base font-normal text-blue-light">{item.name}</dt>
-            <dd className="mt-1 flex justify-between items-baseline md:block lg:flex">
-              <div className="flex items-baseline text-2xl font-semibold text-blue">
+            <dt className="text-base font-normal text-blue-light text-center">{item.name}</dt>
+            <dd className="mt-1 justify-between items-baseline md:block lg:flex w-full">
+              <div className="items-baseline text-2xl font-semibold text-blue w-full text-center">
                 {item.stat}
               </div>
             </dd>

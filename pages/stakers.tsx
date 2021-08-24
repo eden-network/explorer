@@ -1,7 +1,6 @@
 import { stakers } from '@eden-network/data';
-import Head from 'next/head'
-import { useCallback, useMemo, useState } from 'react';
-import Header from '../components/Header'
+import { useMemo, useState } from 'react';
+import Shell from '../components/Shell'
 import Pagination from '../components/Pagination';
 import Search from '../components/Search'
 import Stakers from '../components/Stakers'
@@ -21,41 +20,32 @@ export default function StakersPage({ leaderboard }: { leaderboard: { id: string
     return leaderboard;
   }, [leaderboard, filter]);
 
-  const numPages = useMemo(() => 
+  const numPages = useMemo(() =>
     Math.floor(filtered.length / perPage) + ((filtered.length % perPage) === 0 ? 0 : 1),
     [filtered, perPage]
   );
 
-  const data = useMemo(() => 
+  const data = useMemo(() =>
     filtered.slice(page * perPage, page * perPage + perPage),
     [filtered, page, perPage]
   );
 
   return (
-    <div className="min-h-screen bg-blue-light">
-      <Head>
-        <title>Eden Network Explorer</title>
-        <link rel="icon" href="/favicon.png" />
-      </Head>
-      <Header />
-      <div className="py-10 text-white">
-        <main>
-          <div className="max-w-4xl mx-auto grid gap-5">
-            <div className="flex flex-col rounded-lg shadow-lg overflow-hidden bg-blue">
-              <div className="flex-1 p-6 flex flex-col justify-between">
-                <div className="flex-shrink-0">
-                  <Search prompt="Address" setValue={setFilter} />
-                </div>
-                <div className="flex-1 mt-4">
-                  <Stakers stakers={data} />
-                </div>
-                <Pagination numPages={numPages} perPage={perPage} activePage={page} total={filtered.length} setPage={setPage}/>
-              </div>
+    <Shell>
+      <div className="max-w-4xl mx-auto grid gap-5">
+        <div className="flex flex-col rounded-lg shadow-lg overflow-hidden bg-blue">
+          <div className="flex-1 p-6 flex flex-col justify-between">
+            <div className="flex-shrink-0">
+              <Search prompt="Address" setValue={setFilter} />
             </div>
+            <div className="flex-1 mt-4">
+              <Stakers stakers={data} />
+            </div>
+            <Pagination numPages={numPages} perPage={perPage} activePage={page} total={filtered.length} setPage={setPage} />
           </div>
-        </main>
+        </div>
       </div>
-    </div>
+    </Shell>
   );
 }
 
@@ -73,6 +63,7 @@ export async function getStaticProps() {
   return {
     props: {
       leaderboard
-    }
+    },
+    revalidate: 10
   };
 }

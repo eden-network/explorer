@@ -1,5 +1,6 @@
 import { useEffect } from "react";
 import { useRouter } from 'next/router'
+import Shell from '../../components/Shell'
 
 export default function Block() {
   const router = useRouter()
@@ -9,8 +10,7 @@ export default function Block() {
   }, [router]);
 
   return (
-    <main className="bg-blue">
-    </main>
+    <Shell />
   )
 }
 
