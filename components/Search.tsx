@@ -1,4 +1,11 @@
-export default function Search({ prompt }) {
+import { useCallback } from "react";
+
+export default function Search({ prompt, setValue }: { prompt: string, setValue?: (value: string) => any }) {
+  const onChange = useCallback((event) => {
+    if (setValue)
+      setValue(event.target.value);
+  }, [setValue]);
+
   return (
     <div className="w-full">
       <label htmlFor="search" className="sr-only">Search</label>
@@ -8,7 +15,7 @@ export default function Search({ prompt }) {
             <path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd" />
           </svg>
         </div>
-        <input id="search" name="search" className="block w-full bg-blue-light rounded-md py-2 pl-10 pr-3 text-sm text-white placeholder-gray-500 focus:outline-none focus:text-white focus:placeholder-gray-400 focus:ring-1 focus:ring-green focus:border-green sm:text-sm" placeholder={prompt} type="search" />
+        <input id="search" name="search" className="block w-full bg-blue-light rounded-md py-2 pl-10 pr-3 text-sm text-white placeholder-gray-500 focus:outline-none focus:text-white focus:placeholder-gray-400 focus:ring-1 focus:ring-green focus:border-green sm:text-sm" placeholder={prompt} type="search" onChange={onChange} />
       </div>
     </div>);
 }

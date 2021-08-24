@@ -33,7 +33,8 @@ export default function StakedDistribution({ data }) {
         y: {
           grid: {
             display: false
-          }
+          },
+          type: 'logarithmic'
         }
       },
     }
