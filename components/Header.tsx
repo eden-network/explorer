@@ -20,18 +20,18 @@ export default function Header() {
             </div>
             <div className="hidden lg:block lg:ml-6">
               <div className="flex space-x-4">
-                <Link href="/blocks"><a className={router.route === '/blocks' ? selectedButton : unselectedButton}>Blocks</a></Link>
+                {/*<Link href="/blocks"><a className={router.route === '/blocks' ? selectedButton : unselectedButton}>Blocks</a></Link>*/}
                 <Link href="/stakers"><a className={router.route === '/stakers' ? selectedButton : unselectedButton}>Stakers</a></Link>
-                <Link href="/slots"><a className={router.route === '/slots' ? selectedButton : unselectedButton}>Slots</a></Link>
-                <Link href="/producers"><a className={router.route === '/producers' ? selectedButton : unselectedButton}>Producers</a></Link>
+                {/*<Link href="/slots"><a className={router.route === '/slots' ? selectedButton : unselectedButton}>Slots</a></Link>*/}
+                {/*<Link href="/producers"><a className={router.route === '/producers' ? selectedButton : unselectedButton}>Producers</a></Link>*/}
               </div>
             </div>
           </div>
-          <div className="min-w-0 flex-1 md:px-8 lg:px-0 xl:col-span-6 lg:ml-6">
+          {/*<div className="min-w-0 flex-1 md:px-8 lg:px-0 xl:col-span-6 lg:ml-6">
             <div className="flex items-center px-6 py-4 md:max-w-3xl md:mx-auto lg:max-w-none lg:mx-0 xl:px-0">
               <Search prompt="Search by address, transaction, or block" />
             </div>
-          </div>
+          </div>*/}
         </div>
       </div>
     </nav>
