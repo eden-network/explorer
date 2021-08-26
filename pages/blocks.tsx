@@ -1,5 +1,40 @@
-import ComingSoon from "../components/ComingSoon"
+import Shell from "../components/Shell"
+import Blocks from "../components/Blocks"
+import EndlessPagination from "../components/EndlessPagination"
+import { blocksPaged } from "@eden-network/data";
+import { useMemo } from "react";
+import { useRouter } from "next/router";
 
-export default function Blocks() {
-  return <ComingSoon/>;
+const PER_PAGE = 15;
+
+export default function BlocksPage({blocks}) {
+  const router = useRouter();
+
+  const next = useMemo(() => `/blocks?skip=${router.query.skip === undefined ? PER_PAGE : Number(router.query.skip) + PER_PAGE}`, [router.query.skip]);
+  const previous = useMemo(() => `/blocks?skip=${router.query.skip === undefined || Number(router.query.skip) === 0 ? 0 : Number(router.query.skip) - PER_PAGE}`, [router.query.skip]);
+
+  return (
+    <Shell>
+      <div className="max-w-4xl mx-auto grid gap-5">
+        <div className="flex flex-col rounded-lg shadow-lg overflow-hidden bg-blue">
+          <div className="flex-1 p-6 flex flex-col justify-between">
+            <div className="flex-1 mt-4">
+              <Blocks blocks={blocks} />
+            </div>
+            <EndlessPagination next={next} previous={previous}/>
+          </div>
+        </div>
+      </div>
+    </Shell>
+  );
+}
+
+export async function getServerSideProps(context) {
+  const skip = context.query.skip ?? 0;
+  const blocks = await blocksPaged({start: skip, num: PER_PAGE, fromActiveProducerOnly: true, network: "mainnet"});
+  return {
+    props: {
+      blocks
+    }
+  };
 }

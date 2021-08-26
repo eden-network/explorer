@@ -20,8 +20,8 @@ export default function Header() {
             </div>
             <div className="lg:block lg:ml-6">
               <div className="flex space-x-4">
-                {/*<Link href="/blocks"><a className={router.route === '/blocks' ? selectedButton : unselectedButton}>Blocks</a></Link>*/}
                 <Link href="/stakers"><a className={router.route === '/stakers' ? selectedButton : unselectedButton}>Stakers</a></Link>
+                <Link href="/blocks"><a className={router.route === '/blocks' ? selectedButton : unselectedButton}>Blocks</a></Link>
                 {/*<Link href="/slots"><a className={router.route === '/slots' ? selectedButton : unselectedButton}>Slots</a></Link>*/}
                 {/*<Link href="/producers"><a className={router.route === '/producers' ? selectedButton : unselectedButton}>Producers</a></Link>*/}
               </div>
