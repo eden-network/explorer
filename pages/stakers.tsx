@@ -49,7 +49,7 @@ export default function StakersPage({ leaderboard }: { leaderboard: { id: string
   );
 }
 
-export async function getStaticProps() {
+export async function getServerSideProps(context) {
   const stakers_ = await stakers();
   const leaderboard = stakers_
     .filter(staker => staker.rank != null)
@@ -63,7 +63,6 @@ export async function getStaticProps() {
   return {
     props: {
       leaderboard
-    },
-    revalidate: 10
+    }
   };
 }

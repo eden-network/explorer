@@ -1,19 +1,15 @@
-import { useEffect } from "react";
-import { useRouter } from 'next/router'
 import Shell from '../../components/Shell'
 
 export default function Block() {
-  const router = useRouter()
-
-  useEffect(() => {
-    window.location.href = `https://etherscan.io/block/${router.query.block}`;
-  }, [router]);
-
-  return (
-    <Shell />
-  )
+  return <Shell />;
 }
 
-export async function getServerSideProps() {
-  return {props: {}};
+export async function getServerSideProps(context) {
+  return {
+    props: {},
+    redirect: {
+      destination: `https://etherscan.io/block/${context.query.block}`,
+      permanent: false
+    }
+  };
 }

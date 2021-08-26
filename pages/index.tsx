@@ -53,7 +53,7 @@ export default function Home({ hashRate, stakers, staked, stakeDistribution, blo
 
 
 
-export async function getStaticProps() {
+export async function getServerSideProps(context) {
   const [rewards, stake, blocks, leaderboard] = await Promise.all([
     rewardSchedule(),
     stakeStats(),
@@ -73,7 +73,6 @@ export async function getStaticProps() {
       stakeDistribution,
       blocks,
       topStakedAmount
-    },
-    revalidate: 10
+    }
   }
 }
