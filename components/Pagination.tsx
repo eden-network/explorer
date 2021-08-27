@@ -16,13 +16,13 @@ export default function Pagination({ numPages, perPage, total, activePage, setPa
     <div className="flex-1 flex justify-between sm:hidden">
       <a
         onClick={previous}
-        className="relative inline-flex items-center px-4 py-2 text-sm bg-blue-light font-medium rounded-md hover:bg-gray-50 cursor-pointer select-none"
+        className="relative inline-flex items-center px-4 py-2 text-sm bg-blue-light font-medium rounded-md hover:bg-green hover:text-blue cursor-pointer select-none"
       >
         Previous
       </a>
       <a
         onClick={next}
-        className="ml-3 relative inline-flex items-center px-4 py-2 bg-blue-light text-sm font-medium rounded-md hover:bg-gray-50 cursor-pointer select-none"
+        className="ml-3 relative inline-flex items-center px-4 py-2 bg-blue-light text-sm font-medium rounded-md hover:bg-green hover:text-blue cursor-pointer select-none"
       >
         Next
       </a>
