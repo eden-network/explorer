@@ -1,9 +1,12 @@
+import { useCallback, useEffect } from 'react';
+
 import {
   blocksPaged,
   rewardSchedule,
   stakerLeaderboard,
   stakeStats,
 } from '@eden-network/data';
+import { useRouter } from 'next/router';
 
 import Blocks from '../components/Blocks';
 import HeroStats from '../components/HeroStats';
@@ -22,6 +25,20 @@ export default function Home({
   blocks,
   topStakedAmount,
 }) {
+  const router = useRouter();
+
+  const refreshData = useCallback(() => {
+    router.replace(router.asPath);
+  }, [router]);
+
+  useEffect(() => {
+    const intervalId = setInterval(() => {
+      refreshData();
+    }, 5000);
+
+    return () => clearInterval(intervalId);
+  }, [refreshData]);
+
   return (
     <Shell
       meta={<Meta title="Home" description="Eden Network Explor Home Page" />}
