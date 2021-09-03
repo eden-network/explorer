@@ -34,7 +34,7 @@ export default function Home({
   useEffect(() => {
     const intervalId = setInterval(() => {
       refreshData();
-    }, 5000);
+    }, 60 * 1000);
 
     return () => clearInterval(intervalId);
   }, [refreshData]);
