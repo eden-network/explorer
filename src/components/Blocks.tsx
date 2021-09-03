@@ -29,7 +29,7 @@ function translateProducer(producer: string) {
     case '0x01ca8a0ba4a80d12a8fb6e3655688f57b16608cf':
       return 'Spark Pool';
     default:
-      return null;
+      return 'Not found';
   }
 }
 
