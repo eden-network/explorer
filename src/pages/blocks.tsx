@@ -3,9 +3,9 @@ import { useMemo } from 'react';
 import { blocksPaged } from '@eden-network/data';
 import { useRouter } from 'next/router';
 
-import Blocks from '../src/components/Blocks';
-import EndlessPagination from '../src/components/EndlessPagination';
-import Shell from '../src/components/Shell';
+import Blocks from '../components/Blocks';
+import EndlessPagination from '../components/EndlessPagination';
+import Shell from '../components/Shell';
 
 const PER_PAGE = 15;
 

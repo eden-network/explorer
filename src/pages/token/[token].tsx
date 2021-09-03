@@ -1,4 +1,4 @@
-import Shell from '../../src/components/Shell';
+import Shell from '../../components/Shell';
 
 export default function Token() {
   return <Shell />;

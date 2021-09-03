@@ -5,11 +5,11 @@ import {
   stakeStats,
 } from '@eden-network/data';
 
-import Blocks from '../src/components/Blocks';
-import HeroStats from '../src/components/HeroStats';
-import Shell from '../src/components/Shell';
-import StakedDistribution from '../src/components/StakedDistribution';
-import StakedDistributionSummary from '../src/components/StakedDistributionSummary';
+import Blocks from '../components/Blocks';
+import HeroStats from '../components/HeroStats';
+import Shell from '../components/Shell';
+import StakedDistribution from '../components/StakedDistribution';
+import StakedDistributionSummary from '../components/StakedDistributionSummary';
 
 const WEI = BigInt('1000000000000000000');
 

@@ -2,10 +2,10 @@ import { useMemo, useState } from 'react';
 
 import { stakers } from '@eden-network/data';
 
-import Pagination from '../src/components/Pagination';
-import Search from '../src/components/Search';
-import Shell from '../src/components/Shell';
-import Stakers from '../src/components/Stakers';
+import Pagination from '../components/Pagination';
+import Search from '../components/Search';
+import Shell from '../components/Shell';
+import Stakers from '../components/Stakers';
 
 const WEI = BigInt('1000000000000000000');
 

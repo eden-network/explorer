@@ -1,9 +1,9 @@
 import { staker, stakeStats } from '@eden-network/data';
 import { useRouter } from 'next/router';
 
-import EtherscanLink from '../../src/components/EtherscanLink';
-import Shell from '../../src/components/Shell';
-import StakerHeroStats from '../../src/components/StakerHeroStats';
+import EtherscanLink from '../../components/EtherscanLink';
+import Shell from '../../components/Shell';
+import StakerHeroStats from '../../components/StakerHeroStats';
 
 const WEI = BigInt('1000000000000000000');
 
