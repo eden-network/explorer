@@ -33,7 +33,14 @@ export default function BlocksPage({ blocks }) {
   );
 
   return (
-    <Shell meta={<Meta title="blocks" description="blocks pages" />}>
+    <Shell
+      meta={
+        <Meta
+          title="Block List"
+          description="Eden Network Explor Block List Page"
+        />
+      }
+    >
       <div className="max-w-4xl mx-auto grid gap-5">
         <div className="flex flex-col rounded-lg shadow-lg overflow-hidden bg-blue">
           <div className="flex-1 p-6 flex flex-col justify-between">

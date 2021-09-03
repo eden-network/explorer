@@ -23,7 +23,9 @@ export default function Home({
   topStakedAmount,
 }) {
   return (
-    <Shell meta={<Meta title="Home" description="home page" />}>
+    <Shell
+      meta={<Meta title="Home" description="Eden Network Explor Home Page" />}
+    >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="max-w-4xl mx-auto text-center">
           <h2 className="text-3xl font-extrabold sm:text-4xl">
