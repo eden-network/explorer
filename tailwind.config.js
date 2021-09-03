@@ -24,10 +24,10 @@ module.exports = {
     fontFamily: {
       'sans': ['Titillium Web', 'sans-serif']
     },
-    extend: {},
+    extend: { },
   },
   variants: {
-    extend: {},
+    extend: { },
   },
   plugins: [
     require('@tailwindcss/forms'),
