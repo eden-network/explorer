@@ -1,8 +1,10 @@
-import { useMemo } from "react";
 import Link from 'next/link';
 
-export default function Stakers({ stakers }: {stakers: {id: string, staked: number, rank: number}[]}) {
-
+export default function Stakers({
+  stakers,
+}: {
+  stakers: { id: string; staked: number; rank: number }[];
+}) {
   return (
     <div className="flex flex-col">
       <div className="-my-2 overflow-hidden sm:-mx-6 lg:-mx-8">
@@ -34,8 +36,12 @@ export default function Stakers({ stakers }: {stakers: {id: string, staked: numb
               <tbody className="divide-y divide-blue-light border-b border-blue-light">
                 {stakers.map((staker) => (
                   <tr key={staker.rank}>
-                    <td className="px-6 py-4 whitespace-nowrap">#{staker.rank + 1}</td>
-                    <td className="px-6 py-4 whitespace-nowrap">{Math.floor(staker.staked).toLocaleString()}</td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      #{staker.rank + 1}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      {Math.floor(staker.staked).toLocaleString()}
+                    </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <Link href={`/address/${staker.id}`}>
                         <a className="text-green">{staker.id}</a>
@@ -49,5 +55,5 @@ export default function Stakers({ stakers }: {stakers: {id: string, staked: numb
         </div>
       </div>
     </div>
-  )
+  );
 }

@@ -1,5 +1,5 @@
-import ComingSoon from "../components/ComingSoon"
+import ComingSoon from '../src/components/ComingSoon';
 
 export default function Stakers() {
-  return <ComingSoon/>;
+  return <ComingSoon />;
 }

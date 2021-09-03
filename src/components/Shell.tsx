@@ -1,5 +1,6 @@
-import Head from 'next/head'
-import Header from '../components/Header'
+import Head from 'next/head';
+
+import Header from './Header';
 
 export default function Shell(props) {
   return (
@@ -10,9 +11,7 @@ export default function Shell(props) {
       </Head>
       <Header />
       <div className="py-10 text-white">
-        <main>
-          {props.children}
-        </main>
+        <main>{props.children}</main>
       </div>
     </div>
   );

@@ -1,17 +1,35 @@
-import Shell from "../components/Shell"
-import Blocks from "../components/Blocks"
-import EndlessPagination from "../components/EndlessPagination"
-import { blocksPaged } from "@eden-network/data";
-import { useMemo } from "react";
-import { useRouter } from "next/router";
+import { useMemo } from 'react';
+
+import { blocksPaged } from '@eden-network/data';
+import { useRouter } from 'next/router';
+
+import Blocks from '../src/components/Blocks';
+import EndlessPagination from '../src/components/EndlessPagination';
+import Shell from '../src/components/Shell';
 
 const PER_PAGE = 15;
 
-export default function BlocksPage({blocks}) {
+export default function BlocksPage({ blocks }) {
   const router = useRouter();
 
-  const next = useMemo(() => `/blocks?skip=${router.query.skip === undefined ? PER_PAGE : Number(router.query.skip) + PER_PAGE}`, [router.query.skip]);
-  const previous = useMemo(() => `/blocks?skip=${router.query.skip === undefined || Number(router.query.skip) === 0 ? 0 : Number(router.query.skip) - PER_PAGE}`, [router.query.skip]);
+  const next = useMemo(
+    () =>
+      `/blocks?skip=${
+        router.query.skip === undefined
+          ? PER_PAGE
+          : Number(router.query.skip) + PER_PAGE
+      }`,
+    [router.query.skip]
+  );
+  const previous = useMemo(
+    () =>
+      `/blocks?skip=${
+        router.query.skip === undefined || Number(router.query.skip) === 0
+          ? 0
+          : Number(router.query.skip) - PER_PAGE
+      }`,
+    [router.query.skip]
+  );
 
   return (
     <Shell>
@@ -21,7 +39,7 @@ export default function BlocksPage({blocks}) {
             <div className="flex-1 mt-4">
               <Blocks blocks={blocks} />
             </div>
-            <EndlessPagination next={next} previous={previous}/>
+            <EndlessPagination next={next} previous={previous} />
           </div>
         </div>
       </div>
@@ -31,10 +49,15 @@ export default function BlocksPage({blocks}) {
 
 export async function getServerSideProps(context) {
   const skip = context.query.skip ?? 0;
-  const blocks = await blocksPaged({start: skip, num: PER_PAGE, fromActiveProducerOnly: true, network: "mainnet"});
+  const blocks = await blocksPaged({
+    start: skip,
+    num: PER_PAGE,
+    fromActiveProducerOnly: true,
+    network: 'mainnet',
+  });
   return {
     props: {
-      blocks
-    }
+      blocks,
+    },
   };
 }

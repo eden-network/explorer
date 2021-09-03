@@ -1,4 +1,4 @@
-import Shell from '../../components/Shell'
+import Shell from '../../src/components/Shell';
 
 export default function Tx() {
   return <Shell />;
@@ -9,7 +9,7 @@ export async function getServerSideProps(context) {
     props: {},
     redirect: {
       destination: `https://etherscan.io/tx/${context.query.tx}`,
-      permanent: false
-    }
+      permanent: false,
+    },
   };
 }
