@@ -2,7 +2,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 
-import logo from '../public/logo.svg';
+import logo from '../../public/logo.svg';
 
 const selectedButton =
   'bg-blue-light text-white px-3 py-2 rounded-md text-sm font-medium';
