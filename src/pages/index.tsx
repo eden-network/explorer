@@ -7,9 +7,10 @@ import {
 
 import Blocks from '../components/Blocks';
 import HeroStats from '../components/HeroStats';
-import Shell from '../components/Shell';
 import StakedDistribution from '../components/StakedDistribution';
 import StakedDistributionSummary from '../components/StakedDistributionSummary';
+import { Meta } from '../layout/Meta';
+import Shell from '../layout/Shell';
 
 const WEI = BigInt('1000000000000000000');
 
@@ -22,7 +23,7 @@ export default function Home({
   topStakedAmount,
 }) {
   return (
-    <Shell>
+    <Shell meta={<Meta title="Home" description="home page" />}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="max-w-4xl mx-auto text-center">
           <h2 className="text-3xl font-extrabold sm:text-4xl">

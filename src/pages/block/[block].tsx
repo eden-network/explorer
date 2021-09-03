@@ -1,7 +1,8 @@
-import Shell from '../../components/Shell';
+import { Meta } from '../../layout/Meta';
+import Shell from '../../layout/Shell';
 
 export default function Block() {
-  return <Shell />;
+  return <Shell meta={<Meta title="block" description="block page" />} />;
 }
 
 export async function getServerSideProps(context) {

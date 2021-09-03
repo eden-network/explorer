@@ -5,7 +5,8 @@ import { useRouter } from 'next/router';
 
 import Blocks from '../components/Blocks';
 import EndlessPagination from '../components/EndlessPagination';
-import Shell from '../components/Shell';
+import { Meta } from '../layout/Meta';
+import Shell from '../layout/Shell';
 
 const PER_PAGE = 15;
 
@@ -32,7 +33,7 @@ export default function BlocksPage({ blocks }) {
   );
 
   return (
-    <Shell>
+    <Shell meta={<Meta title="blocks" description="blocks pages" />}>
       <div className="max-w-4xl mx-auto grid gap-5">
         <div className="flex flex-col rounded-lg shadow-lg overflow-hidden bg-blue">
           <div className="flex-1 p-6 flex flex-col justify-between">

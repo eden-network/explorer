@@ -4,8 +4,9 @@ import { stakers } from '@eden-network/data';
 
 import Pagination from '../components/Pagination';
 import Search from '../components/Search';
-import Shell from '../components/Shell';
 import Stakers from '../components/Stakers';
+import { Meta } from '../layout/Meta';
+import Shell from '../layout/Shell';
 
 const WEI = BigInt('1000000000000000000');
 
@@ -39,7 +40,7 @@ export default function StakersPage({
   );
 
   return (
-    <Shell>
+    <Shell meta={<Meta title="stakers" description="stakers page" />}>
       <div className="max-w-4xl mx-auto grid gap-5">
         <div className="flex flex-col rounded-lg shadow-lg overflow-hidden bg-blue">
           <div className="flex-1 p-6 flex flex-col justify-between">
