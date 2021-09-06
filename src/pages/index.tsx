@@ -41,7 +41,7 @@ export default function Home({
 
   return (
     <Shell
-      meta={<Meta title="Home" description="Eden Network Explor Home Page" />}
+      meta={<Meta title="Home" description="Eden Network Explorer Home Page" />}
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="max-w-4xl mx-auto text-center">

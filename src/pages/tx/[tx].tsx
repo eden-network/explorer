@@ -7,7 +7,7 @@ export default function Tx() {
       meta={
         <Meta
           title="Transaction"
-          description="Eden Network Explor Transaction Page"
+          description="Eden Network Explorer Transaction Page"
         />
       }
     />

@@ -42,7 +42,10 @@ export default function StakersPage({
   return (
     <Shell
       meta={
-        <Meta title="Staker List" description="Eden Network Staker List Page" />
+        <Meta
+          title="Staker List"
+          description="Eden Network Explorer Staker List Page"
+        />
       }
     >
       <div className="max-w-4xl mx-auto grid gap-5">

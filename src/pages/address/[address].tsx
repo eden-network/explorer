@@ -14,7 +14,10 @@ export default function Address({ staked, rank, outOf }) {
   return (
     <Shell
       meta={
-        <Meta title="Address" description="Eden Network Explor Address Page" />
+        <Meta
+          title="Address"
+          description="Eden Network Explorer Address Page"
+        />
       }
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

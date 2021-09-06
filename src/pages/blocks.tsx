@@ -37,7 +37,7 @@ export default function BlocksPage({ blocks }) {
       meta={
         <Meta
           title="Block List"
-          description="Eden Network Explor Block List Page"
+          description="Eden Network Explorer Block List Page"
         />
       }
     >

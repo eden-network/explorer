@@ -4,7 +4,9 @@ import Shell from '../../layout/Shell';
 export default function Block() {
   return (
     <Shell
-      meta={<Meta title="Block" description="Eden Network Explor Block Page" />}
+      meta={
+        <Meta title="Block" description="Eden Network Explorer Block Page" />
+      }
     />
   );
 }

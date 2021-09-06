@@ -4,7 +4,9 @@ import Shell from '../../layout/Shell';
 export default function Token() {
   return (
     <Shell
-      meta={<Meta title="Token" description="Eden Network Explor Token Page" />}
+      meta={
+        <Meta title="Token" description="Eden Network Explorer Token Page" />
+      }
     />
   );
 }
