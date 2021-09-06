@@ -18,8 +18,9 @@ export default function Footer() {
               </a>
             </Link>
             <p className="text-gray-400 text-base">
-              Eden Network is backed by some of the most trusted crypto projects
-              and largest Block Producers in the world.
+              Eden is a priority transaction network that protects traders from
+              frontrunning, aligns incentives for block producers, and
+              redistributes miner extractable value.
             </p>
             <div className="flex space-x-6">
               <a
@@ -126,7 +127,7 @@ export default function Footer() {
             <div className="md:grid md:grid-cols-2 md:gap-8">
               <div>
                 <h3 className="text-sm font-semibold text-gray-400 tracking-wider uppercase">
-                  Interal
+                  Internal
                 </h3>
                 <ul className="mt-4 space-y-4">
                   <li>
