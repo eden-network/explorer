@@ -8,7 +8,7 @@ export default function HeroStats({
   staked: number;
 }) {
   return (
-    <div className="mt-10 pb-12 sm:pb-16">
+    <div className="mt-6 pb-6 sm:pb-8">
       <div className="relative">
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="max-w-4xl mx-auto">

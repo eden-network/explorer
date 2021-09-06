@@ -1,21 +1,30 @@
 import { useMemo } from 'react';
 
-import { Bar } from 'react-chartjs-2';
+import { Line } from 'react-chartjs-2';
 
-export default function StakedDistribution({ data }) {
+export default function LastWeekPlot({
+  data,
+  label,
+}: {
+  data: number[];
+  label: string;
+}) {
   const chartData = useMemo(() => {
-    const labels = Array.from(Array(100).keys()).map((x) => `${x.toString()}%`);
+    const labels = Array(data.length).fill('');
     return {
       labels,
       datasets: [
         {
-          label: 'Staked EDEN',
+          label,
           data,
-          backgroundColor: '#CAFF00',
+          pointStyle: 'line',
+          borderColor: '#CAFF00',
+          borderWidth: 3,
+          pointRadius: 0,
         },
       ],
     };
-  }, [data]);
+  }, [data, label]);
 
   const chartOptions = useMemo(() => {
     return {
@@ -30,18 +39,17 @@ export default function StakedDistribution({ data }) {
             display: false,
           },
           ticks: {
-            beginAtZero: true,
+            display: false,
           },
         },
         y: {
           grid: {
             display: false,
           },
-          type: 'logarithmic',
         },
       },
     };
   }, []);
 
-  return <Bar data={chartData} options={chartOptions} />;
+  return <Line data={chartData} options={chartOptions} />;
 }

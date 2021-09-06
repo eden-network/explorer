@@ -9,7 +9,7 @@ export default function Shell(props: IMainProps) {
   return (
     <div className="min-h-screen bg-blue-light">
       {props.meta}
-      <div className="py-10 text-white">
+      <div className="py-6 text-white">
         <main>{props.children}</main>
       </div>
     </div>
