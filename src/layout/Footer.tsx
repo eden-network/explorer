@@ -125,7 +125,7 @@ export default function Footer() {
           <div className="mt-12 grid grid-cols-1 gap-8 xl:mt-0 xl:col-span-2 xl:ml-32">
             <div className="md:grid md:grid-cols-2 md:gap-8">
               <div>
-                <h3 className="text-sm font-semibold text-gray-100 tracking-wider uppercase">
+                <h3 className="text-sm font-semibold text-gray-400 tracking-wider uppercase">
                   Interal
                 </h3>
                 <ul className="mt-4 space-y-4">
@@ -149,7 +149,7 @@ export default function Footer() {
                 </ul>
               </div>
               <div className="mt-12 md:mt-0">
-                <h3 className="text-sm font-semibold text-gray-200 tracking-wider uppercase">
+                <h3 className="text-sm font-semibold text-gray-400 tracking-wider uppercase">
                   External
                 </h3>
                 <ul className="mt-4 space-y-4">
