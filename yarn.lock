@@ -84,10 +84,10 @@
   dependencies:
     "@cspotcode/source-map-consumer" "0.8.0"
 
-"@eden-network/data@1.0.6":
-  version "1.0.6"
-  resolved "https://registry.yarnpkg.com/@eden-network/data/-/data-1.0.6.tgz#857fa0cb67c4d38df47790724b44184cda3d3ee6"
-  integrity sha512-USuumyoRovVGjBx1QrC/975PGqNSUoxFBu9Ys4Tv5AhqBVV0kHN5LzxOyJYOcM+hQrdW7B3ZwshMWI59Q1k0EQ==
+"@eden-network/data@1.0.7":
+  version "1.0.7"
+  resolved "https://registry.yarnpkg.com/@eden-network/data/-/data-1.0.7.tgz#de832e4eae2aaf3c51d3f46bfaafd60932890b6a"
+  integrity sha512-nPlfZ/ivXKzDmAeR74U5eykpxcksy6VP0hEio2+K9nH8NkonnGAHGqYl+6GJEkvEEbh/cWm2a/aMw3fLjcFeJw==
   dependencies:
     ethereumjs-util "^7.0.10"
     ethers "^5.3.1"

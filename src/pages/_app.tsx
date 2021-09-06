@@ -2,6 +2,7 @@
 import 'tailwindcss/tailwind.css';
 import NextNprogress from 'nextjs-progressbar';
 
+import Footer from '../layout/Footer';
 import Header from '../layout/Header';
 
 function MyApp({ Component, pageProps }) {
@@ -16,6 +17,7 @@ function MyApp({ Component, pageProps }) {
         showOnShallow
       />
       <Component {...pageProps} />
+      <Footer />
     </>
   );
 }
