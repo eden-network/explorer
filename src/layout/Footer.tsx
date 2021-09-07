@@ -175,7 +175,10 @@ export default function Footer() {
                     </a>
                   </li>
                   <li>
-                    <a className="text-white hover:text-green" href="/faq">
+                    <a
+                      className="text-white hover:text-green"
+                      href="https://edennetwork.io/faq"
+                    >
                       FAQ
                     </a>
                   </li>
