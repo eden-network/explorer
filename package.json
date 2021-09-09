@@ -28,10 +28,10 @@
     "react-chartjs-2": "^3.0.4",
     "react-dom": "^17.0.2",
     "styled-jsx-plugin-postcss": "^4.0.1",
-    "tailwindcss": "^2.2.7"
+    "tailwindcss": "^2.2.7",
+    "@heroicons/react": "^1.0.4"
   },
   "devDependencies": {
-    "@heroicons/react": "^1.0.4",
     "@next/bundle-analyzer": "^11.1.0",
     "@tailwindcss/forms": "^0.3.3",
     "@types/node": "^16.7.1",
