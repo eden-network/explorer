@@ -38,8 +38,8 @@ export default function BlockPagination({
           <FontAwesomeIcon icon="chevron-left" />
         </button>
         <p className="w-14 text-center py-2 mx-1 bg-blue-light text-sm font-medium rounded-md sm:w-28 sm:mx-2">
-          <span className="hidden sm:inline-flex">Page </span>
-          {currentPage} of {maxPage}{' '}
+          <span className="hidden sm:inline-flex">Page</span> {currentPage} of{' '}
+          {maxPage}
         </p>
         <button
           onClick={next}
