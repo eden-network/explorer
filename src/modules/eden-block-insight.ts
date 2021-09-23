@@ -1,3 +1,4 @@
+import { readFromBucket, writeToBucket } from './gcloud-cache';
 import {
   getSlotDelegates,
   getStakersStake,
@@ -7,7 +8,6 @@ import {
   isEdenBlock as checkIfEdenBlock,
 } from './getters';
 import { BNToGwei } from './utils';
-import { readFromBucket, writeToBucket } from './gcloud-cache';
 
 export const getBlockInsight = async (_blockNumber) => {
   const [slotDelegates, stakersStake, blockInfo, bundledTxs, isEdenBlock] =
@@ -20,14 +20,14 @@ export const getBlockInsight = async (_blockNumber) => {
     ]);
   const { transactions } = blockInfo;
   transactions.sort((tx0, tx1) => tx1.transactionIndex - tx0.transactionIndex); // Start at the end
-  let pastStakedTxs = false;
   const labeledTxs = [];
   transactions.forEach((tx) => {
+    const toSlotDelegate = slotDelegates[tx.to.toLowerCase()];
     const bundleIndex = bundledTxs[tx.hash.toLowerCase()];
     const labeledTx = {
+      toSlot: toSlotDelegate !== undefined ? toSlotDelegate : false,
       bundleIndex: bundleIndex !== undefined ? bundleIndex : null,
       senderStake: stakersStake[tx.from.toLowerCase()] || 0,
-      toSlot: slotDelegates.includes(tx.to.toLowerCase()),
       priorityFee: BNToGwei(tx.maxPriorityFee),
       position: tx.transactionIndex,
       nonce: tx.nonce,
@@ -36,10 +36,7 @@ export const getBlockInsight = async (_blockNumber) => {
       to: tx.to,
       type: '',
     };
-    if (labeledTx.senderStake >= 100) {
-      pastStakedTxs = true;
-    }
-    if (isEdenBlock && labeledTx.toSlot) {
+    if (isEdenBlock && labeledTx.toSlot !== false) {
       labeledTx.type = 'slot';
     } else if (labeledTx.bundleIndex !== null) {
       labeledTx.type = 'fb-bundle';
@@ -54,21 +51,18 @@ export const getBlockInsight = async (_blockNumber) => {
 };
 
 export const getBlockInsightAndCache = async (_blockNumber) => {
-  const blockNumberStr = _blockNumber.toString()
+  const blockNumberStr = _blockNumber.toString();
   try {
-      const labeledTxs = await readFromBucket(blockNumberStr)
-      console.log(`Reading cache for block ${_blockNumber}`)
-      return labeledTxs
-  } catch (_) { }
-  console.log(`Fetching data for block ${_blockNumber}`)
-  const labeledTxs = await getBlockInsight(_blockNumber)
-  isBlockSecure(_blockNumber)
-    .then(isSecure => {
-      if (isSecure) {
-        console.log(`Writing data for block ${_blockNumber}`)
-        writeToBucket(blockNumberStr, labeledTxs)
-          .catch((e) => { console.log(`Couldn't write to storage: ${e}`) })
-      }
-  })
-  return labeledTxs
-}
+    const labeledTxs = await readFromBucket(blockNumberStr);
+    return labeledTxs;
+  } catch (_) {} // eslint-disable-line no-empty
+  const labeledTxs = await getBlockInsight(_blockNumber);
+  isBlockSecure(_blockNumber).then((isSecure) => {
+    if (isSecure) {
+      writeToBucket(blockNumberStr, labeledTxs).catch((e) => {
+        console.log(`Couldn't write to storage: ${e}`);
+      });
+    }
+  });
+  return labeledTxs;
+};
