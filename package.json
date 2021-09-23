@@ -19,8 +19,17 @@
   },
   "dependencies": {
     "@eden-network/data": "1.0.8",
+    "@fortawesome/fontawesome-svg-core": "^1.2.36",
+    "@fortawesome/free-brands-svg-icons": "^5.15.4",
+    "@fortawesome/free-solid-svg-icons": "^5.15.4",
+    "@fortawesome/react-fontawesome": "^0.1.15",
+    "@google-cloud/storage": "^5.14.2",
     "chart.js": "^3.5.1",
+    "classnames": "^2.3.1",
+    "crypto-js": "^4.1.1",
+    "ethers": "^5.4.6",
     "javascript-time-ago": "^2.3.8",
+    "moment": "^2.29.1",
     "next": "latest",
     "next-seo": "^4.26.0",
     "nextjs-progressbar": "^0.0.11",
@@ -28,10 +37,10 @@
     "react-chartjs-2": "^3.0.4",
     "react-dom": "^17.0.2",
     "styled-jsx-plugin-postcss": "^4.0.1",
-    "tailwindcss": "^2.2.7",
-    "@heroicons/react": "^1.0.4"
+    "tailwindcss": "^2.2.7"
   },
   "devDependencies": {
+    "@heroicons/react": "^1.0.4",
     "@next/bundle-analyzer": "^11.1.0",
     "@tailwindcss/forms": "^0.3.3",
     "@types/node": "^16.7.1",

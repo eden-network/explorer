@@ -7,6 +7,7 @@ import {
   stakeStats,
   timeseries,
 } from '@eden-network/data';
+// import en from 'javascript-time-ago/locale/en';
 import { useRouter } from 'next/router';
 
 import Blocks from '../components/Blocks';
@@ -18,6 +19,8 @@ import { Meta } from '../layout/Meta';
 import Shell from '../layout/Shell';
 
 const WEI = BigInt('1000000000000000000');
+
+// TimeAgo.addLocale(en);
 
 export default function Home({
   hashRate,

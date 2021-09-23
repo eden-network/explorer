@@ -4,7 +4,17 @@ const forms = require('@tailwindcss/forms');
 
 module.exports = {
   mode: 'jit',
-  purge: ['./pages/**/*.{js,ts,jsx,tsx}', './src/**/*.{js,ts,jsx,tsx}'],
+  purge: {
+    content: ['./pages/**/*.{js,ts,jsx,tsx}', './src/**/*.{js,ts,jsx,tsx}'],
+    safelist: [
+      'text-red',
+      'text-yellow',
+      'text-purple',
+      'text-pink',
+      'text-indigo',
+      'text-gray-300',
+    ],
+  },
   darkMode: false, // or 'media' or 'class'
   theme: {
     colors: {
@@ -22,6 +32,11 @@ module.exports = {
       black: colors.black,
       white: colors.white,
       gray: colors.trueGray,
+      purple: colors.purple['300'],
+      pink: colors.pink['300'],
+      indigo: colors.green['300'],
+      yellow: colors.yellow['300'],
+      red: colors.red['300'],
     },
     fontFamily: {
       sans: ['Titillium Web', 'sans-serif'],
