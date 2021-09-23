@@ -53,7 +53,9 @@ export const getSlotDelegates = async (_blockNumber) => {
     block: _blockNumber,
     network: network as Network,
   });
-  return slotsInfo.map((slot) => slot.delegate);
+  return Object.fromEntries(
+    slotsInfo.map((slotInfo, slotNum) => [slotInfo.delegate, slotNum])
+  );
 };
 
 export const getBundledTxs = async (_blockNumber) => {

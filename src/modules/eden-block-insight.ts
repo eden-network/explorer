@@ -22,11 +22,12 @@ export const getBlockInsight = async (_blockNumber) => {
   transactions.sort((tx0, tx1) => tx1.transactionIndex - tx0.transactionIndex); // Start at the end
   const labeledTxs = [];
   transactions.forEach((tx) => {
+    const toSlotDelegate = slotDelegates[tx.to.toLowerCase()];
     const bundleIndex = bundledTxs[tx.hash.toLowerCase()];
     const labeledTx = {
+      toSlot: toSlotDelegate !== undefined ? toSlotDelegate : false,
       bundleIndex: bundleIndex !== undefined ? bundleIndex : null,
       senderStake: stakersStake[tx.from.toLowerCase()] || 0,
-      toSlot: slotDelegates.includes(tx.to.toLowerCase()),
       priorityFee: BNToGwei(tx.maxPriorityFee),
       position: tx.transactionIndex,
       nonce: tx.nonce,
@@ -35,7 +36,7 @@ export const getBlockInsight = async (_blockNumber) => {
       to: tx.to,
       type: '',
     };
-    if (isEdenBlock && labeledTx.toSlot) {
+    if (isEdenBlock && labeledTx.toSlot !== false) {
       labeledTx.type = 'slot';
     } else if (labeledTx.bundleIndex !== null) {
       labeledTx.type = 'fb-bundle';

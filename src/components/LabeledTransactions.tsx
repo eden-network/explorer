@@ -146,7 +146,7 @@ export default function LabeledTransactions({ labeledTxs }) {
                         {tx.priorityFee}
                       </td>
                       <td className="px-2 sm:px-4 py-4 whitespace-nowrap">
-                        {tx.toSlot ? 'YES' : 'NO'}
+                        {tx.toSlot !== false ? tx.toSlot : 'NO'}
                       </td>
                       <td className="px-2 sm:px-4 py-4 whitespace-nowrap">
                         {tx.bundleIndex !== null ? tx.bundleIndex : 'NO'}
