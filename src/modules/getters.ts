@@ -4,12 +4,12 @@ import { ethers } from 'ethers';
 import { AppConfig } from '../utils/AppConfig';
 import { safeFetch } from './utils';
 
-const { 
+const {
   cacheBlockConfirmations,
   flashbotsAPIEndpoint,
-  providerEndpoint, 
-  proxyAuthToken, 
-  network, 
+  providerEndpoint,
+  proxyAuthToken,
+  network,
 } = AppConfig;
 
 export const provider = new ethers.providers.JsonRpcProvider(
@@ -18,9 +18,9 @@ export const provider = new ethers.providers.JsonRpcProvider(
 );
 
 export const isBlockSecure = async (_blockNumber) => {
-  const blockHeight = await provider.getBlockNumber()
-  return blockHeight >= (_blockNumber + parseInt(cacheBlockConfirmations))
-}
+  const blockHeight = await provider.getBlockNumber();
+  return blockHeight >= _blockNumber + parseInt(cacheBlockConfirmations, 10);
+};
 
 export const isEdenBlock = async (_blockNumber) => {
   const blocksInfo = await edenData.blocks({
