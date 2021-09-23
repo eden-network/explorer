@@ -38,61 +38,61 @@ export default function LabeledTransactions({ labeledTxs }) {
                 <tr>
                   <th
                     scope="col"
-                    className="px-2 sm:px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                    className="py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider"
                   >
                     {isMobile ? '#' : 'TxIndex'}
                   </th>
                   <th
                     scope="col"
-                    className="px-2 sm:px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                    className="px-2 sm:px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider"
                   >
                     TxHash
                   </th>
                   <th
                     scope="col"
-                    className="px-2 sm:px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                    className="px-2 sm:px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider"
                   >
                     From
                   </th>
                   <th
                     scope="col"
-                    className="px-2 sm:px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                    className="px-2 sm:px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider"
                   >
                     To
                   </th>
                   <th
                     scope="col"
-                    className="px-2 sm:px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                    className="px-2 sm:px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider"
                   >
                     Nonce
                   </th>
                   <th
                     scope="col"
-                    className="px-2 sm:px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                    className="px-2 sm:px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider"
                   >
                     Priority Fee
                   </th>
                   <th
                     scope="col"
-                    className="px-2 sm:px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                    className="px-2 sm:px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider"
                   >
                     To Slot
                   </th>
                   <th
                     scope="col"
-                    className="px-2 sm:px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                    className="px-2 sm:px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider"
                   >
                     Bundle Index
                   </th>
                   <th
                     scope="col"
-                    className="px-2 sm:px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                    className="px-2 sm:px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider"
                   >
                     Sender Stake
                   </th>
                   <th
                     scope="col"
-                    className="px-2 sm:px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                    className="px-2 sm:px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider"
                   >
                     Priority By
                   </th>
@@ -103,10 +103,10 @@ export default function LabeledTransactions({ labeledTxs }) {
                   const rowColor = getRowColor(tx);
                   return (
                     <tr key={tx.hash} className={`text-${rowColor}`}>
-                      <td className="px-2 sm:px-4 py-4 whitespace-nowrap">
+                      <td className="py-4 text-center whitespace-nowrap">
                         {tx.position}
                       </td>
-                      <td className="px-2 sm:px-4 py-4 whitespace-nowrap">
+                      <td className="px-2 sm:px-4 py-4 text-center whitespace-nowrap">
                         <a
                           href={`https://etherscan.io/tx/${tx.hash}`}
                           className=" hover:text-green"
@@ -117,7 +117,7 @@ export default function LabeledTransactions({ labeledTxs }) {
                           <FontAwesomeIcon icon="external-link-alt" size="xs" />
                         </a>
                       </td>
-                      <td className="px-2 sm:px-4 py-4 whitespace-nowrap">
+                      <td className="px-2 sm:px-4 py-4 text-center whitespace-nowrap">
                         <a
                           href={`https://etherscan.io/address/${tx.from}`}
                           className="  hover:text-green"
@@ -128,7 +128,7 @@ export default function LabeledTransactions({ labeledTxs }) {
                           <FontAwesomeIcon icon="external-link-alt" size="xs" />
                         </a>
                       </td>
-                      <td className="px-2 sm:px-4 py-4 whitespace-nowrap">
+                      <td className="px-2 sm:px-4 py-4 text-center whitespace-nowrap">
                         <a
                           href={`https://etherscan.io/address/${tx.to}`}
                           className=" hover:text-green"
@@ -139,22 +139,24 @@ export default function LabeledTransactions({ labeledTxs }) {
                           <FontAwesomeIcon icon="external-link-alt" size="xs" />
                         </a>
                       </td>
-                      <td className="px-2 sm:px-4 py-4 whitespace-nowrap">
-                        {tx.nonce}
+                      <td className="px-2 sm:px-4 py-4 text-right whitespace-nowrap">
+                        {tx.nonce.toLocaleString()}
                       </td>
-                      <td className="px-2 sm:px-4 py-4 whitespace-nowrap">
-                        {tx.priorityFee}
+                      <td className="px-2 sm:px-4 py-4 text-right whitespace-nowrap">
+                        {tx.priorityFee.toLocaleString()}
                       </td>
-                      <td className="px-2 sm:px-4 py-4 whitespace-nowrap">
+                      <td className="px-2 sm:px-4 py-4 text-center whitespace-nowrap">
                         {tx.toSlot ? 'YES' : 'NO'}
                       </td>
-                      <td className="px-2 sm:px-4 py-4 whitespace-nowrap">
+                      <td className="px-2 sm:px-4 py-4 text-center whitespace-nowrap">
                         {tx.bundleIndex !== null ? tx.bundleIndex : 'NO'}
                       </td>
-                      <td className="px-2 sm:px-4 py-4 whitespace-nowrap">
-                        {tx.senderStake >= 100 ? tx.senderStake : 'NO'}
+                      <td className="px-2 sm:px-4 py-4 text-center whitespace-nowrap">
+                        {tx.senderStake >= 100
+                          ? tx.senderStake.toLocaleString()
+                          : 'NO'}
                       </td>
-                      <td className="px-2 sm:px-4 py-4 whitespace-nowrap">
+                      <td className="px-2 sm:px-4 py-4 text-center whitespace-nowrap">
                         {AppConfig.labelsToUI[tx.type]}
                       </td>
                     </tr>
