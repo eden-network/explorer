@@ -24,7 +24,7 @@ export const isBlockSecure = async (_blockNumber) => {
   return blockHeight >= _blockNumber + parseInt(cacheBlockConfirmations, 10);
 };
 
-export const isEdenBlock = async (_blockNumber) => {
+export const isFromEdenProducer = async (_blockNumber) => {
   const blocksInfo = await edenData.blocks({
     startBlock: _blockNumber,
     endBlock: _blockNumber,

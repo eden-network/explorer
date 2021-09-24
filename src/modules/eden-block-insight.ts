@@ -1,23 +1,22 @@
 import { readFromBucket, writeToBucket } from './gcloud-cache';
 import {
+  isFromEdenProducer,
   getSlotDelegates,
   getStakersStake,
-  getBlockInfo,
-  getBundledTxs,
   isBlockSecure,
-  isEdenBlock as checkIfEdenBlock,
+  getBundledTxs,
+  getBlockInfo,
 } from './getters';
 import { BNToGwei, makeArrayUnique } from './utils';
 
 export const getBlockInsight = async (_blockNumber) => {
-  const [slotDelegates, blockInfo, bundledTxs, isEdenBlock] = await Promise.all(
-    [
+  const [slotDelegates, blockInfo, bundledTxs, fromEdenProducer] =
+    await Promise.all([
       getSlotDelegates(_blockNumber - 1),
       getBlockInfo(_blockNumber),
       getBundledTxs(_blockNumber),
-      checkIfEdenBlock(_blockNumber),
-    ]
-  );
+      isFromEdenProducer(_blockNumber),
+    ]);
   const { transactions } = blockInfo;
   const uniqueSenders = makeArrayUnique(
     blockInfo.transactions.map((tx) => tx.from)
@@ -40,33 +39,38 @@ export const getBlockInsight = async (_blockNumber) => {
       to: tx.to,
       type: '',
     };
-    if (isEdenBlock && labeledTx.toSlot !== false) {
+    if (fromEdenProducer && labeledTx.toSlot !== false) {
       labeledTx.type = 'slot';
     } else if (labeledTx.bundleIndex !== null) {
       labeledTx.type = 'fb-bundle';
-    } else if (isEdenBlock && labeledTx.senderStake >= 100) {
+    } else if (fromEdenProducer && labeledTx.senderStake >= 100) {
       labeledTx.type = 'stake';
     } else {
       labeledTx.type = 'priority-fee';
     }
     labeledTxs[labeledTx.position] = labeledTx;
   });
-  return labeledTxs;
+  return {
+    ...blockInfo,
+    transactions: labeledTxs,
+    number: _blockNumber,
+    fromEdenProducer,
+  };
 };
 
 export const getBlockInsightAndCache = async (_blockNumber) => {
   const blockNumberStr = _blockNumber.toString();
   try {
-    const labeledTxs = await readFromBucket(blockNumberStr);
-    return labeledTxs;
+    const blockInsight = await readFromBucket(blockNumberStr);
+    return blockInsight;
   } catch (_) {} // eslint-disable-line no-empty
-  const labeledTxs = await getBlockInsight(_blockNumber);
+  const blockInsight = await getBlockInsight(_blockNumber);
   isBlockSecure(_blockNumber).then((isSecure) => {
     if (isSecure) {
-      writeToBucket(blockNumberStr, labeledTxs).catch((e) => {
+      writeToBucket(blockNumberStr, blockInsight).catch((e) => {
         console.log(`Couldn't write to storage: ${e}`); // eslint-disable-line no-console
       });
     }
   });
-  return labeledTxs;
+  return blockInsight;
 };
