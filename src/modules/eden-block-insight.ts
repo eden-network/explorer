@@ -7,18 +7,22 @@ import {
   isBlockSecure,
   isEdenBlock as checkIfEdenBlock,
 } from './getters';
-import { BNToGwei } from './utils';
+import { BNToGwei, makeArrayUnique } from './utils';
 
 export const getBlockInsight = async (_blockNumber) => {
-  const [slotDelegates, stakersStake, blockInfo, bundledTxs, isEdenBlock] =
-    await Promise.all([
+  const [slotDelegates, blockInfo, bundledTxs, isEdenBlock] = await Promise.all(
+    [
       getSlotDelegates(_blockNumber - 1),
-      getStakersStake(_blockNumber - 1),
       getBlockInfo(_blockNumber),
       getBundledTxs(_blockNumber),
       checkIfEdenBlock(_blockNumber),
-    ]);
+    ]
+  );
   const { transactions } = blockInfo;
+  const uniqueSenders = makeArrayUnique(
+    blockInfo.transactions.map((tx) => tx.from)
+  );
+  const stakersStake = await getStakersStake(uniqueSenders, _blockNumber - 1);
   transactions.sort((tx0, tx1) => tx1.transactionIndex - tx0.transactionIndex); // Start at the end
   const labeledTxs = [];
   transactions.forEach((tx) => {
@@ -60,7 +64,7 @@ export const getBlockInsightAndCache = async (_blockNumber) => {
   isBlockSecure(_blockNumber).then((isSecure) => {
     if (isSecure) {
       writeToBucket(blockNumberStr, labeledTxs).catch((e) => {
-        console.log(`Couldn't write to storage: ${e}`);
+        console.log(`Couldn't write to storage: ${e}`); // eslint-disable-line no-console
       });
     }
   });

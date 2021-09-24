@@ -1,11 +1,13 @@
 import edenData, { Network } from '@eden-network/data';
 import { ethers } from 'ethers';
+import { request, gql } from 'graphql-request';
 
 import { AppConfig } from '../utils/AppConfig';
 import { safeFetch } from './utils';
 
 const {
   cacheBlockConfirmations,
+  graphNetworkEndpoint,
   flashbotsAPIEndpoint,
   providerEndpoint,
   proxyAuthToken,
@@ -35,19 +37,6 @@ export const isEdenBlock = async (_blockNumber) => {
   return blocksInfo[0].fromActiveProducer;
 };
 
-export const getStakersStake = async (_blockNumber) => {
-  const weiBN = BigInt(1e18);
-  const stakers = await edenData
-    .stakers({
-      block: _blockNumber,
-      network: network as Network,
-    })
-    .then((res) => res.filter((staker) => staker.staked > 0));
-  return Object.fromEntries(
-    stakers.map((staker) => [staker.id, Number(staker.staked / weiBN)])
-  );
-};
-
 export const getSlotDelegates = async (_blockNumber) => {
   const slotsInfo = await edenData.slots({
     block: _blockNumber,
@@ -55,6 +44,33 @@ export const getSlotDelegates = async (_blockNumber) => {
   });
   return Object.fromEntries(
     slotsInfo.map((slotInfo, slotNum) => [slotInfo.delegate, slotNum])
+  );
+};
+
+export const getStakersStake = async (_accounts, _blockNumber) => {
+  const weiBN = BigInt(1e18);
+  const stakers = await request(
+    graphNetworkEndpoint,
+    gql`{
+          stakers(
+              where: {
+                staked_gte: 100, 
+                id_in: [ ${_accounts
+                  .map((a) => `"${a.toLowerCase()}"`)
+                  .join(',')} ]
+              }, 
+              block: { number: ${_blockNumber} }
+            ) {
+              id
+              staked
+            }
+      }`
+  );
+  return Object.fromEntries(
+    stakers.stakers.map((staker) => [
+      staker.id,
+      Number(BigInt(staker.staked) / weiBN),
+    ])
   );
 };
 

@@ -8,6 +8,8 @@ const toFixedDecimals = (_numStr, _maxDec) => {
   ).toFixed(_maxDec);
 };
 
+export const makeArrayUnique = (a) => a.filter((e, p) => a.indexOf(e) === p);
+
 export const BNToGwei = (_bn) => {
   return toFixedDecimals(ethers.utils.formatUnits(_bn, 'gwei'), 2);
 };
