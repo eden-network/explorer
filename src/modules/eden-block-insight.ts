@@ -31,7 +31,7 @@ export const getBlockInsight = async (_blockNumber) => {
       toSlot: toSlotDelegate !== undefined ? toSlotDelegate : false,
       bundleIndex: bundleIndex !== undefined ? bundleIndex : null,
       senderStake: stakersStake[tx.from.toLowerCase()] || 0,
-      priorityFee: BNToGwei(tx.maxPriorityFee),
+      maxPriorityFee: BNToGwei(tx.maxPriorityFee), // Format for serialization
       position: tx.transactionIndex,
       nonce: tx.nonce,
       hash: tx.hash,
@@ -52,6 +52,7 @@ export const getBlockInsight = async (_blockNumber) => {
   });
   return {
     ...blockInfo,
+    baseFeePerGas: BNToGwei(blockInfo.baseFeePerGas), // Format for serialization
     transactions: labeledTxs,
     number: _blockNumber,
     fromEdenProducer,

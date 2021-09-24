@@ -11,7 +11,7 @@ import LabeledTransactions from '../../components/LabeledTransactions';
 import usePagination from '../../hooks/usePagination.hook';
 import { Meta } from '../../layout/Meta';
 import Shell from '../../layout/Shell';
-import { getBlockInsight } from '../../modules/eden-block-insight';
+import { getBlockInsightAndCache } from '../../modules/eden-block-insight';
 import { NormalizedBlockType } from '../../utils/type';
 
 const PAGE_SIZE = 15;
@@ -145,7 +145,7 @@ const normailizeBlockInfo = (block): NormalizedBlockType => {
 export async function getServerSideProps(context) {
   const blockNum = Number.parseInt(context.query.block, 10);
   try {
-    const blockInsight = await getBlockInsight(blockNum);
+    const blockInsight = await getBlockInsightAndCache(blockNum);
     return {
       props: {
         isEdenBlock: blockInsight.fromEdenProducer,

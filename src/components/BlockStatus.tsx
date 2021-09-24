@@ -2,7 +2,6 @@
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import moment from 'moment';
 
-import { BNToGwei } from '../modules/utils';
 import { NormalizedBlockType } from '../utils/type';
 
 const Container = ({ children }) => (
@@ -51,9 +50,7 @@ export default function BlockStatus({
       </Info.Container>
       <Info.Container>
         <Info.Label>Base-fee</Info.Label>
-        <Info.Description>
-          {BNToGwei(block.baseFeePerGas)} gwei
-        </Info.Description>
+        <Info.Description>{block.baseFeePerGas} gwei</Info.Description>
       </Info.Container>
       <Info.Container>
         <Info.Label>Gas-limit</Info.Label>

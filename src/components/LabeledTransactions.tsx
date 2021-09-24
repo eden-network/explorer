@@ -143,7 +143,7 @@ export default function LabeledTransactions({ labeledTxs }) {
                         {tx.nonce.toLocaleString()}
                       </td>
                       <td className="px-2 sm:px-4 py-4 text-right whitespace-nowrap">
-                        {tx.priorityFee.toLocaleString()}
+                        {tx.maxPriorityFee.toLocaleString()}
                       </td>
                       <td className="px-2 sm:pl-8 py-4 text-center whitespace-nowrap">
                         {tx.toSlot !== false ? tx.toSlot : 'NO'}
