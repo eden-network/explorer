@@ -59,14 +59,14 @@ export default function Block({
           <div className="pb-4">
             <button
               onClick={handleClickPrev}
-              className="mx-3 relative inline-flex items-center px-4 py-2 bg-blue-light text-sm font-medium rounded-md hover:bg-green hover:text-blue cursor-pointer select-none"
+              className="mx-3 relative inline-flex items-center px-4 py-2 bg-blue-light text-sm font-medium rounded-md betterhover:hover:bg-green betterhover:hover:text-blue cursor-pointer select-none"
             >
               Previous
             </button>
             <span className="text-white">{block.number}</span>
             <button
               onClick={handleClickNext}
-              className="mx-3 relative inline-flex items-center px-6 py-2 bg-blue-light text-sm font-medium rounded-md hover:bg-green hover:text-blue cursor-pointer select-none"
+              className="mx-3 relative inline-flex items-center px-6 py-2 bg-blue-light text-sm font-medium rounded-md betterhover:hover:bg-green betterhover:hover:text-blue cursor-pointer select-none"
             >
               Next
             </button>
@@ -100,7 +100,7 @@ export default function Block({
                   onClick={handleClickPrev}
                   onKeyDown={null}
                   tabIndex={0}
-                  className="ml-0 relative inline-flex items-center px-3 py-2 text-sm font-medium rounded-md bg-blue-light hover:bg-green hover:text-blue cursor-pointer select-none"
+                  className="ml-0 relative inline-flex items-center px-3 py-2 text-sm font-medium rounded-md bg-blue-light betterhover:hover:bg-green betterhover:hover:text-blue cursor-pointer select-none"
                 >
                   <FontAwesomeIcon icon="chevron-left" />
                 </a>
@@ -112,7 +112,7 @@ export default function Block({
                   onClick={handleClickNext}
                   onKeyDown={null}
                   tabIndex={0}
-                  className="ml-3 relative inline-flex items-center px-3 py-2 text-sm font-medium rounded-md bg-blue-light hover:bg-green hover:text-blue cursor-pointer select-none"
+                  className="ml-3 relative inline-flex items-center px-3 py-2 text-sm font-medium rounded-md bg-blue-light betterhover:hover:bg-green betterhover:hover:text-blue cursor-pointer select-none"
                 >
                   <FontAwesomeIcon icon="chevron-right" />
                 </a>

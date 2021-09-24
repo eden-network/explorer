@@ -26,14 +26,14 @@ export default function BlockPagination({
         <button
           onClick={begin}
           disabled={currentPage === 1}
-          className="w-14 py-2 mx-1 bg-blue-light text-sm font-medium rounded-md overflow-hidden betterhover:hover:bg-green betterhover:hover:text-blue cursor-pointer select-none betterhover:disabled:opacity-50 betterhover:disabled:bg-blue-light betterhover:disabled:text-white"
+          className="w-14 py-2 mx-1 bg-blue-light text-sm font-medium rounded-md betterhover:hover:bg-green betterhover:hover:text-blue cursor-pointer select-none betterhover:disabled:opacity-50 betterhover:disabled:bg-blue-light betterhover:disabled:text-white"
         >
           First
         </button>
         <button
           onClick={prev}
           disabled={currentPage === 1}
-          className="w-12 py-2 mx-1 bg-blue-light text-sm font-medium rounded-md overflow-hidden betterhover:hover:bg-green betterhover:hover:text-blue cursor-pointer select-none betterhover:disabled:opacity-50 betterhover:disabled:bg-blue-light betterhover:disabled:text-white"
+          className="w-12 py-2 mx-1 bg-blue-light text-sm font-medium rounded-md betterhover:hover:bg-green betterhover:hover:text-blue cursor-pointer select-none betterhover:disabled:opacity-50 betterhover:disabled:bg-blue-light betterhover:disabled:text-white"
         >
           <FontAwesomeIcon icon="chevron-left" />
         </button>
@@ -44,14 +44,14 @@ export default function BlockPagination({
         <button
           onClick={next}
           disabled={currentPage === maxPage}
-          className="w-12 py-2 mx-1 bg-blue-light text-sm font-medium rounded-md overflow-hidden betterhover:hover:bg-green betterhover:hover:text-blue cursor-pointer select-none betterhover:disabled:opacity-50 betterhover:disabled:bg-blue-light betterhover:disabled:text-white"
+          className="w-12 py-2 mx-1 bg-blue-light text-sm font-medium rounded-md betterhover:hover:bg-green betterhover:hover:text-blue cursor-pointer select-none betterhover:disabled:opacity-50 betterhover:disabled:bg-blue-light betterhover:disabled:text-white"
         >
           <FontAwesomeIcon icon="chevron-right" />
         </button>
         <button
           onClick={end}
           disabled={currentPage === maxPage}
-          className="w-14 py-2 mx-1 bg-blue-light text-sm font-medium rounded-md overflow-hidden betterhover:hover:bg-green betterhover:hover:text-blue cursor-pointer select-none betterhover:disabled:opacity-50 betterhover:disabled:bg-blue-light betterhover:disabled:text-white"
+          className="w-14 py-2 mx-1 bg-blue-light text-sm font-medium rounded-md betterhover:hover:bg-green betterhover:hover:text-blue cursor-pointer select-none betterhover:disabled:opacity-50 betterhover:disabled:bg-blue-light betterhover:disabled:text-white"
         >
           End
         </button>
