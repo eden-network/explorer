@@ -5,6 +5,7 @@ import NextNprogress from 'nextjs-progressbar';
 import Footer from '../layout/Footer';
 import Header from '../layout/Header';
 import '../config/fontawsome';
+import '../assets/_app.css';
 
 function MyApp({ Component, pageProps }) {
   return (
