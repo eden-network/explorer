@@ -41,10 +41,12 @@ module.exports = {
     fontFamily: {
       sans: ['Titillium Web', 'sans-serif'],
     },
-    extend: {},
+    extend: {
+      screens: {
+        betterhover: { raw: '(hover: hover)' },
+      },
+    },
   },
-  variants: {
-    extend: {},
-  },
+  variants: {},
   plugins: [forms],
 };
