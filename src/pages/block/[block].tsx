@@ -164,6 +164,7 @@ export async function getServerSideProps(context) {
       },
     };
   } catch (e) {
+    console.log(e); // eslint-disable-line no-console
     return {
       props: {
         labeledTxs: [],
