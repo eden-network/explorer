@@ -168,7 +168,7 @@ export default function LabeledTransactions({
                 {labeledTxs.map((tx) => {
                   const rowColor = getRowColor(tx);
                   return (
-                    <tr key={tx.hash} className={`text-${rowColor}`}>
+                    <tr key={tx.hash} className="text-gray-300">
                       <td className="py-4 text-center whitespace-nowrap">
                         {tx.position}
                       </td>
