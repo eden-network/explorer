@@ -2,6 +2,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 import useWindowSize from '../hooks/useWindowSize.hook';
 import { AppConfig } from '../utils/AppConfig';
+import TableSortLabel from './table/TableSortLabel';
 
 const rowColorSettings = AppConfig.blockInsightRowColorByPriority;
 
@@ -24,7 +25,12 @@ const getRowColor = (tx) => {
   }
 };
 
-export default function LabeledTransactions({ labeledTxs }) {
+export default function LabeledTransactions({
+  labeledTxs,
+  handleRequestSort,
+  orderBy,
+  order,
+}) {
   const { width } = useWindowSize();
   const isMobile = width < AppConfig.breakpoints.small;
 
@@ -40,61 +46,121 @@ export default function LabeledTransactions({ labeledTxs }) {
                     scope="col"
                     className="py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider"
                   >
-                    {isMobile ? '#' : 'TxIndex'}
+                    <TableSortLabel
+                      active={orderBy === 'position'}
+                      direction={order}
+                      onClick={() => handleRequestSort('position')}
+                    >
+                      {isMobile ? '#' : 'TxIndex'}
+                    </TableSortLabel>
                   </th>
                   <th
                     scope="col"
                     className="px-2 sm:px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider"
                   >
-                    TxHash
+                    <TableSortLabel
+                      active={orderBy === 'hash'}
+                      direction={order}
+                      onClick={() => handleRequestSort('hash')}
+                    >
+                      TxHash
+                    </TableSortLabel>
                   </th>
                   <th
                     scope="col"
                     className="px-2 sm:px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider"
                   >
-                    From
+                    <TableSortLabel
+                      active={orderBy === 'from'}
+                      direction={order}
+                      onClick={() => handleRequestSort('from')}
+                    >
+                      From
+                    </TableSortLabel>
                   </th>
                   <th
                     scope="col"
                     className="px-2 sm:pl-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider"
                   >
-                    To
+                    <TableSortLabel
+                      active={orderBy === 'to'}
+                      direction={order}
+                      onClick={() => handleRequestSort('to')}
+                    >
+                      To
+                    </TableSortLabel>
                   </th>
                   <th
                     scope="col"
                     className="px-2 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider"
                   >
-                    Nonce
+                    <TableSortLabel
+                      active={orderBy === 'nonce'}
+                      direction={order}
+                      onClick={() => handleRequestSort('nonce')}
+                    >
+                      Nonce
+                    </TableSortLabel>
                   </th>
                   <th
                     scope="col"
                     className="px-2 sm:px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider"
                   >
-                    Priority Fee
+                    <TableSortLabel
+                      active={orderBy === 'priorityFee'}
+                      direction={order}
+                      onClick={() => handleRequestSort('priorityFee')}
+                    >
+                      Priority Fee
+                    </TableSortLabel>
                   </th>
                   <th
                     scope="col"
                     className="px-2 sm:pl-8 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider"
                   >
-                    To Slot
+                    <TableSortLabel
+                      active={orderBy === 'toSlot'}
+                      direction={order}
+                      onClick={() => handleRequestSort('toSlot')}
+                    >
+                      To Slot
+                    </TableSortLabel>
                   </th>
                   <th
                     scope="col"
                     className="px-2 sm:px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider"
                   >
-                    Bundle Index
+                    <TableSortLabel
+                      active={orderBy === 'bundleIndex'}
+                      direction={order}
+                      onClick={() => handleRequestSort('bundleIndex')}
+                    >
+                      Bundle Index
+                    </TableSortLabel>
                   </th>
                   <th
                     scope="col"
                     className="px-2 sm:px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider"
                   >
-                    Sender Stake
+                    <TableSortLabel
+                      active={orderBy === 'senderStake'}
+                      direction={order}
+                      onClick={() => handleRequestSort('senderStake')}
+                    >
+                      Sender Stake
+                    </TableSortLabel>
                   </th>
                   <th
                     scope="col"
                     className="px-2 sm:px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider"
                   >
-                    Priority By
+                    <TableSortLabel
+                      active={orderBy === 'type'}
+                      direction={order}
+                      onClick={() => handleRequestSort('type')}
+                    >
+                      Priority By
+                    </TableSortLabel>
                   </th>
                 </tr>
               </thead>
@@ -146,18 +212,22 @@ export default function LabeledTransactions({ labeledTxs }) {
                         {tx.priorityFee.toLocaleString()}
                       </td>
                       <td className="px-2 sm:pl-8 py-4 text-center whitespace-nowrap">
-                        {tx.toSlot !== false ? tx.toSlot : 'NO'}
+                        {tx.toSlot !== false ? tx.toSlot : ''}
                       </td>
                       <td className="px-2 sm:px-4 py-4 text-center whitespace-nowrap">
-                        {tx.bundleIndex !== null ? tx.bundleIndex : 'NO'}
+                        {tx.bundleIndex !== null ? tx.bundleIndex : ''}
                       </td>
                       <td className="px-2 sm:px-4 py-4 text-center whitespace-nowrap">
                         {tx.senderStake >= 100
                           ? tx.senderStake.toLocaleString()
-                          : 'NO'}
+                          : ''}
                       </td>
                       <td className="px-2 sm:px-4 py-4 text-center whitespace-nowrap">
-                        {AppConfig.labelsToUI[tx.type]}
+                        <span
+                          className={`w-28 rounded-3xl py-3 bg-${rowColor} inline-block text-xs text-bold text-blue-light shadow-sm`}
+                        >
+                          {AppConfig.labelsToUI[tx.type]}
+                        </span>
                       </td>
                     </tr>
                   );
