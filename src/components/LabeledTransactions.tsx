@@ -222,9 +222,9 @@ export default function LabeledTransactions({
                           ? tx.senderStake.toLocaleString()
                           : ''}
                       </td>
-                      <td className="px-2 sm:px-4 py-4 text-center whitespace-nowrap">
+                      <td className="px-2 sm:px-4 py-2 text-center whitespace-nowrap">
                         <span
-                          className={`w-28 rounded-3xl py-3 bg-${rowColor} inline-block text-xs text-bold text-blue-light shadow-sm`}
+                          className={`w-28 rounded-3xl py-2 bg-${rowColor} inline-block text-xs text-bold text-blue-light shadow-sm`}
                         >
                           {AppConfig.labelsToUI[tx.type]}
                         </span>
