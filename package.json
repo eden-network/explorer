@@ -18,7 +18,7 @@
     "prepare": "husky install"
   },
   "dependencies": {
-    "@eden-network/data": "1.0.8",
+    "@eden-network/data": "1.0.7",
     "chart.js": "^3.5.1",
     "javascript-time-ago": "^2.3.8",
     "next": "latest",

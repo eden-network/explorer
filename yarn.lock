@@ -84,14 +84,14 @@
   dependencies:
     "@cspotcode/source-map-consumer" "0.8.0"
 
-"@eden-network/data@1.0.8":
-  version "1.0.8"
-  resolved "https://registry.yarnpkg.com/@eden-network/data/-/data-1.0.8.tgz#5d8f79a2547c0cbffec77e5d16d77b252e3d91c9"
-  integrity sha512-n7x1WBjGomnh4KZCaftugUsae+J7ZeaDHWBeiTlH05rllzjyFDqF48LMr6Ta4FD+v+Z/ULfaT23qnjmT5/AXAQ==
+"@eden-network/data@1.0.7":
+  version "1.0.7"
+  resolved "https://registry.yarnpkg.com/@eden-network/data/-/data-1.0.7.tgz#de832e4eae2aaf3c51d3f46bfaafd60932890b6a"
+  integrity sha512-nPlfZ/ivXKzDmAeR74U5eykpxcksy6VP0hEio2+K9nH8NkonnGAHGqYl+6GJEkvEEbh/cWm2a/aMw3fLjcFeJw==
   dependencies:
     ethereumjs-util "^7.0.10"
     ethers "^5.3.1"
-    graph-results-pager "https://github.com/chpiatt/graph-results-pager"
+    graph-results-pager "https://github.com/LufyCZ/graph-results-pager"
     graphql "^15.5.1"
     graphql-request "^3.4.0"
     ts-node "^10.0.0"
@@ -2415,14 +2415,13 @@ graceful-fs@^4.1.2, graceful-fs@^4.1.6, graceful-fs@^4.2.0:
   resolved "https://registry.yarnpkg.com/graceful-fs/-/graceful-fs-4.2.8.tgz#e412b8d33f5e006593cbd3cee6df9f2cebbe802a"
   integrity sha512-qkIilPUYcNhJpd33n0GBXTB1MMPp14TxEsEs0pTrsSVucApsYzW5V+Q8Qxhik6KU3evy+qkAAowTByymK0avdg==
 
-"graph-results-pager@https://github.com/chpiatt/graph-results-pager":
-  version "1.0.7"
-  resolved "https://github.com/chpiatt/graph-results-pager#d872f263718bbeacdb31e39a9acc770584d9e6fd"
+"graph-results-pager@https://github.com/LufyCZ/graph-results-pager":
+  version "1.0.3"
+  resolved "https://github.com/LufyCZ/graph-results-pager#9b230f05b8d79aeedc9e167ac5a1fea33e04d51f"
   dependencies:
-    graphql "^15.5.3"
-    graphql-request "^3.5.0"
+    node-fetch "2.6.1"
 
-graphql-request@^3.4.0, graphql-request@^3.5.0:
+graphql-request@^3.4.0:
   version "3.5.0"
   resolved "https://registry.yarnpkg.com/graphql-request/-/graphql-request-3.5.0.tgz#7e69574e15875fb3f660a4b4be3996ecd0bbc8b7"
   integrity sha512-Io89QpfU4rqiMbqM/KwMBzKaDLOppi8FU8sEccCE4JqCgz95W9Q8bvxQ4NfPALLSMvg9nafgg8AkYRmgKSlukA==
@@ -2435,11 +2434,6 @@ graphql@^15.5.1:
   version "15.5.1"
   resolved "https://registry.yarnpkg.com/graphql/-/graphql-15.5.1.tgz#f2f84415d8985e7b84731e7f3536f8bb9d383aad"
   integrity sha512-FeTRX67T3LoE3LWAxxOlW2K3Bz+rMYAC18rRguK4wgXaTZMiJwSUwDmPFo3UadAKbzirKIg5Qy+sNJXbpPRnQw==
-
-graphql@^15.5.3:
-  version "15.6.0"
-  resolved "https://registry.yarnpkg.com/graphql/-/graphql-15.6.0.tgz#e69323c6a9780a1a4b9ddf7e35ca8904bb04df02"
-  integrity sha512-WJR872Zlc9hckiEPhXgyUftXH48jp2EjO5tgBBOyNMRJZ9fviL2mJBD6CAysk6N5S0r9BTs09Qk39nnJBkvOXQ==
 
 gzip-size@^6.0.0:
   version "6.0.0"
