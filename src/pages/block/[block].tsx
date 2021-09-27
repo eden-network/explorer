@@ -48,7 +48,14 @@ export default function Block({
     setOrderBy(property);
   };
 
-  const sortedRows = stableSort(labeledTxs, getSorting(order, orderBy));
+  const parsedTxs = labeledTxs.map((v) => {
+    return {
+      ...v,
+      parsedMaxPriorityFee: parseFloat(v.maxPriorityFee),
+    };
+  });
+
+  const sortedRows = stableSort(parsedTxs, getSorting(order, orderBy));
   const currentTxs = sortedRows.slice(
     (currentPage - 1) * PAGE_SIZE,
     currentPage * PAGE_SIZE

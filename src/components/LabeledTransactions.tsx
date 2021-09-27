@@ -107,9 +107,9 @@ export default function LabeledTransactions({
                     className="px-2 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider"
                   >
                     <TableSortLabel
-                      active={orderBy === 'maxPriorityFee'}
+                      active={orderBy === 'parsedMaxPriorityFee'}
                       direction={order}
-                      onClick={() => handleRequestSort('maxPriorityFee')}
+                      onClick={() => handleRequestSort('parsedMaxPriorityFee')}
                     >
                       Priority Fee
                     </TableSortLabel>
