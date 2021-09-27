@@ -12,7 +12,7 @@ const Label = ({ children }) => (
   <span className="pr-1 sm:text-sm text-gray-500">{children}:</span>
 );
 const Description = ({ children }) => (
-  <span className=" text-gray-100">{children}</span>
+  <span className=" text-gray-200">{children}</span>
 );
 const Info = { Container, Label, Description };
 
@@ -24,7 +24,7 @@ export default function BlockStatus({
   isEdenBlock: any;
 }) {
   return (
-    <div className="text-small font-medium text-gray-200 sm:flex sm:flex-wrap sm:justify-between">
+    <div className="text-small font-medium sm:flex sm:flex-wrap sm:justify-between">
       <Info.Container>
         <Info.Label>Eden Producer</Info.Label>
         <Info.Description>{isEdenBlock ? 'YES' : 'NO'}</Info.Description>
@@ -45,7 +45,9 @@ export default function BlockStatus({
             rel="noreferrer"
           >
             {getMinerAlias(block.miner) || `${block.miner.slice(0, 6)}...`}{' '}
-            <FontAwesomeIcon icon="external-link-alt" size="xs" />
+            <sup>
+              <FontAwesomeIcon icon="external-link-alt" size="xs" />
+            </sup>
           </a>
         </Info.Description>
       </Info.Container>
@@ -65,7 +67,10 @@ export default function BlockStatus({
             target="_blank"
             rel="noreferrer"
           >
-            See block on Etherscan
+            See block on Etherscan{' '}
+            <sup>
+              <FontAwesomeIcon icon="external-link-alt" size="xs" />
+            </sup>
           </a>
         </Info.Description>
       </Info.Container>

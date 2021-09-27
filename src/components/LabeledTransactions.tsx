@@ -7,10 +7,13 @@ import TableSortLabel from './table/TableSortLabel';
 const rowColorSettings = AppConfig.blockInsightRowColorByPriority;
 
 const formatTxHash = (tx) => {
-  return `${tx.slice(0, 6)}...`;
+  return `${tx.slice(0, 4)}...${tx.slice(tx.length - 4, tx.length)}`;
 };
 const formatAddress = (address) => {
-  return `${address.slice(0, 6)}...`;
+  return `${address.slice(0, 4)}...${address.slice(
+    address.length - 4,
+    address.length
+  )}`;
 };
 
 const getRowColor = (tx) => {
@@ -185,7 +188,12 @@ export default function LabeledTransactions({
                           rel="noreferrer"
                         >
                           {formatTxHash(tx.hash)}{' '}
-                          <FontAwesomeIcon icon="external-link-alt" size="xs" />
+                          <sup>
+                            <FontAwesomeIcon
+                              icon="external-link-alt"
+                              size="xs"
+                            />
+                          </sup>
                         </a>
                       </td>
                       <td className="px-2 sm:px-4 py-4 text-center whitespace-nowrap">
@@ -196,7 +204,12 @@ export default function LabeledTransactions({
                           rel="noreferrer"
                         >
                           {miner === tx.from ? 'Miner' : formatAddress(tx.from)}{' '}
-                          <FontAwesomeIcon icon="external-link-alt" size="xs" />
+                          <sup>
+                            <FontAwesomeIcon
+                              icon="external-link-alt"
+                              size="xs"
+                            />
+                          </sup>
                         </a>
                       </td>
                       <td className="px-2 sm:pl-4 py-4 text-center whitespace-nowrap">
@@ -207,7 +220,12 @@ export default function LabeledTransactions({
                           rel="noreferrer"
                         >
                           {miner === tx.to ? 'Miner' : formatAddress(tx.to)}{' '}
-                          <FontAwesomeIcon icon="external-link-alt" size="xs" />
+                          <sup>
+                            <FontAwesomeIcon
+                              icon="external-link-alt"
+                              size="xs"
+                            />
+                          </sup>
                         </a>
                       </td>
                       <td className="px-2 py-4 text-right whitespace-nowrap">
