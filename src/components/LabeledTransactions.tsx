@@ -7,10 +7,13 @@ import TableSortLabel from './table/TableSortLabel';
 const rowColorSettings = AppConfig.blockInsightRowColorByPriority;
 
 const formatTxHash = (tx) => {
-  return `${tx.slice(0, 6)}...`;
+  return `${tx.slice(0, 4)}...${tx.slice(tx.length - 4, tx.length)}`;
 };
 const formatAddress = (address) => {
-  return `${address.slice(0, 6)}...`;
+  return `${address.slice(0, 6)}...${address.slice(
+    address.length - 4,
+    address.length
+  )}`;
 };
 
 const getRowColor = (tx) => {
@@ -105,19 +108,35 @@ export default function LabeledTransactions({
                   </th>
                   <th
                     scope="col"
-                    className="px-2 sm:px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider"
+                    className="px-2 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider"
                   >
                     <TableSortLabel
-                      active={orderBy === 'priorityFee'}
+                      active={orderBy === 'parsedMaxPriorityFee'}
                       direction={order}
-                      onClick={() => handleRequestSort('priorityFee')}
+                      onClick={() => handleRequestSort('parsedMaxPriorityFee')}
                     >
                       Priority Fee
                     </TableSortLabel>
                   </th>
                   <th
                     scope="col"
-                    className="px-2 sm:pl-8 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider"
+                    className="px-2 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  >
+                    <span className="flex float-right">
+                      <span className="w-28">
+                        <TableSortLabel
+                          active={orderBy === 'type'}
+                          direction={order}
+                          onClick={() => handleRequestSort('type')}
+                        >
+                          Priority By
+                        </TableSortLabel>
+                      </span>
+                    </span>
+                  </th>
+                  <th
+                    scope="col"
+                    className="px-2 py-1 sm:px-4 text-center text-xs font-medium text-gray-500 uppercase tracking-wider w-1/100"
                   >
                     <TableSortLabel
                       active={orderBy === 'toSlot'}
@@ -129,7 +148,7 @@ export default function LabeledTransactions({
                   </th>
                   <th
                     scope="col"
-                    className="px-2 sm:px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider"
+                    className="px-2 py-1 sm:px-4 text-center text-xs font-medium text-gray-500 uppercase tracking-wider w-1/100"
                   >
                     <TableSortLabel
                       active={orderBy === 'bundleIndex'}
@@ -141,7 +160,7 @@ export default function LabeledTransactions({
                   </th>
                   <th
                     scope="col"
-                    className="px-2 sm:px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider"
+                    className="px-2 py-1 sm:px-4 text-center text-xs font-medium text-gray-500 uppercase tracking-wider w-1/100"
                   >
                     <TableSortLabel
                       active={orderBy === 'senderStake'}
@@ -149,18 +168,6 @@ export default function LabeledTransactions({
                       onClick={() => handleRequestSort('senderStake')}
                     >
                       Sender Stake
-                    </TableSortLabel>
-                  </th>
-                  <th
-                    scope="col"
-                    className="px-2 sm:px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider"
-                  >
-                    <TableSortLabel
-                      active={orderBy === 'type'}
-                      direction={order}
-                      onClick={() => handleRequestSort('type')}
-                    >
-                      Priority By
                     </TableSortLabel>
                   </th>
                 </tr>
@@ -181,7 +188,12 @@ export default function LabeledTransactions({
                           rel="noreferrer"
                         >
                           {formatTxHash(tx.hash)}{' '}
-                          <FontAwesomeIcon icon="external-link-alt" size="xs" />
+                          <sup>
+                            <FontAwesomeIcon
+                              icon="external-link-alt"
+                              size="xs"
+                            />
+                          </sup>
                         </a>
                       </td>
                       <td className="px-2 sm:px-4 py-4 text-center whitespace-nowrap">
@@ -192,7 +204,12 @@ export default function LabeledTransactions({
                           rel="noreferrer"
                         >
                           {miner === tx.from ? 'Miner' : formatAddress(tx.from)}{' '}
-                          <FontAwesomeIcon icon="external-link-alt" size="xs" />
+                          <sup>
+                            <FontAwesomeIcon
+                              icon="external-link-alt"
+                              size="xs"
+                            />
+                          </sup>
                         </a>
                       </td>
                       <td className="px-2 sm:pl-4 py-4 text-center whitespace-nowrap">
@@ -203,32 +220,37 @@ export default function LabeledTransactions({
                           rel="noreferrer"
                         >
                           {miner === tx.to ? 'Miner' : formatAddress(tx.to)}{' '}
-                          <FontAwesomeIcon icon="external-link-alt" size="xs" />
+                          <sup>
+                            <FontAwesomeIcon
+                              icon="external-link-alt"
+                              size="xs"
+                            />
+                          </sup>
                         </a>
                       </td>
                       <td className="px-2 py-4 text-right whitespace-nowrap">
                         {tx.nonce.toLocaleString()}
                       </td>
-                      <td className="px-2 sm:px-4 py-4 text-right whitespace-nowrap">
+                      <td className="px-2 py-4 text-right whitespace-nowrap">
                         {tx.maxPriorityFee.toLocaleString()}
                       </td>
-                      <td className="px-2 sm:pl-8 py-4 text-center whitespace-nowrap">
-                        {tx.toSlot !== false ? tx.toSlot : ''}
-                      </td>
-                      <td className="px-2 sm:px-4 py-4 text-center whitespace-nowrap">
-                        {tx.bundleIndex !== null ? tx.bundleIndex : ''}
-                      </td>
-                      <td className="px-2 sm:px-4 py-4 text-center whitespace-nowrap">
-                        {tx.senderStake >= 100
-                          ? tx.senderStake.toLocaleString()
-                          : ''}
-                      </td>
-                      <td className="px-2 sm:px-4 py-2 text-center whitespace-nowrap">
+                      <td className="px-2 py-3 flex float-right text-center whitespace-nowrap">
                         <span
                           className={`w-28 rounded-3xl py-2 bg-${rowColor} inline-block text-xs text-bold text-blue-light shadow-sm font-bold`}
                         >
                           {AppConfig.labelsToUI[tx.type]}
                         </span>
+                      </td>
+                      <td className="px-2 sm:px-4 py-4 text-center whitespace-nowrap w-1/100">
+                        {tx.toSlot !== false ? tx.toSlot : ''}
+                      </td>
+                      <td className="px-2 sm:px-4 py-4 text-center whitespace-nowrap w-1/100">
+                        {tx.bundleIndex !== null ? tx.bundleIndex : ''}
+                      </td>
+                      <td className="px-2 sm:px-4 py-4 text-center whitespace-nowrap w-1/100">
+                        {tx.senderStake >= 100
+                          ? tx.senderStake.toLocaleString()
+                          : ''}
                       </td>
                     </tr>
                   );

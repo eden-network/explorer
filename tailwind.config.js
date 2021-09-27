@@ -51,6 +51,9 @@ module.exports = {
       screens: {
         betterhover: { raw: '(hover: hover)' },
       },
+      width: {
+        '1/100': '7%',
+      },
     },
   },
   variants: {},
