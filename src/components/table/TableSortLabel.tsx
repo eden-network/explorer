@@ -20,18 +20,20 @@ export default function TableSortLabel({
 }: TableSortLabelProps) {
   return (
     <span
-      className={cx('cursor-pointer select-none', {
+      className={cx('cursor-pointer select-none inline-flex items-center', {
         'text-green': active && !hideSortIcon,
       })}
       onClick={onClick}
     >
-      {children}
-      {!hideSortIcon && active && direction === 'asc' && (
-        <FontAwesomeIcon icon="long-arrow-alt-up" className="ml-1" />
-      )}
-      {!hideSortIcon && active && direction === 'desc' && (
-        <FontAwesomeIcon icon="long-arrow-alt-down" className="ml-1" />
-      )}
+      <span className="inline-block">{children}</span>
+      <span className="inline-block">
+        {!hideSortIcon && active && direction === 'asc' && (
+          <FontAwesomeIcon icon="long-arrow-alt-up" className="ml-1" />
+        )}
+        {!hideSortIcon && active && direction === 'desc' && (
+          <FontAwesomeIcon icon="long-arrow-alt-down" className="ml-1" />
+        )}
+      </span>
     </span>
   );
 }
