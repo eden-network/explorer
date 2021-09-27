@@ -13,6 +13,12 @@ module.exports = {
       'text-pink',
       'text-indigo',
       'text-gray-300',
+      'bg-red',
+      'bg-yellow',
+      'bg-purple',
+      'bg-pink',
+      'bg-indigo',
+      'bg-gray-300',
     ],
   },
   darkMode: false, // or 'media' or 'class'

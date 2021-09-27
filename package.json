@@ -30,6 +30,7 @@
     "ethers": "^5.4.6",
     "graphql-request": "^3.5.0",
     "javascript-time-ago": "^2.3.8",
+    "lodash.get": "^4.4.2",
     "moment": "^2.29.1",
     "next": "latest",
     "next-seo": "^4.26.0",

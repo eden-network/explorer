@@ -6,6 +6,16 @@ import {
   faCheck,
   faTimes,
   faExternalLinkAlt,
+  faLongArrowAltUp,
+  faLongArrowAltDown,
 } from '@fortawesome/free-solid-svg-icons';
 
-library.add(faChevronRight, faChevronLeft, faCheck, faTimes, faExternalLinkAlt);
+library.add(
+  faChevronRight,
+  faChevronLeft,
+  faCheck,
+  faTimes,
+  faExternalLinkAlt,
+  faLongArrowAltUp,
+  faLongArrowAltDown
+);

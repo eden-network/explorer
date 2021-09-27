@@ -1,5 +1,5 @@
 /* eslint-disable react/button-has-type */
-import { useCallback } from 'react';
+import { useCallback, useState } from 'react';
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useRouter } from 'next/router';
@@ -12,6 +12,7 @@ import usePagination from '../../hooks/usePagination.hook';
 import { Meta } from '../../layout/Meta';
 import Shell from '../../layout/Shell';
 import { getBlockInsightAndCache } from '../../modules/eden-block-insight';
+import { stableSort, getSorting } from '../../modules/table/sort';
 import { NormalizedBlockType } from '../../utils/type';
 
 const PAGE_SIZE = 15;
@@ -34,7 +35,21 @@ export default function Block({
     labeledTxs.length,
     PAGE_SIZE
   );
-  const currentTxs = labeledTxs.slice(
+  const [order, setOrder] = useState('asc');
+  const [orderBy, setOrderBy] = useState('position');
+
+  const handleRequestSort = (property) => {
+    let newOrder = 'asc';
+
+    if (orderBy === property && order === 'asc') {
+      newOrder = 'desc';
+    }
+    setOrder(newOrder);
+    setOrderBy(property);
+  };
+
+  const sortedRows = stableSort(labeledTxs, getSorting(order, orderBy));
+  const currentTxs = sortedRows.slice(
     (currentPage - 1) * PAGE_SIZE,
     currentPage * PAGE_SIZE
   );
@@ -115,7 +130,12 @@ export default function Block({
               <BlockStatus block={block} isEdenBlock={isEdenBlock} />
             </div>
             <div className="flex-1 mt-4">
-              <LabeledTransactions labeledTxs={currentTxs} />
+              <LabeledTransactions
+                labeledTxs={currentTxs}
+                handleRequestSort={handleRequestSort}
+                orderBy={orderBy}
+                order={order}
+              />
             </div>
             <BlockPagination
               prev={prev}
