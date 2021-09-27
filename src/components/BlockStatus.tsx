@@ -12,7 +12,7 @@ const Label = ({ children }) => (
   <span className="pr-1 sm:text-sm text-gray-500">{children}:</span>
 );
 const Description = ({ children }) => (
-  <span className=" text-gray-200">{children}</span>
+  <span className=" text-gray-300">{children}</span>
 );
 const Info = { Container, Label, Description };
 

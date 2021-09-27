@@ -10,7 +10,7 @@ const formatTxHash = (tx) => {
   return `${tx.slice(0, 4)}...${tx.slice(tx.length - 4, tx.length)}`;
 };
 const formatAddress = (address) => {
-  return `${address.slice(0, 4)}...${address.slice(
+  return `${address.slice(0, 6)}...${address.slice(
     address.length - 4,
     address.length
   )}`;
