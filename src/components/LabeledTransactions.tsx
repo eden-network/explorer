@@ -116,7 +116,7 @@ export default function LabeledTransactions({
                   </th>
                   <th
                     scope="col"
-                    className=" px-2 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider"
+                    className="px-2 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider"
                   >
                     <span className="flex float-right">
                       <span className="w-28">
@@ -132,7 +132,7 @@ export default function LabeledTransactions({
                   </th>
                   <th
                     scope="col"
-                    className="px-2 py-1 text-center text-xs font-medium text-gray-500 uppercase tracking-wider w-1/100"
+                    className="px-2 py-1 sm:px-4 text-center text-xs font-medium text-gray-500 uppercase tracking-wider w-1/100"
                   >
                     <TableSortLabel
                       active={orderBy === 'toSlot'}
@@ -144,7 +144,7 @@ export default function LabeledTransactions({
                   </th>
                   <th
                     scope="col"
-                    className="px-2 py-1 text-center text-xs font-medium text-gray-500 uppercase tracking-wider w-1/100"
+                    className="px-2 py-1 sm:px-4 text-center text-xs font-medium text-gray-500 uppercase tracking-wider w-1/100"
                   >
                     <TableSortLabel
                       active={orderBy === 'bundleIndex'}
@@ -156,7 +156,7 @@ export default function LabeledTransactions({
                   </th>
                   <th
                     scope="col"
-                    className="px-2 py-1 sm:pr-4 text-center text-xs font-medium text-gray-500 uppercase tracking-wider w-1/100"
+                    className="px-2 py-1 sm:px-4 text-center text-xs font-medium text-gray-500 uppercase tracking-wider w-1/100"
                   >
                     <TableSortLabel
                       active={orderBy === 'senderStake'}
@@ -222,13 +222,13 @@ export default function LabeledTransactions({
                           {AppConfig.labelsToUI[tx.type]}
                         </span>
                       </td>
-                      <td className="px-2 py-4 text-center whitespace-nowrap w-1/100">
+                      <td className="px-2 sm:px-4 py-4 text-center whitespace-nowrap w-1/100">
                         {tx.toSlot !== false ? tx.toSlot : ''}
                       </td>
-                      <td className="px-2 py-4 text-center whitespace-nowrap w-1/100">
+                      <td className="px-2 sm:px-4 py-4 text-center whitespace-nowrap w-1/100">
                         {tx.bundleIndex !== null ? tx.bundleIndex : ''}
                       </td>
-                      <td className="px-2 sm:pr-4 py-4 text-center whitespace-nowrap w-1/100">
+                      <td className="px-2 sm:px-4 py-4 text-center whitespace-nowrap w-1/100">
                         {tx.senderStake >= 100
                           ? tx.senderStake.toLocaleString()
                           : ''}
