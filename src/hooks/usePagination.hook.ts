@@ -8,6 +8,10 @@ function usePagination(totalCount, itemsPerPage) {
     setCurrentPage(Math.min(currentPage + 1, maxPage));
   };
 
+  const resetCurrentPage = () => {
+    setCurrentPage(1);
+  };
+
   const prev = () => {
     setCurrentPage(Math.max(currentPage - 1, 1));
   };
@@ -24,7 +28,7 @@ function usePagination(totalCount, itemsPerPage) {
     setCurrentPage(1);
   }, [totalCount]);
 
-  return { next, prev, begin, end, maxPage, currentPage };
+  return { next, prev, begin, end, maxPage, currentPage, resetCurrentPage };
 }
 
 export default usePagination;

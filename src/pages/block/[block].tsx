@@ -31,10 +31,8 @@ export default function Block({
   isValidBlock,
 }: BlockProps) {
   const router = useRouter();
-  const { next, prev, begin, end, maxPage, currentPage } = usePagination(
-    labeledTxs.length,
-    PAGE_SIZE
-  );
+  const { next, prev, begin, end, maxPage, currentPage, resetCurrentPage } =
+    usePagination(labeledTxs.length, PAGE_SIZE);
   const [order, setOrder] = useState('asc');
   const [orderBy, setOrderBy] = useState('position');
 
@@ -46,6 +44,7 @@ export default function Block({
     }
     setOrder(newOrder);
     setOrderBy(property);
+    resetCurrentPage();
   };
 
   const parsedTxs = labeledTxs.map((v) => {
