@@ -114,7 +114,7 @@ export default function Block({
                 >
                   <FontAwesomeIcon icon="chevron-left" />
                 </a>
-                <span className="ml-3 relative inline-flex font-bold py-2 px-4">
+                <span className="ml-0 relative inline-flex font-bold py-2 px-4">
                   {block.number}
                 </span>
                 <a
@@ -122,7 +122,7 @@ export default function Block({
                   onClick={handleClickNext}
                   onKeyDown={null}
                   tabIndex={0}
-                  className="ml-3 relative inline-flex items-center px-3 py-2 text-sm font-medium rounded-md bg-blue-light betterhover:hover:bg-green betterhover:hover:text-blue cursor-pointer select-none"
+                  className="ml-0 relative inline-flex items-center px-3 py-2 text-sm font-medium rounded-md bg-blue-light betterhover:hover:bg-green betterhover:hover:text-blue cursor-pointer select-none"
                 >
                   <FontAwesomeIcon icon="chevron-right" />
                 </a>

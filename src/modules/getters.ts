@@ -12,6 +12,7 @@ const {
   flashbotsAPIEndpoint,
   providerEndpoint,
   proxyAuthToken,
+  minerAlias,
   network,
 } = AppConfig;
 
@@ -127,4 +128,8 @@ export const getBlockInfo = async (_blockNumber) => {
     gasUsed,
     miner,
   };
+};
+
+export const getMinerAlias = (_minerAddress) => {
+  return minerAlias[_minerAddress.toLowerCase()] || null;
 };
