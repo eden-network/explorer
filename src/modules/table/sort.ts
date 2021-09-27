@@ -4,8 +4,8 @@ const desc = (a, b, orderBy) => {
   const aValue = get(a, orderBy);
   const bValue = get(b, orderBy);
 
-  if (!bValue || bValue === '') return -1;
-  if (!aValue || aValue === '') return 1;
+  if (bValue === undefined || bValue === '') return -1;
+  if (aValue === undefined || aValue === '') return 1;
 
   if (bValue < aValue) {
     return -1;
@@ -20,8 +20,8 @@ const asc = (a, b, orderBy) => {
   const aValue = get(a, orderBy);
   const bValue = get(b, orderBy);
 
-  if (!bValue || bValue === '') return -1;
-  if (!aValue || aValue === '') return 1;
+  if (bValue === undefined || bValue === '') return -1;
+  if (aValue === undefined || aValue === '') return 1;
   return -desc(a, b, orderBy);
 };
 
