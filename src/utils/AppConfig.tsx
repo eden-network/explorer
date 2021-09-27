@@ -28,4 +28,14 @@ export const AppConfig = {
   breakpoints: {
     small: 575,
   },
+  cacheBlockInsightParams: {
+    fromEdenProducer: 'boolean',
+    baseFeePerGas: 'string',
+    transactions: 'object',
+    timestamp: 'number',
+    gasLimit: 'number',
+    gasUsed: 'number',
+    number: 'number',
+    miner: 'string',
+  },
 };

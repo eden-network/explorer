@@ -1,6 +1,7 @@
 import { readFromBucket, writeToBucket } from './gcloud-cache';
 import {
   isFromEdenProducer,
+  checkIfValidCache,
   getSlotDelegates,
   getStakersStake,
   isBlockSecure,
@@ -63,13 +64,18 @@ export const getBlockInsightAndCache = async (_blockNumber) => {
   const blockNumberStr = _blockNumber.toString();
   try {
     const blockInsight = await readFromBucket(blockNumberStr);
+    // Check cache validity
+    if (!checkIfValidCache(blockInsight)) {
+      console.log('Invalid cache');
+      throw new Error('Invalid cache');
+    }
     return blockInsight;
   } catch (_) {} // eslint-disable-line no-empty
   const blockInsight = await getBlockInsight(_blockNumber);
   isBlockSecure(_blockNumber).then((isSecure) => {
     if (isSecure) {
       writeToBucket(blockNumberStr, blockInsight).catch((e) => {
-        console.log(`Couldn't write to storage: ${e}`); // eslint-disable-line no-console
+        console.log(`Couldn't write to storage:`, e); // eslint-disable-line no-console
       });
     }
   });

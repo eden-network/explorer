@@ -7,6 +7,7 @@ import { safeFetch } from './utils';
 
 const {
   cacheBlockConfirmations,
+  cacheBlockInsightParams,
   graphNetworkEndpoint,
   flashbotsAPIEndpoint,
   providerEndpoint,
@@ -18,6 +19,12 @@ export const provider = new ethers.providers.JsonRpcProvider(
   providerEndpoint,
   network
 );
+
+export const checkIfValidCache = (_cache) => {
+  return Object.keys(cacheBlockInsightParams).every((param) => {
+    return typeof _cache[param] === cacheBlockInsightParams[param];
+  });
+};
 
 export const isBlockSecure = async (_blockNumber) => {
   const blockHeight = await provider.getBlockNumber();
