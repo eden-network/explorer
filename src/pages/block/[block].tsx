@@ -1,7 +1,6 @@
 /* eslint-disable react/button-has-type */
 import { useCallback, useState } from 'react';
 
-import type { Block as _BlockType } from '@ethersproject/abstract-provider';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useRouter } from 'next/router';
 
@@ -13,10 +12,6 @@ import usePagination from '../../hooks/usePagination.hook';
 import { Meta } from '../../layout/Meta';
 import Shell from '../../layout/Shell';
 import { getBlockInsightAndCache } from '../../modules/eden-block-insight';
-import {
-  provider,
-  isEdenBlock as checkIfEdenBlock,
-} from '../../modules/getters';
 import { stableSort, getSorting } from '../../modules/table/sort';
 import { NormalizedBlockType } from '../../utils/type';
 
@@ -157,39 +152,36 @@ export default function Block({
   );
 }
 
-const normailizeBlockInfo = (block: _BlockType): NormalizedBlockType => {
+const normailizeBlockInfo = (block): NormalizedBlockType => {
   return {
-    number: block.number,
-    timestamp: block.timestamp,
-    miner: block.miner,
     baseFeePerGas: block.baseFeePerGas.toString(),
     gasLimit: block.gasLimit.toString(),
+    timestamp: block.timestamp,
+    number: block.number,
+    miner: block.miner,
   };
 };
 
 export async function getServerSideProps(context) {
   const blockNum = Number.parseInt(context.query.block, 10);
   try {
-    const [labeledTxs, block, isEdenBlock] = await Promise.all([
-      getBlockInsightAndCache(blockNum),
-      provider.getBlock(blockNum),
-      checkIfEdenBlock(blockNum),
-    ]);
+    const blockInsight = await getBlockInsightAndCache(blockNum);
     return {
       props: {
-        labeledTxs,
-        block: normailizeBlockInfo(block),
-        isEdenBlock,
+        isEdenBlock: blockInsight.fromEdenProducer,
+        block: normailizeBlockInfo(blockInsight),
+        labeledTxs: blockInsight.transactions,
         isValidBlock: true,
       },
     };
   } catch (e) {
+    console.log(e); // eslint-disable-line no-console
     return {
       props: {
-        labeledTxs: [],
         block: { number: blockNum },
-        isEdenBlock: false,
         isValidBlock: false,
+        isEdenBlock: false,
+        labeledTxs: [],
       },
     };
   }

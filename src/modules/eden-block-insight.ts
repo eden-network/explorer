@@ -1,24 +1,28 @@
 import { readFromBucket, writeToBucket } from './gcloud-cache';
 import {
+  isFromEdenProducer,
+  checkIfValidCache,
   getSlotDelegates,
   getStakersStake,
-  getBlockInfo,
-  getBundledTxs,
   isBlockSecure,
-  isEdenBlock as checkIfEdenBlock,
+  getBundledTxs,
+  getBlockInfo,
 } from './getters';
-import { BNToGwei } from './utils';
+import { BNToGwei, makeArrayUnique } from './utils';
 
 export const getBlockInsight = async (_blockNumber) => {
-  const [slotDelegates, stakersStake, blockInfo, bundledTxs, isEdenBlock] =
+  const [slotDelegates, blockInfo, bundledTxs, fromEdenProducer] =
     await Promise.all([
       getSlotDelegates(_blockNumber - 1),
-      getStakersStake(_blockNumber - 1),
       getBlockInfo(_blockNumber),
       getBundledTxs(_blockNumber),
-      checkIfEdenBlock(_blockNumber),
+      isFromEdenProducer(_blockNumber),
     ]);
   const { transactions } = blockInfo;
+  const uniqueSenders = makeArrayUnique(
+    blockInfo.transactions.map((tx) => tx.from)
+  );
+  const stakersStake = await getStakersStake(uniqueSenders, _blockNumber - 1);
   transactions.sort((tx0, tx1) => tx1.transactionIndex - tx0.transactionIndex); // Start at the end
   const labeledTxs = [];
   transactions.forEach((tx) => {
@@ -28,7 +32,7 @@ export const getBlockInsight = async (_blockNumber) => {
       toSlot: toSlotDelegate !== undefined ? toSlotDelegate : false,
       bundleIndex: bundleIndex !== undefined ? bundleIndex : null,
       senderStake: stakersStake[tx.from.toLowerCase()] || 0,
-      priorityFee: BNToGwei(tx.maxPriorityFee),
+      maxPriorityFee: BNToGwei(tx.maxPriorityFee), // Format for serialization
       position: tx.transactionIndex,
       nonce: tx.nonce,
       hash: tx.hash,
@@ -36,33 +40,44 @@ export const getBlockInsight = async (_blockNumber) => {
       to: tx.to,
       type: '',
     };
-    if (isEdenBlock && labeledTx.toSlot !== false) {
+    if (fromEdenProducer && labeledTx.toSlot !== false) {
       labeledTx.type = 'slot';
     } else if (labeledTx.bundleIndex !== null) {
       labeledTx.type = 'fb-bundle';
-    } else if (isEdenBlock && labeledTx.senderStake >= 100) {
+    } else if (fromEdenProducer && labeledTx.senderStake >= 100) {
       labeledTx.type = 'stake';
     } else {
       labeledTx.type = 'priority-fee';
     }
     labeledTxs[labeledTx.position] = labeledTx;
   });
-  return labeledTxs;
+  return {
+    ...blockInfo,
+    baseFeePerGas: BNToGwei(blockInfo.baseFeePerGas), // Format for serialization
+    transactions: labeledTxs,
+    number: _blockNumber,
+    fromEdenProducer,
+  };
 };
 
 export const getBlockInsightAndCache = async (_blockNumber) => {
   const blockNumberStr = _blockNumber.toString();
   try {
-    const labeledTxs = await readFromBucket(blockNumberStr);
-    return labeledTxs;
+    const blockInsight = await readFromBucket(blockNumberStr);
+    // Check cache validity
+    if (!checkIfValidCache(blockInsight)) {
+      console.log('Invalid cache');
+      throw new Error('Invalid cache');
+    }
+    return blockInsight;
   } catch (_) {} // eslint-disable-line no-empty
-  const labeledTxs = await getBlockInsight(_blockNumber);
+  const blockInsight = await getBlockInsight(_blockNumber);
   isBlockSecure(_blockNumber).then((isSecure) => {
     if (isSecure) {
-      writeToBucket(blockNumberStr, labeledTxs).catch((e) => {
-        console.log(`Couldn't write to storage: ${e}`);
+      writeToBucket(blockNumberStr, blockInsight).catch((e) => {
+        console.log(`Couldn't write to storage:`, e); // eslint-disable-line no-console
       });
     }
   });
-  return labeledTxs;
+  return blockInsight;
 };
