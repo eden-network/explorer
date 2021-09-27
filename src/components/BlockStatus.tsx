@@ -2,10 +2,11 @@
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import moment from 'moment';
 
+import { getMinerAlias } from '../modules/getters';
 import { NormalizedBlockType } from '../utils/type';
 
 const Container = ({ children }) => (
-  <p className="leading-7 pr-4 xl:pr-7 line-height">{children}</p>
+  <p className="leading-7 pr-4 xl:pr-6 line-height">{children}</p>
 );
 const Label = ({ children }) => (
   <span className="pr-1 sm:text-sm text-gray-500">{children}:</span>
@@ -43,7 +44,7 @@ export default function BlockStatus({
             target="_blank"
             rel="noreferrer"
           >
-            {block.miner.slice(0, 6)}...{' '}
+            {getMinerAlias(block.miner) || `${block.miner.slice(0, 6)}...`}{' '}
             <FontAwesomeIcon icon="external-link-alt" size="xs" />
           </a>
         </Info.Description>
