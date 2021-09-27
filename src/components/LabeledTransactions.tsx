@@ -104,7 +104,7 @@ export default function LabeledTransactions({
                   </th>
                   <th
                     scope="col"
-                    className="px-2 sm:px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider"
+                    className="px-2 sm:pr-8 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider"
                   >
                     <TableSortLabel
                       active={orderBy === 'priorityFee'}
@@ -116,7 +116,19 @@ export default function LabeledTransactions({
                   </th>
                   <th
                     scope="col"
-                    className="px-2 sm:pl-8 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider"
+                    className="px-2 sm:px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  >
+                    <TableSortLabel
+                      active={orderBy === 'type'}
+                      direction={order}
+                      onClick={() => handleRequestSort('type')}
+                    >
+                      Priority By
+                    </TableSortLabel>
+                  </th>
+                  <th
+                    scope="col"
+                    className="px-2 sm:px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider"
                   >
                     <TableSortLabel
                       active={orderBy === 'toSlot'}
@@ -148,18 +160,6 @@ export default function LabeledTransactions({
                       onClick={() => handleRequestSort('senderStake')}
                     >
                       Sender Stake
-                    </TableSortLabel>
-                  </th>
-                  <th
-                    scope="col"
-                    className="px-2 sm:px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider"
-                  >
-                    <TableSortLabel
-                      active={orderBy === 'type'}
-                      direction={order}
-                      onClick={() => handleRequestSort('type')}
-                    >
-                      Priority By
                     </TableSortLabel>
                   </th>
                 </tr>
@@ -208,10 +208,17 @@ export default function LabeledTransactions({
                       <td className="px-2 py-4 text-right whitespace-nowrap">
                         {tx.nonce.toLocaleString()}
                       </td>
-                      <td className="px-2 sm:px-4 py-4 text-right whitespace-nowrap">
+                      <td className="px-2 sm:pr-8 py-4 text-right whitespace-nowrap">
                         {tx.maxPriorityFee.toLocaleString()}
                       </td>
-                      <td className="px-2 sm:pl-8 py-4 text-center whitespace-nowrap">
+                      <td className="px-2 sm:px-4 py-2 text-center whitespace-nowrap">
+                        <span
+                          className={`w-28 rounded-3xl py-2 bg-${rowColor} inline-block text-xs text-bold text-blue-light shadow-sm font-bold`}
+                        >
+                          {AppConfig.labelsToUI[tx.type]}
+                        </span>
+                      </td>
+                      <td className="px-2 sm:px-4 py-4 text-center whitespace-nowrap">
                         {tx.toSlot !== false ? tx.toSlot : ''}
                       </td>
                       <td className="px-2 sm:px-4 py-4 text-center whitespace-nowrap">
@@ -221,13 +228,6 @@ export default function LabeledTransactions({
                         {tx.senderStake >= 100
                           ? tx.senderStake.toLocaleString()
                           : ''}
-                      </td>
-                      <td className="px-2 sm:px-4 py-2 text-center whitespace-nowrap">
-                        <span
-                          className={`w-28 rounded-3xl py-2 bg-${rowColor} inline-block text-xs text-bold text-blue-light shadow-sm font-bold`}
-                        >
-                          {AppConfig.labelsToUI[tx.type]}
-                        </span>
                       </td>
                     </tr>
                   );

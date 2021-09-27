@@ -31,7 +31,7 @@ export default function BlockStatus({
       <Info.Container>
         <Info.Label>Timestamp</Info.Label>
         <Info.Description>
-          {moment(block.timestamp * 1000).format('ddd, DD MMM YYYY HH:mm:ss A')}
+          {moment(block.timestamp * 1000).format('ddd, DD MMM YYYY H:mm:ss A')}
         </Info.Description>
       </Info.Container>
       <Info.Container>
