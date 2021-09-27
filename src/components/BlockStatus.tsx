@@ -11,7 +11,7 @@ const Label = ({ children }) => (
   <span className="pr-1 sm:text-sm text-gray-500">{children}:</span>
 );
 const Description = ({ children }) => (
-  <span className=" text-gray-300">{children}</span>
+  <span className=" text-gray-100">{children}</span>
 );
 const Info = { Container, Label, Description };
 
@@ -56,17 +56,18 @@ export default function BlockStatus({
         <Info.Label>Gas-limit</Info.Label>
         <Info.Description>{block.gasLimit}</Info.Description>
       </Info.Container>
-      <p className="lg:pr-1">
-        <a
-          href={`https://etherscan.io/block/${block.number}`}
-          className=" hover:text-green"
-          target="_blank"
-          rel="noreferrer"
-        >
-          See block on Etherscan{' '}
-          <FontAwesomeIcon icon="external-link-alt" size="xs" />
-        </a>
-      </p>
+      <Info.Container>
+        <Info.Description>
+          <a
+            href={`https://etherscan.io/block/${block.number}`}
+            className="hover:text-green"
+            target="_blank"
+            rel="noreferrer"
+          >
+            See block on Etherscan
+          </a>
+        </Info.Description>
+      </Info.Container>
     </div>
   );
 }
