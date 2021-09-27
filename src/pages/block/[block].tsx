@@ -132,6 +132,7 @@ export default function Block({
             <div className="flex-1 mt-4">
               <LabeledTransactions
                 labeledTxs={currentTxs}
+                miner={block.miner}
                 handleRequestSort={handleRequestSort}
                 orderBy={orderBy}
                 order={order}
