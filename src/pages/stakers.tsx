@@ -50,9 +50,13 @@ export default function StakersPage({
     >
       <div className="max-w-4xl mx-auto grid gap-5">
         <div className="flex flex-col rounded-lg shadow-lg overflow-hidden bg-blue">
-          <div className="flex-1 p-6 flex flex-col justify-between">
+          <div className="p-3 flex-1 sm:p-6 flex flex-col justify-between">
             <div className="flex-shrink-0">
-              <Search prompt="Address" setValue={setFilter} />
+              <Search
+                prompt="Address"
+                handleChange={setFilter}
+                value={filter}
+              />
             </div>
             <div className="flex-1 mt-4">
               <Stakers stakers={data} />

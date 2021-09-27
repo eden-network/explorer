@@ -2,19 +2,14 @@
 import 'tailwindcss/tailwind.css';
 import NextNprogress from 'nextjs-progressbar';
 
-// import Banner from '../layout/Banner';
 import Footer from '../layout/Footer';
 import Header from '../layout/Header';
+import '../config/fontawsome';
+import '../assets/_app.css';
 
 function MyApp({ Component, pageProps }) {
   return (
     <>
-      {/* <Banner>
-        <span>
-          The subgraph that powers the Explorer is currently behind in syncing
-          -- data may be out of date!
-        </span>
-      </Banner> */}
       <Header />
       <NextNprogress
         color="#CAFF00"

@@ -4,6 +4,7 @@
 /node_modules
 /.pnp
 .pnp.js
+gcloud_auth.json
 
 # testing
 /coverage
@@ -27,6 +28,7 @@ yarn-error.log*
 
 # dotenv local files
 .env*.local
+.env
 
 # local folder
 local

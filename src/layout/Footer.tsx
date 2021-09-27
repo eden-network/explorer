@@ -178,6 +178,8 @@ export default function Footer() {
                     <a
                       className="text-white hover:text-green"
                       href="https://edennetwork.io/faq"
+                      target="_blank"
+                      rel="noreferrer"
                     >
                       FAQ
                     </a>

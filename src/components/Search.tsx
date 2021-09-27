@@ -1,18 +1,37 @@
 /* eslint-disable jsx-a11y/label-has-associated-control */
 import { useCallback } from 'react';
 
+import cx from 'classnames';
+
+interface SearchProps {
+  value: string;
+  prompt: string;
+  error?: boolean;
+  handleChange: (value) => void;
+  handleKeyDown?: (event) => void;
+}
+
 export default function Search({
   prompt,
-  setValue,
-}: {
-  prompt: string;
-  setValue?: (value: string) => any;
-}) {
+  value,
+  error,
+  handleChange,
+  handleKeyDown,
+}: SearchProps) {
   const onChange = useCallback(
     (event) => {
-      if (setValue) setValue(event.target.value);
+      handleChange(event.target.value);
     },
-    [setValue]
+    [handleChange]
+  );
+
+  const onKeyDown = useCallback(
+    (event) => {
+      if (handleKeyDown) {
+        handleKeyDown(event);
+      }
+    },
+    [handleKeyDown]
   );
 
   return (
@@ -39,9 +58,17 @@ export default function Search({
         <input
           id="search"
           name="search"
-          className="block w-full bg-blue-light rounded-md py-2 pl-10 pr-3 text-sm text-white placeholder-gray-500 focus:outline-none focus:text-white focus:placeholder-gray-400 focus:ring-1 focus:ring-green focus:border-green sm:text-sm"
+          value={value}
+          className={cx(
+            'block w-full bg-blue-light rounded-md py-2 pl-10 pr-3 text-sm text-white placeholder-gray-500 focus:outline-none focus:text-white focus:placeholder-gray-400 focus:ring-1 focus:ring-green focus:border-green sm:text-sm',
+            {
+              ' text-red focus:text-red border-red focus:border-red focus:ring-red':
+                error,
+            }
+          )}
           placeholder={prompt}
           type="search"
+          onKeyDown={onKeyDown}
           onChange={onChange}
         />
       </div>
