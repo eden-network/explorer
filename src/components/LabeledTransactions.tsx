@@ -27,6 +27,7 @@ const getRowColor = (tx) => {
 
 export default function LabeledTransactions({
   labeledTxs,
+  miner,
   handleRequestSort,
   orderBy,
   order,
@@ -190,7 +191,7 @@ export default function LabeledTransactions({
                           target="_blank"
                           rel="noreferrer"
                         >
-                          {formatAddress(tx.from)}{' '}
+                          {miner === tx.from ? 'Miner' : formatAddress(tx.from)}{' '}
                           <FontAwesomeIcon icon="external-link-alt" size="xs" />
                         </a>
                       </td>
@@ -201,7 +202,7 @@ export default function LabeledTransactions({
                           target="_blank"
                           rel="noreferrer"
                         >
-                          {formatAddress(tx.to)}{' '}
+                          {miner === tx.to ? 'Miner' : formatAddress(tx.to)}{' '}
                           <FontAwesomeIcon icon="external-link-alt" size="xs" />
                         </a>
                       </td>
