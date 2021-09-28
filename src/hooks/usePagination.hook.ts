@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 
 function usePagination(totalCount, itemsPerPage) {
   const [currentPage, setCurrentPage] = useState(1);
-  const maxPage = Math.ceil(totalCount / itemsPerPage);
+  const maxPage = Math.max(1, Math.ceil(totalCount / itemsPerPage));
 
   const next = () => {
     setCurrentPage(Math.min(currentPage + 1, maxPage));
