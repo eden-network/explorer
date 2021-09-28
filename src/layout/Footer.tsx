@@ -143,7 +143,7 @@ export default function Footer() {
                   </li>
 
                   <li>
-                    <Link href="/stakers">
+                    <Link href="/stakers?page=1">
                       <a className="text-white hover:text-green">Stakers</a>
                     </Link>
                   </li>
