@@ -99,13 +99,13 @@ export default function Blocks({
                     <td className="px-2 sm:px-6 py-4 whitespace-nowrap">
                       {block.author}
                     </td>
-                    <td className="px-2 sm:px-6 py-4 whitespace-nowrap">
+                    <td className="px-2 sm:px-6 py-4 whitespace-nowrap text-center">
                       {block.slotTxs}
                     </td>
-                    <td className="px-2 sm:px-6 py-4 whitespace-nowrap">
+                    <td className="px-2 sm:px-6 py-4 whitespace-nowrap text-center">
                       {block.bundledTxs}
                     </td>
-                    <td className="px-2 sm:px-6 py-4 whitespace-nowrap">
+                    <td className="px-2 sm:px-6 py-4 whitespace-nowrap text-center">
                       {block.stakerTxs}
                     </td>
                   </tr>
