@@ -40,8 +40,9 @@ export const AppConfig = {
     miner: 'string',
   },
   cacheTxParams: {
-    position: 'number',
     maxPriorityFee: 'string',
+    position: 'number',
+    gasLimit: 'number',
     nonce: 'number',
     from: 'string',
     hash: 'string',
