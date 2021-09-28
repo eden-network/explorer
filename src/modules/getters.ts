@@ -7,11 +7,13 @@ import { safeFetch } from './utils';
 
 const {
   cacheBlockConfirmations,
-  cacheBlockInsightParams,
   graphNetworkEndpoint,
   flashbotsAPIEndpoint,
   providerEndpoint,
+  cacheBlockParams,
   proxyAuthToken,
+  cacheTxParams,
+  slotGasCap,
   minerAlias,
   network,
 } = AppConfig;
@@ -21,10 +23,20 @@ export const provider = new ethers.providers.JsonRpcProvider(
   network
 );
 
+export const getCapForSlots = () => {
+  return { 0: slotGasCap, 1: slotGasCap, 2: slotGasCap };
+};
+
 export const checkIfValidCache = (_cache) => {
-  return Object.keys(cacheBlockInsightParams).every((param) => {
-    return typeof _cache[param] === cacheBlockInsightParams[param];
-  });
+  return (
+    Object.keys(cacheBlockParams).every((param) => {
+      return typeof _cache[param] === cacheBlockParams[param];
+    }) &&
+    (_cache.transactions.length === 0 ||
+      Object.keys(cacheTxParams).every((param) => {
+        return typeof _cache.transactions[0][param] === cacheTxParams[param];
+      }))
+  );
 };
 
 export const isBlockSecure = async (_blockNumber) => {
@@ -116,6 +128,7 @@ export const getBlockInfo = async (_blockNumber) => {
       to: ethers.utils.getAddress(tx.to || ethers.constants.AddressZero),
       transactionIndex: parseInt(tx.transactionIndex, 16),
       from: ethers.utils.getAddress(tx.from),
+      gasLimit: parseInt(tx.gas, 16),
       nonce: parseInt(tx.nonce, 16),
       hash: tx.hash,
     };

@@ -19,6 +19,7 @@ export const AppConfig = {
     stake: 'yellow',
     slot: 'indigo',
   },
+  slotGasCap: 1.5e6,
   labelsToUI: {
     'fb-bundle': 'BUNDLE (FB)',
     'priority-fee': 'PRIORITY FEE',
@@ -28,7 +29,7 @@ export const AppConfig = {
   breakpoints: {
     small: 575,
   },
-  cacheBlockInsightParams: {
+  cacheBlockParams: {
     fromEdenProducer: 'boolean',
     baseFeePerGas: 'string',
     transactions: 'object',
@@ -37,6 +38,14 @@ export const AppConfig = {
     gasUsed: 'number',
     number: 'number',
     miner: 'string',
+  },
+  cacheTxParams: {
+    position: 'number',
+    maxPriorityFee: 'string',
+    nonce: 'number',
+    from: 'string',
+    hash: 'string',
+    to: 'string',
   },
   minerAlias: {
     '0x00192fb10df37c9fb26829eb2cc623cd1bf599e8': '2Miners: PPLNS',
