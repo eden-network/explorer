@@ -53,7 +53,7 @@ export default function BlockStatus({
       </Info.Container>
       <Info.Container>
         <Info.Label>Base-fee</Info.Label>
-        <Info.Description>{block.baseFeePerGas} gwei</Info.Description>
+        <Info.Description>{block.baseFeePerGas} Gwei</Info.Description>
       </Info.Container>
       <Info.Container>
         <Info.Label>Gas-limit</Info.Label>
