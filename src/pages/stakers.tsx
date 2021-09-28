@@ -24,11 +24,12 @@ const PAGE_SIZE = 15;
 
 export default function StakersPage({ leaderboard, stats }: StakerPageProps) {
   const router = useRouter();
+  const pageNum = router.query.page ? Number(router.query.page) : 1;
 
   const { next, prev, begin, end, maxPage, currentPage } = usePagination(
     stats.numStakers,
     PAGE_SIZE,
-    router.query.page ? Number(router.query.page) : 1
+    pageNum
   );
 
   useEffect(() => {
