@@ -99,6 +99,18 @@ export default function LabeledTransactions({
                     className="px-2 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider"
                   >
                     <TableSortLabel
+                      active={orderBy === 'gasLimit'}
+                      direction={order}
+                      onClick={() => handleRequestSort('gasLimit')}
+                    >
+                      Gas limit
+                    </TableSortLabel>
+                  </th>
+                  <th
+                    scope="col"
+                    className="px-2 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  >
+                    <TableSortLabel
                       active={orderBy === 'nonce'}
                       direction={order}
                       onClick={() => handleRequestSort('nonce')}
@@ -227,6 +239,9 @@ export default function LabeledTransactions({
                             />
                           </sup>
                         </a>
+                      </td>
+                      <td className="px-2 py-4 text-right whitespace-nowrap">
+                        {tx.gasLimit.toLocaleString()}
                       </td>
                       <td className="px-2 py-4 text-right whitespace-nowrap">
                         {tx.nonce.toLocaleString()}

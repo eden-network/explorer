@@ -35,6 +35,7 @@ export const getBlockInsight = async (_blockNumber) => {
       senderStake: stakersStake[tx.from.toLowerCase()] || 0,
       maxPriorityFee: BNToGwei(tx.maxPriorityFee), // Format for serialization
       position: tx.transactionIndex,
+      gasLimit: tx.gasLimit,
       nonce: tx.nonce,
       hash: tx.hash,
       from: tx.from,
