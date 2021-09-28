@@ -57,7 +57,7 @@ export default function Header() {
             </div>
             <div className="ml-6 lg:block lg:ml-6">
               <div className="flex space-x-4">
-                <Link href="/stakers">
+                <Link href="/stakers?page=1">
                   <a
                     className={
                       router.route === '/stakers'

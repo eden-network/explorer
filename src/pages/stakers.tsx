@@ -1,58 +1,43 @@
-import { useMemo, useState } from 'react';
+import { useEffect } from 'react';
 
 import { stakeStats, stakerLeaderboard } from '@eden-network/data';
 import { useRouter } from 'next/router';
 
-import EndlessPagination from '../components/EndlessPagination';
-import Search from '../components/Search';
+import BlockPagination from '../components/BlockPagination';
 import Stakers from '../components/Stakers';
+import usePagination from '../hooks/usePagination.hook';
 import { Meta } from '../layout/Meta';
 import Shell from '../layout/Shell';
 
 const WEI = BigInt('1000000000000000000');
 const PER_PAGE = 15;
 
-export default function StakersPage({
-  leaderboard,
-}: {
+interface StakerPageProps {
   leaderboard: { id: string; rank: number; staked: number }[];
-}) {
+  stats: {
+    numStakers: number;
+    totalStaked: number;
+  };
+}
+
+const PAGE_SIZE = 15;
+
+export default function StakersPage({ leaderboard, stats }: StakerPageProps) {
   const router = useRouter();
-  const next = useMemo(
-    () =>
-      `/stakers?skip=${
-        router.query.skip === undefined
-          ? PER_PAGE
-          : Number(router.query.skip) + PER_PAGE
-      }`,
-    [router.query.skip]
-  );
-  const previous = useMemo(
-    () =>
-      `/stakers?skip=${
-        router.query.skip === undefined || Number(router.query.skip) === 0
-          ? 0
-          : Number(router.query.skip) - PER_PAGE
-      }`,
-    [router.query.skip]
+
+  const { next, prev, begin, end, maxPage, currentPage } = usePagination(
+    stats.numStakers,
+    PAGE_SIZE,
+    router.query.page ? Number(router.query.page) : 1
   );
 
-  const [page] = useState(0);
-  const [perPage] = useState(15);
-  const [filter, setFilter] = useState<string | undefined>();
-
-  const filtered = useMemo(() => {
-    if (filter) {
-      const cmp = filter.toLowerCase();
-      return leaderboard.filter((x) => x.id.indexOf(cmp) !== -1);
+  useEffect(() => {
+    if (currentPage !== Number(router.query.page)) {
+      router.push(
+        `/stakers?page=${router.query.page === undefined ? 1 : currentPage}`
+      );
     }
-    return leaderboard;
-  }, [leaderboard, filter]);
-
-  const data = useMemo(
-    () => filtered.slice(page * perPage, page * perPage + perPage),
-    [filtered, page, perPage]
-  );
+  }, [currentPage, router]);
 
   return (
     <Shell
@@ -66,17 +51,17 @@ export default function StakersPage({
       <div className="max-w-4xl mx-auto grid gap-5">
         <div className="flex flex-col rounded-lg shadow-lg overflow-hidden bg-blue">
           <div className="p-3 flex-1 sm:p-6 flex flex-col justify-between">
-            <div className="flex-shrink-0">
-              <Search
-                prompt="Address"
-                handleChange={setFilter}
-                value={filter}
-              />
-            </div>
             <div className="flex-1 mt-4">
-              <Stakers stakers={data} />
+              <Stakers stakers={leaderboard} />
             </div>
-            <EndlessPagination next={next} previous={previous} />
+            <BlockPagination
+              prev={prev}
+              next={next}
+              end={end}
+              begin={begin}
+              maxPage={maxPage}
+              currentPage={currentPage}
+            />
           </div>
         </div>
       </div>
@@ -85,13 +70,13 @@ export default function StakersPage({
 }
 
 export async function getServerSideProps(context) {
-  const skip = context.query.skip ?? 0;
+  const pageNum = context.query.page ?? 1;
   const [statsRaw, leaderboardRaw] = await Promise.all([
     stakeStats(),
     stakerLeaderboard({
       network: 'mainnet',
       num: PER_PAGE,
-      start: skip,
+      start: (pageNum - 1) * PER_PAGE,
     }),
   ]);
   const stats = {
