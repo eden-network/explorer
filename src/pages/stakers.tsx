@@ -1,21 +1,43 @@
 import { useMemo, useState } from 'react';
 
-import { stakers } from '@eden-network/data';
+import { stakeStats, stakerLeaderboard } from '@eden-network/data';
+import { useRouter } from 'next/router';
 
-import Pagination from '../components/Pagination';
+import EndlessPagination from '../components/EndlessPagination';
 import Search from '../components/Search';
 import Stakers from '../components/Stakers';
 import { Meta } from '../layout/Meta';
 import Shell from '../layout/Shell';
 
 const WEI = BigInt('1000000000000000000');
+const PER_PAGE = 15;
 
 export default function StakersPage({
   leaderboard,
 }: {
   leaderboard: { id: string; rank: number; staked: number }[];
 }) {
-  const [page, setPage] = useState(0);
+  const router = useRouter();
+  const next = useMemo(
+    () =>
+      `/stakers?skip=${
+        router.query.skip === undefined
+          ? PER_PAGE
+          : Number(router.query.skip) + PER_PAGE
+      }`,
+    [router.query.skip]
+  );
+  const previous = useMemo(
+    () =>
+      `/stakers?skip=${
+        router.query.skip === undefined || Number(router.query.skip) === 0
+          ? 0
+          : Number(router.query.skip) - PER_PAGE
+      }`,
+    [router.query.skip]
+  );
+
+  const [page] = useState(0);
   const [perPage] = useState(15);
   const [filter, setFilter] = useState<string | undefined>();
 
@@ -26,13 +48,6 @@ export default function StakersPage({
     }
     return leaderboard;
   }, [leaderboard, filter]);
-
-  const numPages = useMemo(
-    () =>
-      Math.floor(filtered.length / perPage) +
-      (filtered.length % perPage === 0 ? 0 : 1),
-    [filtered, perPage]
-  );
 
   const data = useMemo(
     () => filtered.slice(page * perPage, page * perPage + perPage),
@@ -61,13 +76,7 @@ export default function StakersPage({
             <div className="flex-1 mt-4">
               <Stakers stakers={data} />
             </div>
-            <Pagination
-              numPages={numPages}
-              perPage={perPage}
-              activePage={page}
-              total={filtered.length}
-              setPage={setPage}
-            />
+            <EndlessPagination next={next} previous={previous} />
           </div>
         </div>
       </div>
@@ -75,11 +84,22 @@ export default function StakersPage({
   );
 }
 
-export async function getServerSideProps() {
-  const allStakers = await stakers();
-  const leaderboard = allStakers
+export async function getServerSideProps(context) {
+  const skip = context.query.skip ?? 0;
+  const [statsRaw, leaderboardRaw] = await Promise.all([
+    stakeStats(),
+    stakerLeaderboard({
+      network: 'mainnet',
+      num: PER_PAGE,
+      start: skip,
+    }),
+  ]);
+  const stats = {
+    numStakers: statsRaw.numStakers,
+    totalStaked: Number(statsRaw.totalStaked / WEI),
+  };
+  const leaderboard = leaderboardRaw
     .filter((staker) => staker.rank != null)
-    .sort((a, b) => a.rank - b.rank)
     .map((staker) => {
       return {
         ...staker,
@@ -89,6 +109,7 @@ export async function getServerSideProps() {
   return {
     props: {
       leaderboard,
+      stats,
     },
   };
 }
