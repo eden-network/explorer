@@ -7,6 +7,7 @@ import Blocks from '../components/Blocks';
 import EndlessPagination from '../components/EndlessPagination';
 import { Meta } from '../layout/Meta';
 import Shell from '../layout/Shell';
+import { getBlockInsightAndCache } from '../modules/eden-block-insight';
 
 const PER_PAGE = 15;
 
@@ -63,9 +64,27 @@ export async function getServerSideProps(context) {
     fromActiveProducerOnly: true,
     network: 'mainnet',
   });
+  const blocksWithInsight = await Promise.all(
+    blocks.map(async (block) => {
+      const blockInsight = await getBlockInsightAndCache(block.number);
+      return {
+        bundledTxs: blockInsight.transactions.filter(
+          (tx) => tx.bundleIndex !== null
+        ).length,
+        stakerTxs: blockInsight.transactions.filter(
+          (tx) => tx.senderStake >= 100
+        ).length,
+        slotTxs: blockInsight.transactions.filter((tx) => tx.toSlot !== false)
+          .length,
+        timestamp: block.timestamp,
+        author: block.author,
+        number: block.number,
+      };
+    })
+  );
   return {
     props: {
-      blocks,
+      blocks: blocksWithInsight,
     },
   };
 }
