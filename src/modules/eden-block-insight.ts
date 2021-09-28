@@ -4,6 +4,7 @@ import {
   checkIfValidCache,
   getSlotDelegates,
   getStakersStake,
+  getCapForSlots,
   isBlockSecure,
   getBundledTxs,
   getBlockInfo,
@@ -23,13 +24,13 @@ export const getBlockInsight = async (_blockNumber) => {
     blockInfo.transactions.map((tx) => tx.from)
   );
   const stakersStake = await getStakersStake(uniqueSenders, _blockNumber - 1);
-  transactions.sort((tx0, tx1) => tx1.transactionIndex - tx0.transactionIndex); // Start at the end
+  const slotAvlGas = getCapForSlots();
   const labeledTxs = [];
   transactions.forEach((tx) => {
     const toSlotDelegate = slotDelegates[tx.to.toLowerCase()];
     const bundleIndex = bundledTxs[tx.hash.toLowerCase()];
     const labeledTx = {
-      toSlot: toSlotDelegate !== undefined ? toSlotDelegate : false,
+      toSlot: (toSlotDelegate !== undefined ? toSlotDelegate : false) as any,
       bundleIndex: bundleIndex !== undefined ? bundleIndex : null,
       senderStake: stakersStake[tx.from.toLowerCase()] || 0,
       maxPriorityFee: BNToGwei(tx.maxPriorityFee), // Format for serialization
@@ -40,7 +41,12 @@ export const getBlockInsight = async (_blockNumber) => {
       to: tx.to,
       type: '',
     };
-    if (fromEdenProducer && labeledTx.toSlot !== false) {
+    if (
+      fromEdenProducer &&
+      labeledTx.toSlot !== false &&
+      slotAvlGas[labeledTx.toSlot] > tx.gasLimit
+    ) {
+      slotAvlGas[labeledTx.toSlot] -= tx.gasLimit;
       labeledTx.type = 'slot';
     } else if (labeledTx.bundleIndex !== null) {
       labeledTx.type = 'fb-bundle';
