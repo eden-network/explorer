@@ -192,6 +192,7 @@ export default function LabeledTransactions({
                         {tx.position}
                       </td>
                       <td className="px-2 sm:px-4 py-4 text-center whitespace-nowrap">
+                        <ClipboardButton className="pr-2" copyText={tx.hash} />
                         <a
                           href={`https://etherscan.io/tx/${tx.hash}`}
                           className=" hover:text-green"
@@ -200,9 +201,9 @@ export default function LabeledTransactions({
                         >
                           {formatTxHash(tx.hash)}{' '}
                         </a>
-                        <ClipboardButton className="pl-2" copyText={tx.hash} />
                       </td>
                       <td className="px-2 sm:px-4 py-4 text-center whitespace-nowrap">
+                        <ClipboardButton className="pr-2" copyText={tx.from} />
                         <a
                           href={`https://etherscan.io/address/${tx.from}`}
                           className="  hover:text-green"
@@ -211,9 +212,9 @@ export default function LabeledTransactions({
                         >
                           {miner === tx.from ? 'Miner' : formatAddress(tx.from)}{' '}
                         </a>
-                        <ClipboardButton className="pl-2" copyText={tx.from} />
                       </td>
                       <td className="px-2 sm:pl-4 py-4 text-center whitespace-nowrap">
+                        <ClipboardButton className="pr-2" copyText={tx.to} />
                         <a
                           href={`https://etherscan.io/address/${tx.to}`}
                           className=" hover:text-green"
@@ -222,7 +223,6 @@ export default function LabeledTransactions({
                         >
                           {miner === tx.to ? 'Miner' : formatAddress(tx.to)}{' '}
                         </a>
-                        <ClipboardButton className="pl-2" copyText={tx.to} />
                       </td>
                       <td className="px-2 py-4 text-right whitespace-nowrap">
                         {tx.gasLimit.toLocaleString()}
