@@ -1,13 +1,10 @@
+/* eslint-disable react/button-has-type */
 export default function EndlessPagination({
-  next,
-  previous,
   nextClick,
   prevClick,
   page,
   total,
 }: {
-  next?: string;
-  previous?: string;
   page?: number;
   total?: number;
   nextClick?: () => void;
@@ -16,25 +13,23 @@ export default function EndlessPagination({
   return (
     <div className="px-4 py-3 flex items-center justify-between sm:px-6">
       <div className="flex items-center justify-between w-full">
-        <a
+        <button
           onClick={prevClick}
-          href={previous}
           className="relative inline-flex items-center px-4 py-2 bg-blue-light text-sm font-medium rounded-md hover:bg-green hover:text-blue cursor-pointer select-none"
         >
           Previous
-        </a>
+        </button>
         {total && (
           <span className="text-white">
             {page + 1} of {total}
           </span>
         )}
-        <a
+        <button
           onClick={nextClick}
-          href={next}
           className="ml-3 relative inline-flex items-center px-4 py-2 bg-blue-light text-sm font-medium rounded-md hover:bg-green hover:text-blue cursor-pointer select-none"
         >
           Next
-        </a>
+        </button>
       </div>
     </div>
   );

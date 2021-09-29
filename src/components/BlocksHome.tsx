@@ -63,24 +63,6 @@ export default function Blocks({
                   >
                     Producer
                   </th>
-                  <th
-                    scope="col"
-                    className="px-2 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                  >
-                    Slot Txs
-                  </th>
-                  <th
-                    scope="col"
-                    className="px-2 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                  >
-                    Bundled Txs
-                  </th>
-                  <th
-                    scope="col"
-                    className="px-2 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                  >
-                    Staker Txs
-                  </th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-blue-light">
@@ -98,15 +80,6 @@ export default function Blocks({
                     </td>
                     <td className="px-2 sm:px-6 py-4 whitespace-nowrap">
                       {block.author}
-                    </td>
-                    <td className="px-2 sm:px-6 py-4 whitespace-nowrap text-center">
-                      {block.slotTxs}
-                    </td>
-                    <td className="px-2 sm:px-6 py-4 whitespace-nowrap text-center">
-                      {block.bundledTxs}
-                    </td>
-                    <td className="px-2 sm:px-6 py-4 whitespace-nowrap text-center">
-                      {block.stakerTxs}
                     </td>
                   </tr>
                 ))}

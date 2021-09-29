@@ -9,7 +9,7 @@ import {
 } from '@eden-network/data';
 import { useRouter } from 'next/router';
 
-import Blocks from '../components/Blocks';
+import Blocks from '../components/BlocksHome';
 import HeroStats from '../components/HeroStats';
 import LastWeekPlot from '../components/LastWeekPlot';
 import StakedDistribution from '../components/StakedDistribution';
