@@ -70,9 +70,17 @@ export default function Block({
 
   if (!isValidBlock) {
     return (
-      <ErrorMsg errorMsg="">
+      <ErrorMsg errorMsg="Couldn't fetch data for the block">
         <div className="text-center pb-2">
-          <div className="pb-4">
+          <a
+            href={`https://etherscan.io/block/${block.number}`}
+            target="_blank"
+            className="text-green"
+            rel="noreferrer"
+          >
+            View block on Etherscan
+          </a>
+          <div className="pb-4 my-10">
             <button
               onClick={handleClickPrev}
               className="mx-3 relative inline-flex items-center px-4 py-2 bg-blue-light text-sm font-medium rounded-md betterhover:hover:bg-green betterhover:hover:text-blue cursor-pointer select-none"
@@ -87,14 +95,6 @@ export default function Block({
               Next
             </button>
           </div>
-          <a
-            href={`https://etherscan.io/block/${block.number}`}
-            target="_blank"
-            className="text-green"
-            rel="noreferrer"
-          >
-            View on Etherscan
-          </a>
         </div>
       </ErrorMsg>
     );
