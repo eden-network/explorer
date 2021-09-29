@@ -7,7 +7,7 @@ import { Meta } from '../layout/Meta';
 import Shell from '../layout/Shell';
 import { getBlockInsightAndCache } from '../modules/eden-block-insight';
 
-const PER_PAGE = 15;
+const PER_PAGE = 10;
 
 export default function BlocksPage({ blocks }) {
   const router = useRouter();
