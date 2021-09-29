@@ -32,7 +32,7 @@ export default function ClipboardButton({
         setIsCopied(true);
         setTimeout(() => {
           setIsCopied(false);
-        }, 1000);
+        }, 250);
       })
       .catch((err) => {
         console.log(err);
