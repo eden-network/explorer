@@ -1,7 +1,6 @@
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-
 import useWindowSize from '../hooks/useWindowSize.hook';
 import { AppConfig } from '../utils/AppConfig';
+import ClipboardButton from './ClipboardButton';
 import TableSortLabel from './table/TableSortLabel';
 
 const rowColorSettings = AppConfig.blockInsightRowColorByPriority;
@@ -200,13 +199,8 @@ export default function LabeledTransactions({
                           rel="noreferrer"
                         >
                           {formatTxHash(tx.hash)}{' '}
-                          <sup>
-                            <FontAwesomeIcon
-                              icon="external-link-alt"
-                              size="xs"
-                            />
-                          </sup>
                         </a>
+                        <ClipboardButton className="pl-2" copyText={tx.hash} />
                       </td>
                       <td className="px-2 sm:px-4 py-4 text-center whitespace-nowrap">
                         <a
@@ -216,13 +210,8 @@ export default function LabeledTransactions({
                           rel="noreferrer"
                         >
                           {miner === tx.from ? 'Miner' : formatAddress(tx.from)}{' '}
-                          <sup>
-                            <FontAwesomeIcon
-                              icon="external-link-alt"
-                              size="xs"
-                            />
-                          </sup>
                         </a>
+                        <ClipboardButton className="pl-2" copyText={tx.from} />
                       </td>
                       <td className="px-2 sm:pl-4 py-4 text-center whitespace-nowrap">
                         <a
@@ -232,13 +221,8 @@ export default function LabeledTransactions({
                           rel="noreferrer"
                         >
                           {miner === tx.to ? 'Miner' : formatAddress(tx.to)}{' '}
-                          <sup>
-                            <FontAwesomeIcon
-                              icon="external-link-alt"
-                              size="xs"
-                            />
-                          </sup>
                         </a>
+                        <ClipboardButton className="pl-2" copyText={tx.to} />
                       </td>
                       <td className="px-2 py-4 text-right whitespace-nowrap">
                         {tx.gasLimit.toLocaleString()}
