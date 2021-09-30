@@ -6,7 +6,7 @@ import TableSortLabel from './table/TableSortLabel';
 const rowColorSettings = AppConfig.blockInsightRowColorByPriority;
 
 const formatTxHash = (tx) => {
-  return `${tx.slice(0, 4)}...${tx.slice(tx.length - 4, tx.length)}`;
+  return `${tx.slice(0, 6)}...${tx.slice(tx.length - 4, tx.length)}`;
 };
 const formatAddress = (address) => {
   return `${address.slice(0, 6)}...${address.slice(
@@ -192,37 +192,54 @@ export default function LabeledTransactions({
                         {tx.position}
                       </td>
                       <td className="px-2 sm:px-4 py-4 text-center whitespace-nowrap">
-                        <ClipboardButton className="pr-2" copyText={tx.hash} />
-                        <a
-                          href={`https://etherscan.io/tx/${tx.hash}`}
-                          className=" hover:text-green"
-                          target="_blank"
-                          rel="noreferrer"
-                        >
-                          {formatTxHash(tx.hash)}{' '}
-                        </a>
+                        <span className="flex items-center justify-center">
+                          <ClipboardButton
+                            className="pr-2 block"
+                            copyText={tx.hash}
+                          />
+                          <a
+                            href={`https://etherscan.io/tx/${tx.hash}`}
+                            className=" hover:text-green block"
+                            target="_blank"
+                            rel="noreferrer"
+                          >
+                            {formatTxHash(tx.hash)}{' '}
+                          </a>
+                        </span>
                       </td>
                       <td className="px-2 sm:px-4 py-4 text-center whitespace-nowrap">
-                        <ClipboardButton className="pr-2" copyText={tx.from} />
-                        <a
-                          href={`https://etherscan.io/address/${tx.from}`}
-                          className="  hover:text-green"
-                          target="_blank"
-                          rel="noreferrer"
-                        >
-                          {miner === tx.from ? 'Miner' : formatAddress(tx.from)}{' '}
-                        </a>
+                        <span className="flex items-center justify-center">
+                          <ClipboardButton
+                            className="pr-2 block"
+                            copyText={tx.from}
+                          />
+                          <a
+                            href={`https://etherscan.io/address/${tx.from}`}
+                            className="  hover:text-green block"
+                            target="_blank"
+                            rel="noreferrer"
+                          >
+                            {miner === tx.from
+                              ? 'Miner'
+                              : formatAddress(tx.from)}{' '}
+                          </a>
+                        </span>
                       </td>
                       <td className="px-2 sm:pl-4 py-4 text-center whitespace-nowrap">
-                        <ClipboardButton className="pr-2" copyText={tx.to} />
-                        <a
-                          href={`https://etherscan.io/address/${tx.to}`}
-                          className=" hover:text-green"
-                          target="_blank"
-                          rel="noreferrer"
-                        >
-                          {miner === tx.to ? 'Miner' : formatAddress(tx.to)}{' '}
-                        </a>
+                        <span className="flex items-center justify-center">
+                          <ClipboardButton
+                            className="pr-2 block"
+                            copyText={tx.to}
+                          />
+                          <a
+                            href={`https://etherscan.io/address/${tx.to}`}
+                            className=" hover:text-green block"
+                            target="_blank"
+                            rel="noreferrer"
+                          >
+                            {miner === tx.to ? 'Miner' : formatAddress(tx.to)}{' '}
+                          </a>
+                        </span>
                       </td>
                       <td className="px-2 py-4 text-right whitespace-nowrap">
                         {tx.gasLimit.toLocaleString()}
