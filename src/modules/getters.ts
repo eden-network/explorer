@@ -103,10 +103,9 @@ export const getBundledTxs = async (_blockNumber) => {
         return [];
       }
       return Object.fromEntries(
-        resJson.blocks[0].transactions.map((tx) => [
-          tx.transaction_hash,
-          tx.bundle_index,
-        ])
+        resJson.blocks[0].transactions
+          .filter((tx) => tx.bundle_type === 'flashbots') // Exclude rogue
+          .map((tx) => [tx.transaction_hash, tx.bundle_index])
       );
     }
   );
