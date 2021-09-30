@@ -12,13 +12,14 @@ import {
 import { BNToGwei, makeArrayUnique } from './utils';
 
 export const getBlockInsight = async (_blockNumber) => {
-  const [slotDelegates, blockInfo, bundledTxs, fromEdenProducer] =
+  const [bundledTxsWrapped, fromEdenProducer, slotDelegates, blockInfo] =
     await Promise.all([
-      getSlotDelegates(_blockNumber - 1),
-      getBlockInfo(_blockNumber),
       getBundledTxs(_blockNumber),
       isFromEdenProducer(_blockNumber),
+      getSlotDelegates(_blockNumber - 1),
+      getBlockInfo(_blockNumber),
     ]);
+  const [, bundledTxs] = bundledTxsWrapped;
   const { transactions } = blockInfo;
   const uniqueSenders = makeArrayUnique(
     blockInfo.transactions.map((tx) => tx.from)
@@ -61,6 +62,7 @@ export const getBlockInsight = async (_blockNumber) => {
   return {
     ...blockInfo,
     baseFeePerGas: BNToGwei(blockInfo.baseFeePerGas), // Format for serialization
+    bundledTxsCallSuccess: bundledTxsWrapped[0],
     transactions: labeledTxs,
     number: _blockNumber,
     fromEdenProducer,
@@ -79,12 +81,14 @@ export const getBlockInsightAndCache = async (_blockNumber) => {
     return blockInsight;
   } catch (_) {} // eslint-disable-line no-empty
   const blockInsight = await getBlockInsight(_blockNumber);
-  isBlockSecure(_blockNumber).then((isSecure) => {
-    if (isSecure) {
-      writeToBucket(blockNumberStr, blockInsight).catch((e) => {
-        console.log(`Couldn't write to storage:`, e); // eslint-disable-line no-console
-      });
-    }
-  });
+  if (blockInsight.bundledTxsCallSuccess) {
+    isBlockSecure(_blockNumber).then((isSecure) => {
+      if (isSecure) {
+        writeToBucket(blockNumberStr, blockInsight).catch((e) => {
+          console.log(`Couldn't write to storage:`, e); // eslint-disable-line no-console
+        });
+      }
+    });
+  }
   return blockInsight;
 };
