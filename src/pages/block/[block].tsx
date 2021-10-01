@@ -192,7 +192,7 @@ export async function getServerSideProps(context) {
         block: normailizeBlockInfo(blockInsight),
         labeledTxs: blockInsight.transactions,
         isValidBlock: true,
-        bundledTxsCallSuccess: false,
+        bundledTxsCallSuccess: blockInsight.bundledTxsCallSuccess,
       },
     };
   } catch (e) {
