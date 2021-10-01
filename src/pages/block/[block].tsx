@@ -79,7 +79,7 @@ export default function Block({
     if (!bundledTxsCallSuccess) {
       notify('error', 'Flashbots API is not available!');
     }
-  }, [bundledTxsCallSuccess, notify]);
+  }, [notify, block, bundledTxsCallSuccess]);
 
   if (!isValidBlock) {
     return (
