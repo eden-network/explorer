@@ -77,7 +77,10 @@ export default function Block({
 
   useEffect(() => {
     if (!bundledTxsCallSuccess) {
-      notify('error', 'Flashbots API is not available!');
+      notify(
+        'error',
+        'Unable to retrieve Flashbot bundles, please try again in a few minutes!'
+      );
     }
   }, [notify, block, bundledTxsCallSuccess]);
 
