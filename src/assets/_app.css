@@ -1,1 +1,5 @@
 * { -webkit-tap-highlight-color: rgba(0,0,0,0); }
+
+.bg-alert-red {
+    background-color: #FCA5A5 !important;
+}

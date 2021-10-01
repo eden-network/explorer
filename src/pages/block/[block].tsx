@@ -1,5 +1,5 @@
 /* eslint-disable react/button-has-type */
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useRouter } from 'next/router';
@@ -8,6 +8,7 @@ import BlockPagination from '../../components/BlockPagination';
 import BlockStatus from '../../components/BlockStatus';
 import ErrorMsg from '../../components/ErrorMsg';
 import LabeledTransactions from '../../components/LabeledTransactions';
+import toast from '../../components/Toast';
 import usePagination from '../../hooks/usePagination.hook';
 import { Meta } from '../../layout/Meta';
 import Shell from '../../layout/Shell';
@@ -22,6 +23,7 @@ interface BlockProps {
   block: NormalizedBlockType;
   isEdenBlock: string;
   isValidBlock: boolean;
+  bundledTxsCallSuccess: boolean;
 }
 
 export default function Block({
@@ -29,6 +31,7 @@ export default function Block({
   block,
   isEdenBlock,
   isValidBlock,
+  bundledTxsCallSuccess,
 }: BlockProps) {
   const router = useRouter();
   const { next, prev, begin, end, maxPage, currentPage, resetCurrentPage } =
@@ -67,6 +70,14 @@ export default function Block({
   const handleClickNext = useCallback(() => {
     router.push(`/block/${block.number + 1}`);
   }, [router, block]);
+
+  const notify = useCallback((type, message) => {
+    toast({ type, message });
+  }, []);
+
+  useEffect(() => {
+    notify('error', 'Flashbots API is not available!');
+  }, [bundledTxsCallSuccess, notify]);
 
   if (!isValidBlock) {
     return (
@@ -179,6 +190,7 @@ export async function getServerSideProps(context) {
         block: normailizeBlockInfo(blockInsight),
         labeledTxs: blockInsight.transactions,
         isValidBlock: true,
+        bundledTxsCallSuccess: blockInsight.bundledTxsCallSuccess,
       },
     };
   } catch (e) {
@@ -189,6 +201,7 @@ export async function getServerSideProps(context) {
         isValidBlock: false,
         isEdenBlock: false,
         labeledTxs: [],
+        bundledTxsCallSuccess: false,
       },
     };
   }
