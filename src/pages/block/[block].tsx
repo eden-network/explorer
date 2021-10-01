@@ -76,7 +76,9 @@ export default function Block({
   }, []);
 
   useEffect(() => {
-    notify('error', 'Flashbots API is not available!');
+    if (!bundledTxsCallSuccess) {
+      notify('error', 'Flashbots API is not available!');
+    }
   }, [bundledTxsCallSuccess, notify]);
 
   if (!isValidBlock) {
@@ -190,7 +192,7 @@ export async function getServerSideProps(context) {
         block: normailizeBlockInfo(blockInsight),
         labeledTxs: blockInsight.transactions,
         isValidBlock: true,
-        bundledTxsCallSuccess: blockInsight.bundledTxsCallSuccess,
+        bundledTxsCallSuccess: false,
       },
     };
   } catch (e) {
