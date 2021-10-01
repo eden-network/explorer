@@ -24,10 +24,12 @@ interface ToastMessageProps {
 const ToastMessage = ({ type, message }: ToastMessageProps) =>
   toast[type](
     <div className="flex white items-center">
-      <div className="font-normal pl-2 pt-0 flex-shrink-0 text-center text-blue">
+      <div className="font-normal pl-2 pt-0 flex-shrink-0 text-center text-white">
         {displayIcon(type)}
       </div>
-      <div className="flex-1 font-normal px-4 text-sm text-blue">{message}</div>
+      <div className="flex-1 font-normal px-4 text-sm text-white">
+        {message}
+      </div>
     </div>,
     { className: 'bg-alert-red' }
   );
