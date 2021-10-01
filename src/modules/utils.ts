@@ -29,7 +29,8 @@ export const safeFetch = async (url, options, callback) => {
       return failResponse;
     }
     const resJson = JSON.parse(resText);
-    return [true, callback(resJson)];
+    const callbackRes = await callback(resJson);
+    return [true, callbackRes];
   } catch (e) {
     // eslint-disable-next-line no-console
     console.log('REST call failed due to internal error:', e);
