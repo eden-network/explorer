@@ -12,6 +12,7 @@ const {
   providerEndpoint,
   cacheBlockParams,
   proxyAuthToken,
+  firstEdenBlock,
   cacheTxParams,
   slotGasCap,
   minerAlias,
@@ -144,4 +145,73 @@ export const getBlockInfo = async (_blockNumber) => {
 
 export const getMinerAlias = (_minerAddress) => {
   return minerAlias[_minerAddress.toLowerCase()] || null;
+};
+
+export const getTxsForAccount = async (
+  _blockNumber,
+  _account,
+  _offset = null,
+  _page = null
+) => {
+  const endpoint = 'https://api.etherscan.io/api';
+  const offset = _offset ?? null;
+  const page = _page ?? null;
+  const query: any = {
+    apikey: process.env.ETHERSCAN_API_TOKEN,
+    startblock: firstEdenBlock,
+    endblock: _blockNumber,
+    address: _account,
+    module: 'account',
+    action: 'txlist',
+    sort: 'desc',
+    offset,
+    page,
+  };
+  const queryString = new URLSearchParams(query);
+  const url: any = new URL(endpoint);
+  url.search = queryString;
+  const { status, message, result } = await fetch(url.href).then((r) =>
+    r.json()
+  );
+  if (status !== '1') {
+    console.log(`Etherscan request failed: ${message}`);
+    return [];
+  }
+  return result;
+};
+
+export const filterForEdenBlocks = async (_blocks) => {
+  // GraphQL returns max of 1000 entries per call
+  return request(
+    graphNetworkEndpoint,
+    gql`{
+          blocks(
+            first: 1000,
+            where : { 
+                fromActiveProducer: true, 
+                number_in: [${_blocks.join()}]
+            }
+          ) {
+            number
+          }
+      }`
+  );
+};
+
+export const getLatestStake = async (_staker) => {
+  const response = await request(
+    graphNetworkEndpoint,
+    gql`{
+          staker(
+            id: "${_staker.toLowerCase()}"
+          ) {
+            staked, 
+            rank
+          }
+      }`
+  ).then((r) => r.staker);
+  if (response === null) {
+    return { rank: -1, staked: 0 };
+  }
+  return response;
 };

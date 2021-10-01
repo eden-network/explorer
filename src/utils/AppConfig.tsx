@@ -1,4 +1,5 @@
 export const AppConfig = {
+  firstEdenBlock: 12965000,
   site_name: 'Eden Network Explorer',
   title: 'Home',
   description: 'Eden Network block and stacking view',
