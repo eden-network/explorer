@@ -1,4 +1,10 @@
-export default function EtherscanLink({ path }: { path: string }) {
+export default function EtherscanLink({
+  path,
+  text = 'View on Etherscan',
+}: {
+  path: string;
+  text: string;
+}) {
   return (
     <a
       href={`https://etherscan.io/${path}`}
@@ -6,7 +12,7 @@ export default function EtherscanLink({ path }: { path: string }) {
       target="_blank"
       rel="noreferrer"
     >
-      View on Etherscan
+      {text}
       <svg
         xmlns="http://www.w3.org/2000/svg"
         className="h-10 w-10 pl-2"
