@@ -5,6 +5,8 @@ import EtherscanLink from '../../components/EtherscanLink';
 import StakerHeroStats from '../../components/StakerHeroStats';
 import { Meta } from '../../layout/Meta';
 import Shell from '../../layout/Shell';
+import { getAddressForENS } from '../../modules/getters';
+import { validate as ensValidator } from '../../modules/validator/ens';
 
 const WEI = BigInt('1000000000000000000');
 
@@ -44,8 +46,13 @@ export default function Address({ staked, rank, outOf }) {
 }
 
 export async function getServerSideProps(context) {
+  // Find address if ENS
+  let { address } = context.query;
+  if (ensValidator(address)) {
+    address = await getAddressForENS(address);
+  }
   const [data, stats] = await Promise.all([
-    staker({ staker: context.query.address.toLowerCase(), network: 'mainnet' }),
+    staker({ staker: address.toLowerCase(), network: 'mainnet' }),
     stakeStats(),
   ]);
   const staked = data !== undefined ? Number(data.staked / WEI) : undefined;
