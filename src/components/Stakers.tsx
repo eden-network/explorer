@@ -46,7 +46,9 @@ export default function Stakers({
                       #{staker.rank + 1}
                     </td>
                     <td className="px-2 sm:px-6 py-4 whitespace-nowrap">
-                      {Math.floor(staker.staked).toLocaleString()}
+                      {staker.staked > 1
+                        ? Math.floor(staker.staked).toLocaleString()
+                        : '< 1'}
                     </td>
                     <td className="px-2 sm:px-6 py-4 whitespace-nowrap">
                       <Link href={`/address/${staker.id}`}>
