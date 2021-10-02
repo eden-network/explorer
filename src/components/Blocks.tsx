@@ -18,6 +18,7 @@ export default function Blocks({
     slotTxs: number;
     bundledTxs: number;
     stakerTxs: number;
+    bundledTxsCallSuccess: boolean;
   }[];
 }) {
   const timeAgo = useMemo(() => new TimeAgo('en-US'), []);
@@ -29,6 +30,7 @@ export default function Blocks({
           number: block.number,
           author: getMinerAlias(block.author) || block.author,
           timestamp: timeAgo.format(block.timestamp * 1000),
+          bundledTxsCallSuccess: block.bundledTxsCallSuccess,
           bundledTxs: block.bundledTxs,
           stakerTxs: block.stakerTxs,
           slotTxs: block.slotTxs,
@@ -103,7 +105,9 @@ export default function Blocks({
                       {block.slotTxs}
                     </td>
                     <td className="px-2 sm:px-6 py-4 whitespace-nowrap text-center">
-                      {block.bundledTxs}
+                      {block.bundledTxs > 0 || block.bundledTxsCallSuccess
+                        ? block.bundledTxs
+                        : '?'}
                     </td>
                     <td className="px-2 sm:px-6 py-4 whitespace-nowrap text-center">
                       {block.stakerTxs}

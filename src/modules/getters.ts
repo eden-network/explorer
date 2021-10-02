@@ -100,7 +100,15 @@ export const getBundledTxs = async (_blockNumber) => {
     `${flashbotsAPIEndpoint}/v1/blocks?block_number=${_blockNumber}`,
     { method: 'GET', headers: { Auth: proxyAuthToken } },
     (resJson) => {
-      if (!resJson || !resJson.blocks || resJson.blocks.length === 0) {
+      if (!resJson || !resJson.blocks || !resJson.latest_block_number) {
+        throw new Error(`Invalid response format:\n${JSON.stringify(resJson)}`);
+      }
+      if (resJson.latest_block_number < _blockNumber) {
+        throw new Error(
+          `Querying block ${_blockNumber}, but latest avl block is ${resJson.latest_block_number}`
+        );
+      }
+      if (resJson.blocks.length === 0) {
         return [];
       }
       return Object.fromEntries(

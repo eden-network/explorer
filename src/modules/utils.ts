@@ -15,23 +15,25 @@ export const BNToGwei = (_bn) => {
 };
 
 export const safeFetch = async (url, options, callback) => {
+  const failResponse = [false, []];
   try {
     const res: any = await fetch(url, options).catch((e) => {
       // eslint-disable-next-line no-console
-      console.log(`Couldn't fetch bundles info:`, e);
-      return [];
+      console.log(`REST call failed:`, e);
+      return failResponse;
     });
     const resText = await res.text();
     if (res.status !== 200) {
       // eslint-disable-next-line no-console
-      console.log('External error: ', res.status);
-      return [];
+      console.log('REST call failed due to external error: ', res.status);
+      return failResponse;
     }
     const resJson = JSON.parse(resText);
-    return callback(resJson);
+    const callbackRes = await callback(resJson);
+    return [true, callbackRes];
   } catch (e) {
     // eslint-disable-next-line no-console
-    console.log('Internal error:', e);
-    return [];
+    console.log('REST call failed due to internal error:', e);
+    return failResponse;
   }
 };

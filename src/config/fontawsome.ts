@@ -9,6 +9,10 @@ import {
   faExternalLinkAlt,
   faLongArrowAltUp,
   faLongArrowAltDown,
+  faCheckCircle,
+  faInfoCircle,
+  faExclamationTriangle,
+  faExclamationCircle,
 } from '@fortawesome/free-solid-svg-icons';
 
 library.add(
@@ -19,5 +23,9 @@ library.add(
   faExternalLinkAlt,
   faLongArrowAltUp,
   faClipboard,
-  faLongArrowAltDown
+  faLongArrowAltDown,
+  faCheckCircle,
+  faInfoCircle,
+  faExclamationTriangle,
+  faExclamationCircle
 );
