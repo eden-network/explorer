@@ -78,6 +78,8 @@ export const getBlockInsightAndCache = async (_blockNumber) => {
       console.log('Invalid cache');
       throw new Error('Invalid cache');
     }
+    // Only responses from successfull calls were cached
+    blockInsight.bundledTxsCallSuccess = true;
     return blockInsight;
   } catch (_) {} // eslint-disable-line no-empty
   const blockInsight = await getBlockInsight(_blockNumber);

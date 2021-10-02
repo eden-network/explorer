@@ -78,6 +78,7 @@ export async function getServerSideProps(context) {
             slotTxs: blockInsight.transactions.filter(
               (tx) => tx.toSlot !== false
             ).length,
+            bundledTxsCallSuccess: blockInsight.bundledTxsCallSuccess,
             timestamp: block.timestamp,
             author: block.author,
             number: block.number,
