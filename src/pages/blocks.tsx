@@ -57,33 +57,49 @@ export default function BlocksPage({ blocks }) {
 
 export async function getServerSideProps(context) {
   const skip = context.query.skip ?? 0;
-  const blocks = await blocksPaged({
-    start: skip,
-    num: PER_PAGE,
-    fromActiveProducerOnly: true,
-    network: 'mainnet',
-  });
-  const blocksWithInsight = await Promise.all(
-    blocks.map(async (block) => {
-      const blockInsight = await getBlockInsightAndCache(block.number);
-      return {
-        bundledTxs: blockInsight.transactions.filter(
-          (tx) => tx.bundleIndex !== null
-        ).length,
-        stakerTxs: blockInsight.transactions.filter(
-          (tx) => tx.senderStake >= 100
-        ).length,
-        slotTxs: blockInsight.transactions.filter((tx) => tx.toSlot !== false)
-          .length,
-        timestamp: block.timestamp,
-        author: block.author,
-        number: block.number,
-      };
-    })
-  );
-  return {
-    props: {
-      blocks: blocksWithInsight,
-    },
-  };
+  try {
+    const blocks = await blocksPaged({
+      start: skip,
+      num: PER_PAGE,
+      fromActiveProducerOnly: true,
+      network: 'mainnet',
+    });
+    const blocksWithInsight = await Promise.all(
+      blocks.map(async (block) => {
+        try {
+          const blockInsight = await getBlockInsightAndCache(block.number);
+          return {
+            bundledTxs: blockInsight.transactions.filter(
+              (tx) => tx.bundleIndex !== null
+            ).length,
+            stakerTxs: blockInsight.transactions.filter(
+              (tx) => tx.senderStake >= 100
+            ).length,
+            slotTxs: blockInsight.transactions.filter(
+              (tx) => tx.toSlot !== false
+            ).length,
+            bundledTxsCallSuccess: blockInsight.bundledTxsCallSuccess,
+            timestamp: block.timestamp,
+            author: block.author,
+            number: block.number,
+          };
+        } catch (e) {
+          console.log(e); // eslint-disable-line no-console
+          return block;
+        }
+      })
+    );
+    return {
+      props: {
+        blocks: blocksWithInsight,
+      },
+    };
+  } catch (e) {
+    console.log(e);
+    return {
+      props: {
+        blocks: [],
+      },
+    };
+  }
 }

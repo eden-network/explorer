@@ -1,5 +1,5 @@
 /* eslint-disable react/button-has-type */
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useRouter } from 'next/router';
@@ -8,6 +8,7 @@ import BlockPagination from '../../components/BlockPagination';
 import BlockStatus from '../../components/BlockStatus';
 import ErrorMsg from '../../components/ErrorMsg';
 import LabeledTransactions from '../../components/LabeledTransactions';
+import toast from '../../components/Toast';
 import usePagination from '../../hooks/usePagination.hook';
 import { Meta } from '../../layout/Meta';
 import Shell from '../../layout/Shell';
@@ -22,6 +23,7 @@ interface BlockProps {
   block: NormalizedBlockType;
   isEdenBlock: string;
   isValidBlock: boolean;
+  bundledTxsCallSuccess: boolean;
 }
 
 export default function Block({
@@ -29,6 +31,7 @@ export default function Block({
   block,
   isEdenBlock,
   isValidBlock,
+  bundledTxsCallSuccess,
 }: BlockProps) {
   const router = useRouter();
   const { next, prev, begin, end, maxPage, currentPage, resetCurrentPage } =
@@ -68,11 +71,32 @@ export default function Block({
     router.push(`/block/${block.number + 1}`);
   }, [router, block]);
 
+  const notify = useCallback((type, message) => {
+    toast({ type, message });
+  }, []);
+
+  useEffect(() => {
+    if (!bundledTxsCallSuccess) {
+      notify(
+        'error',
+        'Unable to retrieve Flashbot bundles, please try again in a few minutes!'
+      );
+    }
+  }, [notify, block, bundledTxsCallSuccess]);
+
   if (!isValidBlock) {
     return (
-      <ErrorMsg errorMsg="">
+      <ErrorMsg errorMsg="Couldn't fetch data for the block">
         <div className="text-center pb-2">
-          <div className="pb-4">
+          <a
+            href={`https://etherscan.io/block/${block.number}`}
+            target="_blank"
+            className="text-green"
+            rel="noreferrer"
+          >
+            View block on Etherscan
+          </a>
+          <div className="pb-4 my-10">
             <button
               onClick={handleClickPrev}
               className="mx-3 relative inline-flex items-center px-4 py-2 bg-blue-light text-sm font-medium rounded-md betterhover:hover:bg-green betterhover:hover:text-blue cursor-pointer select-none"
@@ -87,14 +111,6 @@ export default function Block({
               Next
             </button>
           </div>
-          <a
-            href={`https://etherscan.io/block/${block.number}`}
-            target="_blank"
-            className="text-green"
-            rel="noreferrer"
-          >
-            View on Etherscan
-          </a>
         </div>
       </ErrorMsg>
     );
@@ -179,6 +195,7 @@ export async function getServerSideProps(context) {
         block: normailizeBlockInfo(blockInsight),
         labeledTxs: blockInsight.transactions,
         isValidBlock: true,
+        bundledTxsCallSuccess: blockInsight.bundledTxsCallSuccess,
       },
     };
   } catch (e) {
@@ -189,6 +206,7 @@ export async function getServerSideProps(context) {
         isValidBlock: false,
         isEdenBlock: false,
         labeledTxs: [],
+        bundledTxsCallSuccess: false,
       },
     };
   }
