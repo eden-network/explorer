@@ -76,6 +76,10 @@ export async function getServerSideProps(context) {
     address = await getAddressForENS(address);
   }
   const accountInfo = await getAccountInfo(address.toLowerCase());
+  // Change address to ENS if available
+  if (context.query.address.toLowerCase() !== address.toLowerCase()) {
+    accountInfo.accountOverview.address = context.query.address.toLowerCase();
+  }
   return {
     props: {
       ...accountInfo,
