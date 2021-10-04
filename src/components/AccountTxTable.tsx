@@ -86,7 +86,7 @@ export default function AccountTxTable({ transactions }) {
                     <td className="px-2 sm:px-6 py-4 whitespace-nowrap">
                       <ClipboardButton className="pr-2" copyText={tx.hash} />
                       <a
-                        href={`https://etherscan.io/transaction/${tx.hash}`}
+                        href={`https://etherscan.io/tx/${tx.hash}`}
                         className=" hover:text-green"
                         target="_blank"
                         rel="noreferrer"
