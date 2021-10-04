@@ -24,6 +24,10 @@ export const provider = new ethers.providers.JsonRpcProvider(
   network
 );
 
+export const getAddressForENS = async (_ens: string) => {
+  return provider.resolveName(_ens);
+};
+
 export const getCapForSlots = () => {
   return { 0: slotGasCap, 1: slotGasCap, 2: slotGasCap };
 };

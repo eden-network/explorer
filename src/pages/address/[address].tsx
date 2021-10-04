@@ -9,6 +9,8 @@ import usePagination from '../../hooks/usePagination.hook';
 import { Meta } from '../../layout/Meta';
 import Shell from '../../layout/Shell';
 import { getAccountInfo } from '../../modules/account-info';
+import { getAddressForENS } from '../../modules/getters';
+import { validate as ensValidator } from '../../modules/validator/ens';
 
 const PAGE_SIZE = 10;
 
@@ -68,7 +70,12 @@ export default function Address({ accountOverview, transactions }) {
 }
 
 export async function getServerSideProps(context) {
-  const accountInfo = await getAccountInfo(context.query.address.toLowerCase());
+  // Find address if ENS
+  let { address } = context.query;
+  if (ensValidator(address)) {
+    address = await getAddressForENS(address);
+  }
+  const accountInfo = await getAccountInfo(address.toLowerCase());
   return {
     props: {
       ...accountInfo,

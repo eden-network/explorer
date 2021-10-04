@@ -8,6 +8,7 @@ import logo from '../../public/logo.svg';
 import Search from '../components/Search';
 import { validate as addressValidator } from '../modules/validator/address';
 import { validate as blockValidator } from '../modules/validator/block';
+import { validate as ensValidator } from '../modules/validator/ens';
 
 const selectedButton =
   'bg-blue-light text-white px-3 py-2 rounded-md text-sm font-medium';
@@ -27,6 +28,8 @@ export default function Header() {
       router.push(`/address/${keyWord}`);
     } else if (blockValidator(keyWord)) {
       router.push(`/block/${parseInt(keyWord, 10)}`);
+    } else if (ensValidator(keyWord)) {
+      router.push(`/address/${keyWord.toLocaleLowerCase()}`);
     } else {
       setInputError(true);
     }
@@ -88,7 +91,7 @@ export default function Header() {
             <div className="flex items-center px-2 pt-3 pb-6 md:max-w-3xl md:mx-auto sm:px-6 sm:py-4 lg:max-w-none lg:mx-0 xl:px-0">
               <Search
                 value={value}
-                prompt="Search by address, or block"
+                prompt="Search by ENS, address, or block"
                 handleChange={handleChange}
                 handleKeyDown={handleKeyDown}
                 error={inputError}
