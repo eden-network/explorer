@@ -35,12 +35,8 @@ export default function Block({
 }: BlockProps) {
   const router = useRouter();
 
-  const initialPage = (() => {
-
-  }, [router])
-
   const { setCurrentPage, currentPage, maxPage, begin, next, prev, end } =
-    usePagination(labeledTxs.length, PAGE_SIZE);
+    usePagination(labeledTxs.length, PAGE_SIZE, 14);
   const [order, setOrder] = useState('asc');
   const [orderBy, setOrderBy] = useState('position');
 
@@ -87,15 +83,19 @@ export default function Block({
 
   useEffect(() => {
     const hash = window.location.hash.slice(1);
-    const targetPage = pageForTx[hash];
-    setCurrentPage(targetPage);
+    if (hash) {
+      const targetPage = pageForTx[hash];
+      setCurrentPage(targetPage);
 
-    setTimeout(() => {
-      if (document.getElementById(hash)) {
-        const element = document.getElementById(hash);
-        element.scrollIntoView();
-      }
-    }, 0);
+      setTimeout(() => {
+        if (document.getElementById(hash)) {
+          const element = document.getElementById(hash);
+          element.scrollIntoView();
+        }
+      }, 0);
+    } else {
+      setCurrentPage(1);
+    }
 
     if (!bundledTxsCallSuccess) {
       notify(
@@ -103,7 +103,8 @@ export default function Block({
         'Unable to retrieve Flashbot bundles, please try again in a few minutes!'
       );
     }
-  }, []);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [router]);
 
   if (!isValidBlock) {
     return (
