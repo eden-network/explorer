@@ -29,19 +29,31 @@ export default function AccountTxTable({ transactions }) {
                     scope="col"
                     className="px-2 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
                   >
-                    Hash
-                  </th>
-                  <th
-                    scope="col"
-                    className="px-2 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                  >
                     Block
                   </th>
                   <th
                     scope="col"
                     className="px-2 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
                   >
+                    Timestamp
+                  </th>
+                  <th
+                    scope="col"
+                    className="px-2 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  >
+                    Hash
+                  </th>
+                  <th
+                    scope="col"
+                    className="px-2 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  >
                     To
+                  </th>
+                  <th
+                    scope="col"
+                    className="px-2 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  >
+                    Status
                   </th>
                   <th
                     scope="col"
@@ -58,17 +70,6 @@ export default function AccountTxTable({ transactions }) {
                       {tx.nonce}
                     </td>
                     <td className="px-2 sm:px-6 py-4 whitespace-nowrap">
-                      <ClipboardButton className="pr-2" copyText={tx.hash} />
-                      <a
-                        href={`https://etherscan.io/transaction/${tx.hash}`}
-                        className=" hover:text-green"
-                        target="_blank"
-                        rel="noreferrer"
-                      >
-                        {formatTxHash(tx.hash)}
-                      </a>
-                    </td>
-                    <td className="px-2 sm:px-6 py-4 whitespace-nowrap">
                       <ClipboardButton className="pr-2" copyText={tx.block} />
                       <a
                         href={`/block/${tx.block}`}
@@ -77,6 +78,20 @@ export default function AccountTxTable({ transactions }) {
                         rel="noreferrer"
                       >
                         {tx.block}
+                      </a>
+                    </td>
+                    <td className="px-2 sm:px-6 py-4 whitespace-nowrap">
+                      {new Date(tx.timestamp * 1e3).toLocaleString()}
+                    </td>
+                    <td className="px-2 sm:px-6 py-4 whitespace-nowrap">
+                      <ClipboardButton className="pr-2" copyText={tx.hash} />
+                      <a
+                        href={`https://etherscan.io/transaction/${tx.hash}`}
+                        className=" hover:text-green"
+                        target="_blank"
+                        rel="noreferrer"
+                      >
+                        {formatTxHash(tx.hash)}
                       </a>
                     </td>
                     <td className="px-2 sm:px-6 py-4 whitespace-nowrap">
@@ -89,6 +104,13 @@ export default function AccountTxTable({ transactions }) {
                       >
                         {formatAddress(tx.to)}
                       </a>
+                    </td>
+                    <td
+                      className={`px-2 sm:px-6 py-4 whitespace-nowrap capitalize ${
+                        tx.status === 'fail' ? 'text-red' : 'text-green'
+                      }`}
+                    >
+                      {tx.status}
                     </td>
                     <td className="px-2 sm:px-6 py-4 whitespace-nowrap">
                       {tx.gasPrice} Gwei

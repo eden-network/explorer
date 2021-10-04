@@ -8,6 +8,7 @@ import {
 
 interface TxOverview {
   status: 'success' | 'fail';
+  timestamp: number;
   gasPrice: number;
   block: number;
   nonce: number;
@@ -50,6 +51,7 @@ export const getAccountInfo = async (_account) => {
       block: parseInt(_tx.blockNumber, 10),
       to: ethers.utils.getAddress(_tx.to),
       nonce: parseInt(_tx.nonce, 10),
+      timestamp: _tx.timeStamp,
       hash: _tx.hash,
     };
   };
