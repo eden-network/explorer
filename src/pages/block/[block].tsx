@@ -34,16 +34,13 @@ export default function Block({
   bundledTxsCallSuccess,
 }: BlockProps) {
   const router = useRouter();
-  const {
-    resetCurrentPage,
-    setCurrentPage,
-    currentPage,
-    maxPage,
-    begin,
-    next,
-    prev,
-    end,
-  } = usePagination(labeledTxs.length, PAGE_SIZE);
+
+  const initialPage = (() => {
+
+  }, [router])
+
+  const { setCurrentPage, currentPage, maxPage, begin, next, prev, end } =
+    usePagination(labeledTxs.length, PAGE_SIZE);
   const [order, setOrder] = useState('asc');
   const [orderBy, setOrderBy] = useState('position');
 
@@ -55,7 +52,7 @@ export default function Block({
     }
     setOrder(newOrder);
     setOrderBy(property);
-    resetCurrentPage();
+    setCurrentPage(1);
   };
 
   const parsedTxs = labeledTxs.map((v) => {
@@ -89,30 +86,16 @@ export default function Block({
   }, []);
 
   useEffect(() => {
-    async function waitForElement(id) {
-      return new Promise((resolve) => {
-        if (document.getElementById(id)) {
-          resolve(document.getElementById(id));
-        }
-        const observer = new MutationObserver(() => {
-          if (document.getElementById(id)) {
-            resolve(document.getElementById(id));
-            observer.disconnect();
-          }
-        });
-        observer.observe(document.body, {
-          childList: true,
-          subtree: true,
-        });
-      });
-    }
-
     const hash = window.location.hash.slice(1);
     const targetPage = pageForTx[hash];
     setCurrentPage(targetPage);
-    waitForElement(hash).then((element: any) => {
-      element.scrollIntoView();
-    });
+
+    setTimeout(() => {
+      if (document.getElementById(hash)) {
+        const element = document.getElementById(hash);
+        element.scrollIntoView();
+      }
+    }, 0);
 
     if (!bundledTxsCallSuccess) {
       notify(
