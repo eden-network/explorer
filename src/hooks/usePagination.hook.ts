@@ -28,7 +28,16 @@ function usePagination(totalCount, itemsPerPage, initialPage = 1) {
     setCurrentPage(initialPage);
   }, [totalCount, initialPage]);
 
-  return { next, prev, begin, end, maxPage, currentPage, resetCurrentPage };
+  return {
+    resetCurrentPage,
+    setCurrentPage,
+    currentPage,
+    maxPage,
+    begin,
+    next,
+    prev,
+    end,
+  };
 }
 
 export default usePagination;

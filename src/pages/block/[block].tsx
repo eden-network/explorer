@@ -34,8 +34,16 @@ export default function Block({
   bundledTxsCallSuccess,
 }: BlockProps) {
   const router = useRouter();
-  const { next, prev, begin, end, maxPage, currentPage, resetCurrentPage } =
-    usePagination(labeledTxs.length, PAGE_SIZE);
+  const {
+    resetCurrentPage,
+    setCurrentPage,
+    currentPage,
+    maxPage,
+    begin,
+    next,
+    prev,
+    end,
+  } = usePagination(labeledTxs.length, PAGE_SIZE);
   const [order, setOrder] = useState('asc');
   const [orderBy, setOrderBy] = useState('position');
 
@@ -62,6 +70,11 @@ export default function Block({
     (currentPage - 1) * PAGE_SIZE,
     currentPage * PAGE_SIZE
   );
+  const pageForTx = Object.fromEntries(
+    labeledTxs.map((tx) => {
+      return [tx.hash, Math.ceil(tx.position / PAGE_SIZE)];
+    })
+  );
 
   const handleClickPrev = useCallback(() => {
     router.push(`/block/${block.number - 1}`);
@@ -76,13 +89,38 @@ export default function Block({
   }, []);
 
   useEffect(() => {
+    async function waitForElement(id) {
+      return new Promise((resolve) => {
+        if (document.getElementById(id)) {
+          resolve(document.getElementById(id));
+        }
+        const observer = new MutationObserver(() => {
+          if (document.getElementById(id)) {
+            resolve(document.getElementById(id));
+            observer.disconnect();
+          }
+        });
+        observer.observe(document.body, {
+          childList: true,
+          subtree: true,
+        });
+      });
+    }
+
+    const hash = window.location.hash.slice(1);
+    const targetPage = pageForTx[hash];
+    setCurrentPage(targetPage);
+    waitForElement(hash).then((element: any) => {
+      element.scrollIntoView();
+    });
+
     if (!bundledTxsCallSuccess) {
       notify(
         'error',
         'Unable to retrieve Flashbot bundles, please try again in a few minutes!'
       );
     }
-  }, [notify, block, bundledTxsCallSuccess]);
+  }, []);
 
   if (!isValidBlock) {
     return (
@@ -191,11 +229,11 @@ export async function getServerSideProps(context) {
     const blockInsight = await getBlockInsightAndCache(blockNum);
     return {
       props: {
+        bundledTxsCallSuccess: blockInsight.bundledTxsCallSuccess,
         isEdenBlock: blockInsight.fromEdenProducer,
         block: normailizeBlockInfo(blockInsight),
         labeledTxs: blockInsight.transactions,
         isValidBlock: true,
-        bundledTxsCallSuccess: blockInsight.bundledTxsCallSuccess,
       },
     };
   } catch (e) {

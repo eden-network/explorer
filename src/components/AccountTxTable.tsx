@@ -72,7 +72,7 @@ export default function AccountTxTable({ transactions }) {
                     <td className="px-2 sm:px-6 py-4 whitespace-nowrap">
                       <ClipboardButton className="pr-2" copyText={tx.block} />
                       <a
-                        href={`/block/${tx.block}`}
+                        href={`/block/${tx.block}#${tx.hash}`}
                         className=" hover:text-green"
                         target="_blank"
                         rel="noreferrer"
