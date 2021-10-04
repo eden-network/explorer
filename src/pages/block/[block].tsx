@@ -1,5 +1,5 @@
 /* eslint-disable react/button-has-type */
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useState, useMemo } from 'react';
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useRouter } from 'next/router';
@@ -35,8 +35,22 @@ export default function Block({
 }: BlockProps) {
   const router = useRouter();
 
+  const initialPage = useMemo(() => {
+    const selectedTx = router.query.selected_tx
+      ? router.query.selected_tx
+      : null;
+    if (selectedTx) {
+      const ind = labeledTxs.findIndex((tx) => tx.hash === selectedTx);
+      if (ind > 0) {
+        return Math.floor(ind / PAGE_SIZE) + 1;
+      }
+    }
+    return 1;
+  }, [router, labeledTxs]);
+
   const { setCurrentPage, currentPage, maxPage, begin, next, prev, end } =
-    usePagination(labeledTxs.length, PAGE_SIZE, 14);
+    usePagination(labeledTxs.length, PAGE_SIZE, initialPage);
+
   const [order, setOrder] = useState('asc');
   const [orderBy, setOrderBy] = useState('position');
 
@@ -63,11 +77,6 @@ export default function Block({
     (currentPage - 1) * PAGE_SIZE,
     currentPage * PAGE_SIZE
   );
-  const pageForTx = Object.fromEntries(
-    labeledTxs.map((tx) => {
-      return [tx.hash, Math.ceil(tx.position / PAGE_SIZE)];
-    })
-  );
 
   const handleClickPrev = useCallback(() => {
     router.push(`/block/${block.number - 1}`);
@@ -82,21 +91,6 @@ export default function Block({
   }, []);
 
   useEffect(() => {
-    const hash = window.location.hash.slice(1);
-    if (hash) {
-      const targetPage = pageForTx[hash];
-      setCurrentPage(targetPage);
-
-      setTimeout(() => {
-        if (document.getElementById(hash)) {
-          const element = document.getElementById(hash);
-          element.scrollIntoView();
-        }
-      }, 0);
-    } else {
-      setCurrentPage(1);
-    }
-
     if (!bundledTxsCallSuccess) {
       notify(
         'error',

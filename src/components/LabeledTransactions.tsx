@@ -1,3 +1,8 @@
+import { useRef, useEffect } from 'react';
+
+import cx from 'classnames';
+import { useRouter } from 'next/router';
+
 import useWindowSize from '../hooks/useWindowSize.hook';
 import { AppConfig } from '../utils/AppConfig';
 import ClipboardButton from './ClipboardButton';
@@ -35,7 +40,19 @@ export default function LabeledTransactions({
   order,
 }) {
   const { width } = useWindowSize();
+  const router = useRouter();
+  const fieldRef = useRef(null);
   const isMobile = width < AppConfig.breakpoints.small;
+
+  const selectedTx = router.query.selected_tx ? router.query.selected_tx : null;
+
+  useEffect(() => {
+    if (fieldRef.current) {
+      fieldRef.current.scrollIntoView({
+        behavior: 'smooth',
+      });
+    }
+  }, []);
 
   return (
     <div className="flex flex-col">
@@ -188,9 +205,11 @@ export default function LabeledTransactions({
                   const rowColor = getRowColor(tx);
                   return (
                     <tr
-                      id={tx.hash}
+                      ref={tx.hash === selectedTx ? fieldRef : null}
                       key={tx.hash}
-                      className="text-gray-300 active:ring active:border-red-300"
+                      className={cx('text-gray-300', {
+                        'ring border-red-300': tx.hash === selectedTx,
+                      })}
                     >
                       <td className="py-4 text-center whitespace-nowrap">
                         {tx.position}
