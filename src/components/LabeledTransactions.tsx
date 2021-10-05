@@ -242,7 +242,7 @@ export default function LabeledTransactions({
                           />
                           <a
                             href={`https://etherscan.io/tx/${tx.hash}`}
-                            className=" hover:text-green block"
+                            className=" hover:text-green block w-26"
                             target="_blank"
                             rel="noreferrer"
                             onClick={handleClickLink}
@@ -259,7 +259,7 @@ export default function LabeledTransactions({
                           />
                           <a
                             href={`/address/${tx.from}`}
-                            className="  hover:text-green block"
+                            className=" hover:text-green block w-26"
                             target="_blank"
                             rel="noreferrer"
                             onClick={handleClickLink}
@@ -278,7 +278,7 @@ export default function LabeledTransactions({
                           />
                           <a
                             href={`/address/${tx.to}`}
-                            className=" hover:text-green block"
+                            className=" hover:text-green block w-26"
                             target="_blank"
                             rel="noreferrer"
                             onClick={handleClickLink}

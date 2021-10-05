@@ -27,7 +27,7 @@ export default function AccountTxTable({ transactions }) {
                   </th>
                   <th
                     scope="col"
-                    className="px-2 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                    className="px-2 sm:px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider"
                   >
                     Eden
                   </th>
@@ -39,19 +39,19 @@ export default function AccountTxTable({ transactions }) {
                   </th>
                   <th
                     scope="col"
-                    className="px-2 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                    className="px-2 sm:pl-2 sm:pr-12 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider"
                   >
                     Timestamp
                   </th>
                   <th
                     scope="col"
-                    className="px-2 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                    className="px-2 sm:px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider"
                   >
                     Hash
                   </th>
                   <th
                     scope="col"
-                    className="px-2 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                    className="px-2 sm:px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider"
                   >
                     To
                   </th>
@@ -83,40 +83,52 @@ export default function AccountTxTable({ transactions }) {
                       {tx.isEden ? 'Yes' : 'No'}
                     </td>
                     <td className="px-2 sm:px-6 py-4 whitespace-nowrap">
-                      <ClipboardButton className="pr-2" copyText={tx.block} />
-                      <a
-                        href={`/block/${tx.block}?tx=${tx.hash}`}
-                        className=" hover:text-green"
-                        target="_blank"
-                        rel="noreferrer"
-                      >
-                        {tx.block}
-                      </a>
+                      <span className="flex items-center justify-center">
+                        <ClipboardButton
+                          className="pr-2 block"
+                          copyText={tx.block}
+                        />
+                        <a
+                          href={`/block/${tx.block}?tx=${tx.hash}`}
+                          className=" hover:text-green block"
+                          target="_blank"
+                          rel="noreferrer"
+                        >
+                          {tx.block}
+                        </a>
+                      </span>
                     </td>
                     <td className="px-2 sm:px-6 py-4 whitespace-nowrap">
                       {new Date(tx.timestamp * 1e3).toLocaleString()}
                     </td>
                     <td className="px-2 sm:px-6 py-4 whitespace-nowrap">
-                      <ClipboardButton className="pr-2" copyText={tx.hash} />
-                      <a
-                        href={`https://etherscan.io/tx/${tx.hash}`}
-                        className=" hover:text-green"
-                        target="_blank"
-                        rel="noreferrer"
-                      >
-                        {formatTxHash(tx.hash)}
-                      </a>
+                      <span className="flex items-center justify-center">
+                        <ClipboardButton
+                          className="pr-2 block"
+                          copyText={tx.hash}
+                        />
+                        <a
+                          href={`https://etherscan.io/tx/${tx.hash}`}
+                          className=" hover:text-green block"
+                          target="_blank"
+                          rel="noreferrer"
+                        >
+                          {formatTxHash(tx.hash)}
+                        </a>
+                      </span>
                     </td>
                     <td className="px-2 sm:px-6 py-4 whitespace-nowrap">
-                      <ClipboardButton className="pr-2" copyText={tx.to} />
-                      <a
-                        href={`/address/${tx.to}`}
-                        className=" hover:text-green"
-                        target="_blank"
-                        rel="noreferrer"
-                      >
-                        {formatAddress(tx.to)}
-                      </a>
+                      <span className="flex items-center justify-center">
+                        <ClipboardButton className="pr-2" copyText={tx.to} />
+                        <a
+                          href={`/address/${tx.to}`}
+                          className=" hover:text-green block"
+                          target="_blank"
+                          rel="noreferrer"
+                        >
+                          {formatAddress(tx.to)}
+                        </a>
+                      </span>
                     </td>
                     <td
                       className={`px-2 sm:px-6 py-4 whitespace-nowrap capitalize ${

@@ -58,7 +58,7 @@ export default function Stakers({
                           copyText={staker.id}
                         />
                         <Link href={`/address/${staker.id}`}>
-                          <a className="hover:text-green block w-44 sm:w-96">
+                          <a className="hover:text-green block w-44 sm:w-90">
                             {isMobileView
                               ? `${staker.id.slice(0, 16)}...${staker.id.slice(
                                   36,
