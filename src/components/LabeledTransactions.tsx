@@ -49,7 +49,7 @@ export default function LabeledTransactions({
   useEffect(() => {
     if (fieldRef.current) {
       fieldRef.current.scrollIntoView({
-        behavior: 'auto',
+        behavior: 'smooth',
         block: 'center',
         inline: 'nearest',
       });
