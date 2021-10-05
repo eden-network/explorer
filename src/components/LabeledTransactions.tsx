@@ -50,6 +50,8 @@ export default function LabeledTransactions({
     if (fieldRef.current) {
       fieldRef.current.scrollIntoView({
         behavior: 'smooth',
+        block: 'center',
+        inline: 'nearest',
       });
     }
   }, []);
