@@ -1,4 +1,6 @@
 /* eslint-disable react/jsx-props-no-spreading */
+import { useEffect } from 'react';
+
 import { useRouter } from 'next/router';
 
 import AccountTxTable from '../../components/AccountTxTable';
@@ -19,14 +21,21 @@ export default function Address({ accountOverview, transactions }) {
   const pageNum = router.query.page ? Number(router.query.page) : 1;
 
   const { next, prev, begin, end, maxPage, currentPage } = usePagination(
-    accountOverview.edenTxCount,
+    Math.ceil(accountOverview.txCount / PAGE_SIZE),
     PAGE_SIZE,
     pageNum
   );
-  const currentTxs = transactions.slice(
-    (currentPage - 1) * PAGE_SIZE,
-    currentPage * PAGE_SIZE
-  );
+  useEffect(() => {
+    if (currentPage !== Number(router.query.page)) {
+      router.push(
+        `/address/${router.query.address}?page=${
+          router.query.page === undefined ? 1 : currentPage
+        }`,
+        null,
+        { scroll: false }
+      );
+    }
+  }, [currentPage, router]);
 
   return (
     <Shell
@@ -52,7 +61,7 @@ export default function Address({ accountOverview, transactions }) {
         <div className="flex flex-col rounded-lg shadow-lg overflow-hidden bg-blue">
           <div className="p-3 flex-1 sm:p-6 flex flex-col justify-between">
             <div className="flex-1 mt-4">
-              <AccountTxTable transactions={currentTxs} />
+              <AccountTxTable transactions={transactions} />
             </div>
             <BlockPagination
               prev={prev}
@@ -70,12 +79,17 @@ export default function Address({ accountOverview, transactions }) {
 }
 
 export async function getServerSideProps(context) {
+  const pageNum = context.query.page ?? 1;
   // Find address if ENS
   let { address } = context.query;
   if (ensValidator(address)) {
     address = await getAddressForENS(address);
   }
-  const accountInfo = await getAccountInfo(address.toLowerCase());
+  const accountInfo = await getAccountInfo(
+    address.toLowerCase(),
+    PAGE_SIZE,
+    pageNum
+  );
   // Change address to ENS if available
   if (context.query.address.toLowerCase() !== address.toLowerCase()) {
     accountInfo.accountOverview.address = context.query.address.toLowerCase();

@@ -29,6 +29,12 @@ export default function AccountTxTable({ transactions }) {
                     scope="col"
                     className="px-2 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
                   >
+                    Eden
+                  </th>
+                  <th
+                    scope="col"
+                    className="px-2 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  >
                     Block
                   </th>
                   <th
@@ -65,9 +71,16 @@ export default function AccountTxTable({ transactions }) {
               </thead>
               <tbody className="divide-y divide-blue-light border-b border-blue-light">
                 {transactions.map((tx) => (
-                  <tr key={tx.nonce}>
-                    <td className="px-2 sm:px-6 py-4 whitespace-nowrap">
+                  <tr key={tx.hash}>
+                    <td className="px-2 sm:px-6 py-4 whitespace-nowrap ">
                       {tx.nonce}
+                    </td>
+                    <td
+                      className={`px-2 sm:px-6 py-4 whitespace-nowrap capitalize flex justify-center ${
+                        tx.isEden ? 'text-green' : 'text-white'
+                      }`}
+                    >
+                      {tx.isEden ? 'Yes' : 'No'}
                     </td>
                     <td className="px-2 sm:px-6 py-4 whitespace-nowrap">
                       <ClipboardButton className="pr-2" copyText={tx.block} />
