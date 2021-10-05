@@ -1,5 +1,3 @@
-import Link from 'next/link';
-
 import useWindowSize from '../hooks/useWindowSize.hook';
 import { AppConfig } from '../utils/AppConfig';
 import ClipboardButton from './ClipboardButton';
@@ -57,16 +55,19 @@ export default function Stakers({
                           className="pr-2"
                           copyText={staker.id}
                         />
-                        <Link href={`/address/${staker.id}`}>
-                          <a className="hover:text-green block w-44 sm:w-90">
-                            {isMobileView
-                              ? `${staker.id.slice(0, 16)}...${staker.id.slice(
-                                  36,
-                                  40
-                                )}`
-                              : staker.id}
-                          </a>
-                        </Link>
+                        <a
+                          className="hover:text-green block w-44 sm:w-90"
+                          href={`/address/${staker.id}`}
+                          target="_blank"
+                          rel="noreferrer"
+                        >
+                          {isMobileView
+                            ? `${staker.id.slice(0, 16)}...${staker.id.slice(
+                                36,
+                                40
+                              )}`
+                            : staker.id}
+                        </a>
                       </span>
                     </td>
                   </tr>
