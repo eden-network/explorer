@@ -21,7 +21,7 @@ export default function Address({ accountOverview, transactions }) {
   const pageNum = router.query.page ? Number(router.query.page) : 1;
 
   const { next, prev, begin, end, maxPage, currentPage } = usePagination(
-    Math.ceil(accountOverview.txCount / PAGE_SIZE),
+    accountOverview.txCount,
     PAGE_SIZE,
     pageNum
   );
@@ -79,7 +79,7 @@ export default function Address({ accountOverview, transactions }) {
 }
 
 export async function getServerSideProps(context) {
-  const pageNum = context.query.page ?? 1;
+  const pageNum = context.query.page || 1;
   // Find address if ENS
   let { address } = context.query;
   if (ensValidator(address)) {

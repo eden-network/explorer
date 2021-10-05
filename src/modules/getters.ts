@@ -12,7 +12,6 @@ const {
   providerEndpoint,
   cacheBlockParams,
   proxyAuthToken,
-  firstEdenBlock,
   cacheTxParams,
   slotGasCap,
   minerAlias,
@@ -174,7 +173,7 @@ export const getTxsForAccount = async (
   const endpoint = 'https://api.etherscan.io/api';
   const query: any = {
     apikey: process.env.ETHERSCAN_API_TOKEN,
-    startblock: firstEdenBlock,
+    startblock: 0,
     endblock: _blockNumber,
     address: _account,
     module: 'account',
