@@ -162,12 +162,10 @@ export const getMinerAlias = (_minerAddress) => {
 export const getTxsForAccount = async (
   _blockNumber,
   _account,
-  _offset = null,
-  _page = null
+  _offset = 1000,
+  _page = 1
 ) => {
   const endpoint = 'https://api.etherscan.io/api';
-  const offset = _offset ?? null;
-  const page = _page ?? null;
   const query: any = {
     apikey: process.env.ETHERSCAN_API_TOKEN,
     startblock: firstEdenBlock,
@@ -175,9 +173,9 @@ export const getTxsForAccount = async (
     address: _account,
     module: 'account',
     action: 'txlist',
+    offset: _offset,
     sort: 'desc',
-    offset,
-    page,
+    page: _page,
   };
   const queryString = new URLSearchParams(query);
   const url: any = new URL(endpoint);
