@@ -225,7 +225,6 @@ export default function LabeledTransactions({
                           selectedRow === tx.hash,
                       })}
                       key={tx.hash}
-                      id={tx.hash}
                       onClick={() => handleClickRow(tx)}
                     >
                       <td className="py-4 text-center whitespace-nowrap">
