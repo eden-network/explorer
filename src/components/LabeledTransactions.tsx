@@ -44,7 +44,7 @@ export default function LabeledTransactions({
   const fieldRef = useRef(null);
   const isMobile = width < AppConfig.breakpoints.small;
 
-  const selectedTx = router.query.selected_tx ? router.query.selected_tx : null;
+  const selectedTx = router.query.tx ? router.query.tx : null;
 
   const [selectedRow, setSelectedRow] = useState(null);
 
