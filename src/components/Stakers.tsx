@@ -34,7 +34,7 @@ export default function Stakers({
                   </th>
                   <th
                     scope="col"
-                    className="px-2 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                    className="px-2 sm:px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider"
                   >
                     Address
                   </th>
@@ -52,17 +52,22 @@ export default function Stakers({
                         : '< 1'}
                     </td>
                     <td className="px-2 sm:px-6 py-4 whitespace-nowrap">
-                      <ClipboardButton className="pr-2" copyText={staker.id} />
-                      <Link href={`/address/${staker.id}`}>
-                        <a className="hover:text-green">
-                          {isMobileView
-                            ? `${staker.id.slice(0, 16)}...${staker.id.slice(
-                                36,
-                                40
-                              )}`
-                            : staker.id}
-                        </a>
-                      </Link>
+                      <span className="flex items-center justify-center">
+                        <ClipboardButton
+                          className="pr-2"
+                          copyText={staker.id}
+                        />
+                        <Link href={`/address/${staker.id}`}>
+                          <a className="hover:text-green block w-44 sm:w-96">
+                            {isMobileView
+                              ? `${staker.id.slice(0, 16)}...${staker.id.slice(
+                                  36,
+                                  40
+                                )}`
+                              : staker.id}
+                          </a>
+                        </Link>
+                      </span>
                     </td>
                   </tr>
                 ))}
