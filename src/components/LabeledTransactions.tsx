@@ -1,6 +1,5 @@
-import { useRef, useEffect } from 'react';
+import { useRef, useEffect, useState } from 'react';
 
-import cx from 'classnames';
 import { useRouter } from 'next/router';
 
 import useWindowSize from '../hooks/useWindowSize.hook';
@@ -46,6 +45,8 @@ export default function LabeledTransactions({
 
   const selectedTx = router.query.selected_tx ? router.query.selected_tx : null;
 
+  const [selectedRow, setSelectedRow] = useState(null);
+
   useEffect(() => {
     if (fieldRef.current) {
       fieldRef.current.scrollIntoView({
@@ -53,8 +54,22 @@ export default function LabeledTransactions({
         block: 'center',
         inline: 'nearest',
       });
+      fieldRef.current.click();
     }
   }, []);
+
+  function highlightSwitch(el, partOfClassName) {
+    if (selectedRow !== null) {
+      selectedRow.className = selectedRow.className.replace(
+        partOfClassName,
+        ''
+      );
+    }
+    if (selectedRow !== el) {
+      el.className += partOfClassName;
+      setSelectedRow(el);
+    }
+  }
 
   return (
     <div className="flex flex-col">
@@ -209,9 +224,14 @@ export default function LabeledTransactions({
                     <tr
                       ref={tx.hash === selectedTx ? fieldRef : null}
                       key={tx.hash}
-                      className={cx('text-gray-300', {
-                        'ring border-red-300': tx.hash === selectedTx,
-                      })}
+                      id={tx.hash}
+                      onClick={() => {
+                        highlightSwitch(
+                          document.getElementById(tx.hash),
+                          'outline-none ring ring-red-300 border-transparent'
+                        );
+                      }}
+                      className="text-gray-300"
                     >
                       <td className="py-4 text-center whitespace-nowrap">
                         {tx.position}
