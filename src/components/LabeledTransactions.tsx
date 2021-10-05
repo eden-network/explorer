@@ -1,4 +1,4 @@
-import { useRef, useEffect, useState } from 'react';
+import { useRef, useEffect, useState, useCallback } from 'react';
 
 import cx from 'classnames';
 import { useRouter } from 'next/router';
@@ -67,6 +67,10 @@ export default function LabeledTransactions({
       setSelectedRow(row.hash);
     }
   };
+
+  const handleClickLink = useCallback((event) => {
+    event.stopPropagation();
+  }, []);
 
   return (
     <div className="flex flex-col">
@@ -241,6 +245,7 @@ export default function LabeledTransactions({
                             className=" hover:text-green block"
                             target="_blank"
                             rel="noreferrer"
+                            onClick={handleClickLink}
                           >
                             {formatTxHash(tx.hash)}{' '}
                           </a>
@@ -257,6 +262,7 @@ export default function LabeledTransactions({
                             className="  hover:text-green block"
                             target="_blank"
                             rel="noreferrer"
+                            onClick={handleClickLink}
                           >
                             {miner === tx.from
                               ? 'Miner'
@@ -275,6 +281,7 @@ export default function LabeledTransactions({
                             className=" hover:text-green block"
                             target="_blank"
                             rel="noreferrer"
+                            onClick={handleClickLink}
                           >
                             {miner === tx.to ? 'Miner' : formatAddress(tx.to)}{' '}
                           </a>

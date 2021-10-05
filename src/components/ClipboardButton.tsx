@@ -27,17 +27,13 @@ export default function ClipboardButton({
   const handleCopyClick = (event) => {
     event.stopPropagation();
     // Asynchronously call copyTextToClipboard
-    copyTextToClipboard(copyText)
-      .then(() => {
-        // If successful, update the isCopied state value
-        setIsCopied(true);
-        setTimeout(() => {
-          setIsCopied(false);
-        }, 250);
-      })
-      .catch((err) => {
-        console.log(err);
-      });
+    copyTextToClipboard(copyText).then(() => {
+      // If successful, update the isCopied state value
+      setIsCopied(true);
+      setTimeout(() => {
+        setIsCopied(false);
+      }, 250);
+    });
   };
 
   return (
