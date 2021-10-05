@@ -26,11 +26,13 @@ export default function Address({ accountOverview, transactions }) {
     pageNum
   );
   useEffect(() => {
-    if (currentPage !== Number(router.query.page)) {
+    // Dont update first page twice!
+    if (
+      (currentPage !== 1 || router.query.page !== undefined) &&
+      currentPage !== Number(router.query.page)
+    ) {
       router.push(
-        `/address/${router.query.address}?page=${
-          router.query.page === undefined ? 1 : currentPage
-        }`,
+        `/address/${router.query.address}?page=${currentPage}`,
         null,
         { scroll: false }
       );
