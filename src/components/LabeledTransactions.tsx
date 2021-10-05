@@ -219,13 +219,12 @@ export default function LabeledTransactions({
                   const rowColor = getRowColor(tx);
                   return (
                     <tr
+                      key={tx.hash}
                       ref={tx.hash === selectedTx ? fieldRef : null}
                       className={cx('text-gray-300', {
                         'outline-none ring ring-red-300 border-transparent':
                           selectedRow === tx.hash,
                       })}
-                      key={tx.hash}
-                      id={tx.hash}
                       onClick={() => handleClickRow(tx)}
                     >
                       <td className="py-4 text-center whitespace-nowrap">
