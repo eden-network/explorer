@@ -9,3 +9,7 @@
 .Toastify__toast-container--bottom-right {
     right: 32px !important;
 }
+
+tbody tr:nth-child(odd) {
+    background-color: #181E47;
+}
