@@ -76,7 +76,7 @@ export default function AccountTxTable({ transactions }) {
                           copyText={tx.block}
                         />
                         <a
-                          href={`/block/${tx.block}?selected_tx=${tx.hash}`}
+                          href={`/block/${tx.block}?tx=${tx.hash}`}
                           className=" hover:text-green block"
                           target="_blank"
                           rel="noreferrer"
