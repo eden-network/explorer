@@ -1,4 +1,4 @@
-import { useRef, useLayoutEffect } from 'react';
+import { useRef, useEffect } from 'react';
 
 import cx from 'classnames';
 import { useRouter } from 'next/router';
@@ -46,7 +46,7 @@ export default function LabeledTransactions({
 
   const selectedTx = router.query.selected_tx ? router.query.selected_tx : null;
 
-  useLayoutEffect(() => {
+  useEffect(() => {
     if (fieldRef.current) {
       fieldRef.current.scrollIntoView({
         behavior: 'auto',
