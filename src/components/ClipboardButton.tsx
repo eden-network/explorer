@@ -24,7 +24,8 @@ export default function ClipboardButton({
   }
 
   // onClick handler function for the copy button
-  const handleCopyClick = () => {
+  const handleCopyClick = (event) => {
+    event.stopPropagation();
     // Asynchronously call copyTextToClipboard
     copyTextToClipboard(copyText)
       .then(() => {

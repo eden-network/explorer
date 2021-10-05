@@ -61,7 +61,11 @@ export default function LabeledTransactions({
   }, []);
 
   const handleClickRow = (row) => {
-    setSelectedRow(row.hash);
+    if (row.hash === selectedRow) {
+      setSelectedRow(null);
+    } else {
+      setSelectedRow(row.hash);
+    }
   };
 
   return (
