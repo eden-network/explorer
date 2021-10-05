@@ -33,7 +33,7 @@ export default function StakerHeroStats({
               </div>
               <div className="flex flex-col border-t border-b border-blue p-6 text-center sm:border-0 sm:border-l sm:border-r">
                 <dt className="order-2 mt-2 text-lg leading-6 font-medium text-blue-light">
-                  Txs in EDEN blocks
+                  Sent txs in EDEN blocks
                 </dt>
                 <dd className="order-1 text-5xl font-extrabold text-blue">
                   {edenTxCount.toLocaleString()}
@@ -41,7 +41,7 @@ export default function StakerHeroStats({
               </div>
               <div className="flex flex-col border-t border-b border-blue p-6 text-center sm:border-0 sm:border-l sm:border-r">
                 <dt className="order-2 mt-2 text-lg leading-6 font-medium text-blue-light">
-                  Proportion of txs in EDEN blocks
+                  Proportion of sent txs in EDEN blocks
                 </dt>
                 <dd className="order-1 text-5xl font-extrabold text-blue">
                   {allTxCount === 1e4 ? '+' : ''}
