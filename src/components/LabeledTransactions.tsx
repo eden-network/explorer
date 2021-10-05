@@ -259,7 +259,7 @@ export default function LabeledTransactions({
                             copyText={tx.from}
                           />
                           <a
-                            href={`https://etherscan.io/address/${tx.from}`}
+                            href={`/address/${tx.from}`}
                             className="  hover:text-green block"
                             target="_blank"
                             rel="noreferrer"
@@ -277,7 +277,7 @@ export default function LabeledTransactions({
                             copyText={tx.to}
                           />
                           <a
-                            href={`https://etherscan.io/address/${tx.to}`}
+                            href={`/address/${tx.to}`}
                             className=" hover:text-green block"
                             target="_blank"
                             rel="noreferrer"
