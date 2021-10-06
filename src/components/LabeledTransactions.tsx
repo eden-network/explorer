@@ -74,9 +74,9 @@ export default function LabeledTransactions({
 
   return (
     <div className="flex flex-col">
-      <div className="overflow-scroll sm:overflow-hidden -my-2 sm:-mx-6 lg:-mx-8">
+      <div className="overflow-scroll md:overflow-hidden -my-2 sm:-mx-6 lg:-mx-8">
         <div className="py-2 align-middle inline-block min-w-full sm:px-4 lg:px-8">
-          <div className="overflow-scroll sm:overflow-hidden sm:rounded-lg">
+          <div className="overflow-scroll md:overflow-hidden sm:rounded-lg">
             <table className="min-w-full">
               <thead className="bg-blue-light">
                 <tr>
