@@ -36,9 +36,7 @@ export default function Block({
   const router = useRouter();
 
   const initialPage = useMemo(() => {
-    const selectedTx = router.query.selected_tx
-      ? router.query.selected_tx
-      : null;
+    const selectedTx = router.query.tx ? router.query.tx : null;
     if (selectedTx) {
       const ind = labeledTxs.findIndex((tx) => tx.hash === selectedTx);
       if (ind > 0) {

@@ -29,6 +29,12 @@ export default function AccountTxTable({ transactions }) {
                     scope="col"
                     className="px-2 sm:px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider"
                   >
+                    Eden
+                  </th>
+                  <th
+                    scope="col"
+                    className="px-2 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  >
                     Block
                   </th>
                   <th
@@ -59,15 +65,28 @@ export default function AccountTxTable({ transactions }) {
                     scope="col"
                     className="px-2 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
                   >
+                    Index
+                  </th>
+                  <th
+                    scope="col"
+                    className="px-2 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  >
                     Gas Price
                   </th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-blue-light border-b border-blue-light">
                 {transactions.map((tx) => (
-                  <tr key={tx.nonce}>
-                    <td className="px-2 sm:px-6 py-4 whitespace-nowrap">
+                  <tr key={tx.hash}>
+                    <td className="px-2 sm:px-6 py-4 whitespace-nowrap ">
                       {tx.nonce}
+                    </td>
+                    <td
+                      className={`px-2 sm:px-6 py-4 whitespace-nowrap capitalize flex justify-center ${
+                        tx.isEden ? 'text-green' : 'text-white'
+                      }`}
+                    >
+                      {tx.isEden ? 'Yes' : 'No'}
                     </td>
                     <td className="px-2 sm:px-6 py-4 whitespace-nowrap">
                       <span className="flex items-center justify-center">
@@ -76,7 +95,7 @@ export default function AccountTxTable({ transactions }) {
                           copyText={tx.block}
                         />
                         <a
-                          href={`/block/${tx.block}?selected_tx=${tx.hash}`}
+                          href={`/block/${tx.block}?tx=${tx.hash}`}
                           className=" hover:text-green block"
                           target="_blank"
                           rel="noreferrer"
@@ -123,6 +142,9 @@ export default function AccountTxTable({ transactions }) {
                       }`}
                     >
                       {tx.status}
+                    </td>
+                    <td className="px-2 sm:px-6 py-4 whitespace-nowrap flex justify-center">
+                      {tx.index}
                     </td>
                     <td className="px-2 sm:px-6 py-4 whitespace-nowrap">
                       {tx.gasPrice} Gwei
