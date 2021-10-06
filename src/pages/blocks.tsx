@@ -42,7 +42,7 @@ export default function BlocksPage({ blocks }) {
       }
     >
       <div className="max-w-4xl mx-auto grid gap-5">
-        <div className="flex flex-col rounded-lg shadow-lg sm:overflow-hidden bg-blue">
+        <div className="flex flex-col rounded-lg shadow-lg overflow-hidden bg-blue">
           <div className="p-3 flex-1 sm:p-6 flex flex-col justify-between">
             <div className="flex-1 mt-4">
               <Blocks blocks={blocks} />
