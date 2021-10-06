@@ -1,6 +1,7 @@
 import { ethers } from 'ethers';
 
 import {
+  getTxCountForAccount,
   filterForEdenBlocks,
   getTxsForAccount,
   getLatestStake,
@@ -10,10 +11,11 @@ interface TxOverview {
   status: 'success' | 'fail';
   timestamp: number;
   gasPrice: number;
+  isEden: boolean;
   block: number;
   nonce: number;
-  to: string;
   hash: string;
+  to: string;
 }
 
 interface AccountOverview {
@@ -21,12 +23,18 @@ interface AccountOverview {
   edenStaked: number;
   allTxCount: number;
   stakerRank: number;
+  txCount: number;
   address: string;
 }
 
-async function getEdenTxsForAccount(_account) {
+async function getEdenTxsForAccount(_account, _txPerPage, _page) {
   const endblockDefault = 99999999;
-  const txsForAccount = await getTxsForAccount(endblockDefault, _account);
+  const txsForAccount = await getTxsForAccount(
+    endblockDefault,
+    _account,
+    _txPerPage,
+    _page
+  );
   const txsFromSender = txsForAccount.filter((tx) => tx.from === _account);
   const blocksForAccount = txsFromSender.map((tx) => tx.blockNumber);
   const edenBlocks = await filterForEdenBlocks(blocksForAccount);
@@ -34,16 +42,18 @@ async function getEdenTxsForAccount(_account) {
   const isEdenBlock = Object.fromEntries(
     edenBlocks.blocks.map((b) => [b.number, true])
   );
-  const edenTxsForAccount = txsFromSender.filter((tx) => {
-    return isEdenBlock[tx.blockNumber] ?? false;
+  const txsForAccountEnriched = txsFromSender.map((tx) => {
+    tx.fromEdenProducer = isEdenBlock[tx.blockNumber] ?? false;
+    return tx;
   });
-  return {
-    allTxCount: txsFromSender.length,
-    edenTxsForAccount,
-  };
+  return txsForAccountEnriched;
 }
 
-export const getAccountInfo = async (_account) => {
+export const getAccountInfo = async (
+  _account,
+  _txPerPage = 1000,
+  _page = 1
+) => {
   const formatTx = (_tx) => {
     return {
       gasPrice: Math.round(parseInt(_tx.gasPrice, 10) / 1e9),
@@ -51,24 +61,28 @@ export const getAccountInfo = async (_account) => {
       block: parseInt(_tx.blockNumber, 10),
       to: ethers.utils.getAddress(_tx.to),
       nonce: parseInt(_tx.nonce, 10),
+      isEden: _tx.fromEdenProducer,
       timestamp: _tx.timeStamp,
       hash: _tx.hash,
     };
   };
   const [
-    { edenTxsForAccount, allTxCount },
+    txsForAccount,
     { staked: edenStaked, rank: stakerRank },
+    accountTxCount,
   ] = await Promise.all([
-    getEdenTxsForAccount(_account.toLowerCase()),
+    getEdenTxsForAccount(_account.toLowerCase(), _txPerPage, _page),
     getLatestStake(_account.toLowerCase()),
+    getTxCountForAccount(_account),
   ]);
   const accountOverview: AccountOverview = {
     address: ethers.utils.getAddress(_account),
     edenStaked: parseInt(edenStaked, 10) / 1e18,
-    edenTxCount: edenTxsForAccount.length,
-    allTxCount,
+    edenTxCount: txsForAccount.filter((tx) => tx.fromEdenProducer).length,
+    allTxCount: txsForAccount.length,
+    txCount: accountTxCount,
     stakerRank,
   };
-  const transactions: Array<TxOverview> = edenTxsForAccount.map(formatTx);
+  const transactions: Array<TxOverview> = txsForAccount.map(formatTx);
   return { accountOverview, transactions };
 };

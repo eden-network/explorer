@@ -12,7 +12,6 @@ const {
   providerEndpoint,
   cacheBlockParams,
   proxyAuthToken,
-  firstEdenBlock,
   cacheTxParams,
   slotGasCap,
   minerAlias,
@@ -23,6 +22,12 @@ export const provider = new ethers.providers.JsonRpcProvider(
   providerEndpoint,
   network
 );
+
+export const getTxCountForAccount = async (_address) => {
+  return provider
+    .send('eth_getTransactionCount', [_address])
+    .then((txCount) => parseInt(txCount, 16));
+};
 
 export const getAddressForENS = async (_ens: string) => {
   return provider.resolveName(_ens);
@@ -168,7 +173,7 @@ export const getTxsForAccount = async (
   const endpoint = 'https://api.etherscan.io/api';
   const query: any = {
     apikey: process.env.ETHERSCAN_API_TOKEN,
-    startblock: firstEdenBlock,
+    startblock: 0,
     endblock: _blockNumber,
     address: _account,
     module: 'account',
