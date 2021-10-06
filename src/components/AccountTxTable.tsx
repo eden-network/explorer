@@ -16,7 +16,7 @@ export default function AccountTxTable({ transactions }) {
       <div className="-my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
         <div className="py-2 align-middle inline-block min-w-full sm:px-6 lg:px-8">
           <div className="overflow-x-auto sm:rounded-lg">
-            <table className="min-w-full">
+            <table className="min-w-full text-center">
               <thead className="bg-blue-light">
                 <tr>
                   <th
@@ -33,7 +33,7 @@ export default function AccountTxTable({ transactions }) {
                   </th>
                   <th
                     scope="col"
-                    className="px-2 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                    className="px-2 sm:px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider"
                   >
                     Block
                   </th>
@@ -71,24 +71,24 @@ export default function AccountTxTable({ transactions }) {
                     scope="col"
                     className="px-2 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
                   >
-                    Gas Price
+                    Gas Cost
                   </th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-blue-light border-b border-blue-light">
                 {transactions.map((tx) => (
                   <tr key={tx.hash}>
-                    <td className="px-2 sm:px-6 py-4 whitespace-nowrap ">
+                    <td className="px-2 sm:px-1 py-4 whitespace-nowrap">
                       {tx.nonce}
                     </td>
                     <td
-                      className={`px-2 sm:px-6 py-4 whitespace-nowrap capitalize flex justify-center ${
+                      className={`px-2 sm:px-1 py-4 whitespace-nowrap capitalize ${
                         tx.isEden ? 'text-green' : 'text-white'
                       }`}
                     >
                       {tx.isEden ? 'Yes' : 'No'}
                     </td>
-                    <td className="px-2 sm:px-6 py-4 whitespace-nowrap">
+                    <td className="px-2 sm:px-1 py-4 whitespace-nowrap">
                       <span className="flex items-center justify-center">
                         <ClipboardButton
                           className="pr-2 block"
@@ -104,10 +104,10 @@ export default function AccountTxTable({ transactions }) {
                         </a>
                       </span>
                     </td>
-                    <td className="px-2 sm:px-6 py-4 whitespace-nowrap">
+                    <td className="px-2 sm:px-1 py-4 whitespace-nowrap">
                       {new Date(tx.timestamp * 1e3).toLocaleString()}
                     </td>
-                    <td className="px-2 sm:px-6 py-4 whitespace-nowrap">
+                    <td className="px-2 sm:px-1 py-4 whitespace-nowrap">
                       <span className="flex items-center justify-center">
                         <ClipboardButton
                           className="pr-2 block"
@@ -123,7 +123,7 @@ export default function AccountTxTable({ transactions }) {
                         </a>
                       </span>
                     </td>
-                    <td className="px-2 sm:px-6 py-4 whitespace-nowrap">
+                    <td className="px-2 sm:px-1 py-4 whitespace-nowrap">
                       <span className="flex items-center justify-center">
                         <ClipboardButton className="pr-2" copyText={tx.to} />
                         <a
@@ -132,22 +132,22 @@ export default function AccountTxTable({ transactions }) {
                           target="_blank"
                           rel="noreferrer"
                         >
-                          {formatAddress(tx.to)}
+                          {tx.toLabel || formatAddress(tx.to)}
                         </a>
                       </span>
                     </td>
                     <td
-                      className={`px-2 sm:px-6 py-4 whitespace-nowrap capitalize ${
+                      className={`px-2 sm:px-1 py-4 whitespace-nowrap capitalize ${
                         tx.status === 'fail' ? 'text-red' : 'text-green'
                       }`}
                     >
                       {tx.status}
                     </td>
-                    <td className="px-2 sm:px-6 py-4 whitespace-nowrap flex justify-center">
+                    <td className="px-2 sm:px-1 py-4 whitespace-nowrap">
                       {tx.index}
                     </td>
-                    <td className="px-2 sm:px-6 py-4 whitespace-nowrap">
-                      {tx.gasPrice} Gwei
+                    <td className="px-2 sm:px-1 py-4 whitespace-nowrap">
+                      ${tx.gasCostUSD}
                     </td>
                   </tr>
                 ))}
