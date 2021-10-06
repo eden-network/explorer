@@ -50,7 +50,7 @@ export default function Address({ accountOverview, transactions }) {
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="max-w-4xl mx-auto text-center">
-          <h2 className="text-2xl font-extrabold sm:text-4xl hover:text-green break-words">
+          <h2 className="text-2xl font-extrabold sm:text-4xl hover:text-green break-all">
             <EtherscanLink
               text={accountOverview.address}
               path={`address/${accountOverview.address}`}
