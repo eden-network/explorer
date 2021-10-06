@@ -79,9 +79,9 @@ export const getAccountInfo = async (
     address: ethers.utils.getAddress(_account),
     edenStaked: parseInt(edenStaked, 10) / 1e18,
     edenTxCount: txsForAccount.filter((tx) => tx.fromEdenProducer).length,
+    stakerRank: parseInt(stakerRank, 10),
     allTxCount: txsForAccount.length,
     txCount: accountTxCount,
-    stakerRank,
   };
   const transactions: Array<TxOverview> = txsForAccount.map(formatTx);
   return { accountOverview, transactions };
