@@ -39,5 +39,6 @@ export const safeFetch = async (url, options, callback) => {
 };
 
 export const weiToGwei = (_wei) => {
-  return Math.round(parseInt(_wei, 10) / 1e9);
+  const base = _wei.toString().startsWith('0x') ? 16 : 10;
+  return Math.round(parseInt(_wei, base) / 1e9);
 };
