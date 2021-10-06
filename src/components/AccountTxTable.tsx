@@ -65,6 +65,12 @@ export default function AccountTxTable({ transactions }) {
                     scope="col"
                     className="px-2 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
                   >
+                    Index
+                  </th>
+                  <th
+                    scope="col"
+                    className="px-2 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  >
                     Gas Price
                   </th>
                 </tr>
@@ -136,6 +142,9 @@ export default function AccountTxTable({ transactions }) {
                       }`}
                     >
                       {tx.status}
+                    </td>
+                    <td className="px-2 sm:px-6 py-4 whitespace-nowrap flex justify-center">
+                      {tx.index}
                     </td>
                     <td className="px-2 sm:px-6 py-4 whitespace-nowrap">
                       {tx.gasPrice} Gwei

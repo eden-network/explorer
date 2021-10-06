@@ -14,6 +14,7 @@ interface TxOverview {
   isEden: boolean;
   block: number;
   nonce: number;
+  index: number;
   hash: string;
   to: string;
 }
@@ -58,6 +59,7 @@ export const getAccountInfo = async (
     return {
       gasPrice: Math.round(parseInt(_tx.gasPrice, 10) / 1e9),
       status: _tx.isError === '0' ? 'success' : 'fail',
+      index: parseInt(_tx.transactionIndex, 10),
       block: parseInt(_tx.blockNumber, 10),
       to: ethers.utils.getAddress(_tx.to),
       nonce: parseInt(_tx.nonce, 10),
