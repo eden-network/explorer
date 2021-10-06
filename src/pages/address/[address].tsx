@@ -96,6 +96,10 @@ export async function getServerSideProps(context) {
   if (context.query.address.toLowerCase() !== address.toLowerCase()) {
     accountInfo.accountOverview.address = context.query.address.toLowerCase();
   }
+  // Contracts have tx-count of one
+  if (accountInfo.transactions.length === 0) {
+    accountInfo.accountOverview.txCount = 0;
+  }
   return {
     props: {
       ...accountInfo,
