@@ -65,9 +65,9 @@ export const getAccountInfo = async (
   };
   const formatTx = (_tx) => ({
     status: _tx.successful ? 'success' : 'fail',
+    timestamp: Date.parse(_tx.timestamp) / 1e3,
     nonce: accountTxCount - _tx.nonceOffset,
     gasCostUSD: Math.round(_tx.gasCostUSD),
-    timestamp: Date.parse(_tx.timestamp),
     to: ethers.utils.getAddress(_tx.to),
     gasPrice: weiToGwei(_tx.gasPrice),
     isEden: _tx.fromEdenProducer,
