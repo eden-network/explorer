@@ -37,3 +37,7 @@ export const safeFetch = async (url, options, callback) => {
     return failResponse;
   }
 };
+
+export const weiToGwei = (_wei) => {
+  return Math.round(parseInt(_wei, 10) / 1e9);
+};
