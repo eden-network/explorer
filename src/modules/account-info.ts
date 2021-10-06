@@ -20,9 +20,7 @@ interface TxOverview {
 }
 
 interface AccountOverview {
-  edenTxCount: number;
   edenStaked: number;
-  allTxCount: number;
   stakerRank: number;
   txCount: number;
   address: string;
@@ -57,11 +55,11 @@ export const getAccountInfo = async (
 ) => {
   const formatTx = (_tx) => {
     return {
+      to: ethers.utils.getAddress(_tx.to || ethers.constants.AddressZero),
       gasPrice: Math.round(parseInt(_tx.gasPrice, 10) / 1e9),
       status: _tx.isError === '0' ? 'success' : 'fail',
       index: parseInt(_tx.transactionIndex, 10),
       block: parseInt(_tx.blockNumber, 10),
-      to: ethers.utils.getAddress(_tx.to),
       nonce: parseInt(_tx.nonce, 10),
       isEden: _tx.fromEdenProducer,
       timestamp: _tx.timeStamp,
@@ -78,11 +76,9 @@ export const getAccountInfo = async (
     getTxCountForAccount(_account),
   ]);
   const accountOverview: AccountOverview = {
-    address: ethers.utils.getAddress(_account),
     edenStaked: parseInt(edenStaked, 10) / 1e18,
-    edenTxCount: txsForAccount.filter((tx) => tx.fromEdenProducer).length,
+    address: ethers.utils.getAddress(_account),
     stakerRank: parseInt(stakerRank, 10),
-    allTxCount: txsForAccount.length,
     txCount: accountTxCount,
   };
   const transactions: Array<TxOverview> = txsForAccount.map(formatTx);
