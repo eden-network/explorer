@@ -50,6 +50,20 @@ export const checkIfValidCache = (_cache) => {
   );
 };
 
+export const getBlockInfoForBlocks = async (_blockNums) => {
+  const makeRequest = (_block) => ({
+    jsonrpc: '2.0',
+    id: _block,
+    method: 'eth_getBlockByNumber',
+    params: [`0x${parseInt(_block, 10).toString(16)}`, false],
+  });
+  const requests = _blockNums.map(makeRequest);
+  return fetch(AppConfig.providerEndpoint, {
+    method: 'POST',
+    body: JSON.stringify(requests),
+  }).then((r) => r.json());
+};
+
 export const isBlockSecure = async (_blockNumber) => {
   const blockHeight = await provider.getBlockNumber();
   return blockHeight >= _blockNumber + parseInt(cacheBlockConfirmations, 10);

@@ -1,6 +1,7 @@
 import { ethers } from 'ethers';
 
 import {
+  getBlockInfoForBlocks,
   getTxCountForAccount,
   filterForEdenBlocks,
   getTxsForAccount,
@@ -10,8 +11,10 @@ import { weiToGwei } from './utils';
 
 interface TxOverview {
   status: 'success' | 'fail';
+  toLabel: string | null;
+  blockTxCount: number;
+  priorityFee: number;
   timestamp: number;
-  gasPrice: number;
   isEden: boolean;
   block: number;
   nonce: number;
@@ -30,13 +33,24 @@ interface AccountOverview {
 async function getEdenTxsForAccount(_account, _txPerPage, _page) {
   const txsForAccount = await getTxsForAccount(_account, _txPerPage, _page);
   const txsFromSender = txsForAccount.filter((tx) => tx.from === _account);
-  const blocksForAccount = txsFromSender.map((tx) => tx.blockNumber);
-  const edenBlocks = await filterForEdenBlocks(blocksForAccount);
+  const blocksForAccount = txsFromSender
+    .map((tx) => tx.blockNumber)
+    .filter((b, i, a) => a.indexOf(b) === i); // Remove duplicates
+  const [edenBlocks, blockInfos] = await Promise.all([
+    filterForEdenBlocks(blocksForAccount),
+    getBlockInfoForBlocks(blocksForAccount),
+  ]);
   // Filter out txs that were not mined in an Eden block
   const isEdenBlock = Object.fromEntries(
     edenBlocks.blocks.map((b) => [b.number, true])
   );
+  const infoForBlock = Object.fromEntries(
+    blockInfos.map((r) => [r.id, r.result])
+  );
   const txsForAccountEnriched = txsFromSender.map((tx) => {
+    const blockInfo = infoForBlock[tx.blockNumber];
+    tx.blockTxCount = blockInfo.transactions.length;
+    tx.baseFee = blockInfo.baseFeePerGas || 0;
     tx.fromEdenProducer = isEdenBlock[tx.blockNumber] ?? false;
     return tx;
   });
@@ -64,11 +78,12 @@ export const getAccountInfo = async (
     txCount: accountTxCount,
   };
   const formatTx = (_tx) => ({
+    to: ethers.utils.getAddress(_tx.to || ethers.constants.AddressZero),
+    priorityFee: weiToGwei(_tx.gasPrice) - weiToGwei(_tx.baseFee),
+    blockTxCount: parseInt(_tx.blockTxCount, 16),
     status: _tx.successful ? 'success' : 'fail',
     timestamp: Date.parse(_tx.timestamp) / 1e3,
     nonce: accountTxCount - _tx.nonceOffset,
-    to: ethers.utils.getAddress(_tx.to),
-    gasPrice: weiToGwei(_tx.gasPrice),
     isEden: _tx.fromEdenProducer,
     block: _tx.blockNumber,
     toLabel: _tx.toLabel,

@@ -15,63 +15,63 @@ export default function AccountTxTable({ transactions }) {
     <div className="flex flex-col">
       <div className="-my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
         <div className="py-2 align-middle inline-block min-w-full sm:px-6 lg:px-8">
-          <div className="overflow-x-auto sm:rounded-lg">
-            <table className="min-w-full text-center">
+          <div className="overflow-x-auto sm:rounded-lg text-center">
+            <table className="min-w-full">
               <thead className="bg-blue-light">
                 <tr>
                   <th
                     scope="col"
-                    className="px-2 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                    className="px-2 sm:px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider"
                   >
                     Nonce
                   </th>
                   <th
                     scope="col"
-                    className="px-2 sm:px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider"
+                    className="px-2 sm:px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider"
                   >
                     Eden
                   </th>
                   <th
                     scope="col"
-                    className="px-2 sm:px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider"
+                    className="px-2 sm:px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider"
                   >
                     Block
                   </th>
                   <th
                     scope="col"
-                    className="px-2 sm:pl-2 sm:pr-12 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider"
+                    className="px-2 sm:pl-2 sm:pr-12 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider"
                   >
                     Timestamp
                   </th>
                   <th
                     scope="col"
-                    className="px-2 sm:px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider"
+                    className="px-2 sm:px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider"
                   >
                     Hash
                   </th>
                   <th
                     scope="col"
-                    className="px-2 sm:px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider"
+                    className="px-2 sm:px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider"
                   >
                     To
                   </th>
                   <th
                     scope="col"
-                    className="px-2 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                    className="px-2 sm:px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider"
                   >
                     Status
                   </th>
                   <th
                     scope="col"
-                    className="px-2 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                    className="px-2 sm:px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider"
                   >
-                    Index
+                    % Above
                   </th>
                   <th
                     scope="col"
-                    className="px-2 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                    className="px-2 sm:px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider"
                   >
-                    Gas Price
+                    Priority Fee
                   </th>
                 </tr>
               </thead>
@@ -143,11 +143,11 @@ export default function AccountTxTable({ transactions }) {
                     >
                       {tx.status}
                     </td>
-                    <td className="px-2 sm:px-1 py-4 whitespace-nowrap">
-                      {tx.index}
+                    <td className="px-2 sm:px-6 py-4 whitespace-nowrap flex justify-center">
+                      {Math.round((tx.index / tx.blockTxCount) * 100)} %
                     </td>
-                    <td className="px-2 sm:px-1 py-4 whitespace-nowrap">
-                      {tx.gasPrice} Gwei
+                    <td className="px-2 sm:px-6 py-4 whitespace-nowrap">
+                      {tx.priorityFee} Gwei
                     </td>
                   </tr>
                 ))}
