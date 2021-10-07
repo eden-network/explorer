@@ -14,6 +14,11 @@ export const BNToGwei = (_bn) => {
   return toFixedDecimals(ethers.utils.formatUnits(_bn, 'gwei'), 2);
 };
 
+export const weiToGwei = (_wei) => {
+  const base = _wei.toString().startsWith('0x') ? 16 : 10;
+  return Math.round(parseInt(_wei, base) / 1e9);
+};
+
 export const safeFetch = async (url, options, callback) => {
   const failResponse = [false, []];
   try {

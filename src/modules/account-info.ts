@@ -6,6 +6,7 @@ import {
   getTxsForAccount,
   getLatestStake,
 } from './getters';
+import { weiToGwei } from './utils';
 
 interface TxOverview {
   status: 'success' | 'fail';
@@ -27,13 +28,7 @@ interface AccountOverview {
 }
 
 async function getEdenTxsForAccount(_account, _txPerPage, _page) {
-  const endblockDefault = 99999999;
-  const txsForAccount = await getTxsForAccount(
-    endblockDefault,
-    _account,
-    _txPerPage,
-    _page
-  );
+  const txsForAccount = await getTxsForAccount(_account, _txPerPage, _page);
   const txsFromSender = txsForAccount.filter((tx) => tx.from === _account);
   const blocksForAccount = txsFromSender.map((tx) => tx.blockNumber);
   const edenBlocks = await filterForEdenBlocks(blocksForAccount);
@@ -53,19 +48,6 @@ export const getAccountInfo = async (
   _txPerPage = 1000,
   _page = 1
 ) => {
-  const formatTx = (_tx) => {
-    return {
-      to: ethers.utils.getAddress(_tx.to || ethers.constants.AddressZero),
-      gasPrice: Math.round(parseInt(_tx.gasPrice, 10) / 1e9),
-      status: _tx.isError === '0' ? 'success' : 'fail',
-      index: parseInt(_tx.transactionIndex, 10),
-      block: parseInt(_tx.blockNumber, 10),
-      nonce: parseInt(_tx.nonce, 10),
-      isEden: _tx.fromEdenProducer,
-      timestamp: _tx.timeStamp,
-      hash: _tx.hash,
-    };
-  };
   const [
     txsForAccount,
     { staked: edenStaked, rank: stakerRank },
@@ -81,6 +63,18 @@ export const getAccountInfo = async (
     stakerRank: parseInt(stakerRank, 10),
     txCount: accountTxCount,
   };
+  const formatTx = (_tx) => ({
+    status: _tx.successful ? 'success' : 'fail',
+    timestamp: Date.parse(_tx.timestamp) / 1e3,
+    nonce: accountTxCount - _tx.nonceOffset,
+    to: ethers.utils.getAddress(_tx.to),
+    gasPrice: weiToGwei(_tx.gasPrice),
+    isEden: _tx.fromEdenProducer,
+    block: _tx.blockNumber,
+    toLabel: _tx.toLabel,
+    index: _tx.index,
+    hash: _tx.hash,
+  });
   const transactions: Array<TxOverview> = txsForAccount.map(formatTx);
   return { accountOverview, transactions };
 };
