@@ -11,6 +11,7 @@ const {
   flashbotsAPIEndpoint,
   providerEndpoint,
   cacheBlockParams,
+  covalentAPIKey,
   proxyAuthToken,
   cacheTxParams,
   slotGasCap,
@@ -178,35 +179,40 @@ export const getMinerAlias = (_minerAddress) => {
   return minerAlias[_minerAddress.toLowerCase()] || null;
 };
 
-export const getTxsForAccount = async (
-  _blockNumber,
-  _account,
-  _offset = 1000,
-  _page = 1
-) => {
-  const endpoint = 'https://api.etherscan.io/api';
+export const getTxsForAccount = async (_account, _pageSize = 10, _page = 1) => {
+  // Setup
+  const endpoint = `https://api.covalenthq.com/v1/1/address/${_account}/transactions_v2/`;
   const query: any = {
-    apikey: process.env.ETHERSCAN_API_TOKEN,
-    startblock: 0,
-    endblock: _blockNumber,
-    address: _account,
-    module: 'account',
-    action: 'txlist',
-    offset: _offset,
-    sort: 'desc',
-    page: _page,
+    match: `{from_address: ${_account}}`,
+    skip: (_page - 1) * _pageSize,
+    'block-signed-at-asc': false,
+    key: covalentAPIKey,
+    limit: _pageSize,
+    'no-logs': true,
   };
-  const queryString = new URLSearchParams(query);
-  const url: any = new URL(endpoint);
+  // Fetch data
+  const queryString: any = new URLSearchParams(query);
+  const url = new URL(endpoint);
   url.search = queryString;
-  const { status, message, result } = await fetch(url.href).then((r) =>
-    r.json()
-  );
-  if (status !== '1') {
-    console.log(`Etherscan request failed: ${message}`);
+  const res = await fetch(url.href).then((r) => r.json());
+  // Response
+  if (res.error) {
+    console.log(`Covalent request failed: ${res.error_message}`);
     return [];
   }
-  return result;
+  return res.data.items.map((tx, i) => ({
+    to: tx.to_address || ethers.constants.AddressZero,
+    nonceOffset: (_page - 1) * _pageSize + i + 1,
+    fromLabel: tx.from_address_label,
+    timestamp: tx.block_signed_at,
+    toLabel: tx.to_address_label,
+    blockNumber: tx.block_height,
+    successful: tx.successful,
+    gasPrice: tx.gas_price,
+    from: tx.from_address,
+    index: tx.tx_offset,
+    hash: tx.tx_hash,
+  }));
 };
 
 export const filterForEdenBlocks = async (_blocks) => {

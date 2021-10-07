@@ -11,8 +11,10 @@ import { weiToGwei } from './utils';
 
 interface TxOverview {
   status: 'success' | 'fail';
+  toLabel: string | null;
+  blockTxCount: number;
+  priorityFee: number;
   timestamp: number;
-  gasPrice: number;
   isEden: boolean;
   block: number;
   nonce: number;
@@ -29,13 +31,7 @@ interface AccountOverview {
 }
 
 async function getEdenTxsForAccount(_account, _txPerPage, _page) {
-  const endblockDefault = 99999999;
-  const txsForAccount = await getTxsForAccount(
-    endblockDefault,
-    _account,
-    _txPerPage,
-    _page
-  );
+  const txsForAccount = await getTxsForAccount(_account, _txPerPage, _page);
   const txsFromSender = txsForAccount.filter((tx) => tx.from === _account);
   const blocksForAccount = txsFromSender
     .map((tx) => tx.blockNumber)
@@ -54,7 +50,7 @@ async function getEdenTxsForAccount(_account, _txPerPage, _page) {
   const txsForAccountEnriched = txsFromSender.map((tx) => {
     const blockInfo = infoForBlock[tx.blockNumber];
     tx.blockTxCount = blockInfo.transactions.length;
-    tx.baseFee = blockInfo.baseFeePerGas;
+    tx.baseFee = blockInfo.baseFeePerGas || 0;
     tx.fromEdenProducer = isEdenBlock[tx.blockNumber] ?? false;
     return tx;
   });
@@ -66,20 +62,6 @@ export const getAccountInfo = async (
   _txPerPage = 1000,
   _page = 1
 ) => {
-  const formatTx = (_tx) => {
-    return {
-      to: ethers.utils.getAddress(_tx.to || ethers.constants.AddressZero),
-      priorityFee: weiToGwei(_tx.gasPrice) - weiToGwei(_tx.baseFee),
-      status: _tx.isError === '0' ? 'success' : 'fail',
-      blockTxCount: parseInt(_tx.blockTxCount, 16),
-      index: parseInt(_tx.transactionIndex, 10),
-      block: parseInt(_tx.blockNumber, 10),
-      nonce: parseInt(_tx.nonce, 10),
-      isEden: _tx.fromEdenProducer,
-      timestamp: _tx.timeStamp,
-      hash: _tx.hash,
-    };
-  };
   const [
     txsForAccount,
     { staked: edenStaked, rank: stakerRank },
@@ -95,6 +77,19 @@ export const getAccountInfo = async (
     stakerRank: parseInt(stakerRank, 10),
     txCount: accountTxCount,
   };
+  const formatTx = (_tx) => ({
+    to: ethers.utils.getAddress(_tx.to || ethers.constants.AddressZero),
+    priorityFee: weiToGwei(_tx.gasPrice) - weiToGwei(_tx.baseFee),
+    blockTxCount: parseInt(_tx.blockTxCount, 16),
+    status: _tx.successful ? 'success' : 'fail',
+    timestamp: Date.parse(_tx.timestamp) / 1e3,
+    nonce: accountTxCount - _tx.nonceOffset,
+    isEden: _tx.fromEdenProducer,
+    block: _tx.blockNumber,
+    toLabel: _tx.toLabel,
+    index: _tx.index,
+    hash: _tx.hash,
+  });
   const transactions: Array<TxOverview> = txsForAccount.map(formatTx);
   return { accountOverview, transactions };
 };

@@ -78,17 +78,17 @@ export default function AccountTxTable({ transactions }) {
               <tbody className="divide-y divide-blue-light border-b border-blue-light">
                 {transactions.map((tx) => (
                   <tr key={tx.hash}>
-                    <td className="px-2 sm:px-6 py-4 whitespace-nowrap ">
+                    <td className="px-2 sm:px-1 py-4 whitespace-nowrap">
                       {tx.nonce}
                     </td>
                     <td
-                      className={`px-2 sm:px-6 py-4 whitespace-nowrap capitalize flex justify-center ${
+                      className={`px-2 sm:px-1 py-4 whitespace-nowrap capitalize ${
                         tx.isEden ? 'text-green' : 'text-white'
                       }`}
                     >
                       {tx.isEden ? 'Yes' : 'No'}
                     </td>
-                    <td className="px-2 sm:px-6 py-4 whitespace-nowrap">
+                    <td className="px-2 sm:px-1 py-4 whitespace-nowrap">
                       <span className="flex items-center justify-center">
                         <ClipboardButton
                           className="pr-2 block"
@@ -104,10 +104,10 @@ export default function AccountTxTable({ transactions }) {
                         </a>
                       </span>
                     </td>
-                    <td className="px-2 sm:px-6 py-4 whitespace-nowrap">
+                    <td className="px-2 sm:px-1 py-4 whitespace-nowrap">
                       {new Date(tx.timestamp * 1e3).toLocaleString()}
                     </td>
-                    <td className="px-2 sm:px-6 py-4 whitespace-nowrap">
+                    <td className="px-2 sm:px-1 py-4 whitespace-nowrap">
                       <span className="flex items-center justify-center">
                         <ClipboardButton
                           className="pr-2 block"
@@ -123,7 +123,7 @@ export default function AccountTxTable({ transactions }) {
                         </a>
                       </span>
                     </td>
-                    <td className="px-2 sm:px-6 py-4 whitespace-nowrap">
+                    <td className="px-2 sm:px-1 py-4 whitespace-nowrap">
                       <span className="flex items-center justify-center">
                         <ClipboardButton className="pr-2" copyText={tx.to} />
                         <a
@@ -132,12 +132,12 @@ export default function AccountTxTable({ transactions }) {
                           target="_blank"
                           rel="noreferrer"
                         >
-                          {formatAddress(tx.to)}
+                          {tx.toLabel || formatAddress(tx.to)}
                         </a>
                       </span>
                     </td>
                     <td
-                      className={`px-2 sm:px-6 py-4 whitespace-nowrap capitalize ${
+                      className={`px-2 sm:px-1 py-4 whitespace-nowrap capitalize ${
                         tx.status === 'fail' ? 'text-red' : 'text-green'
                       }`}
                     >
