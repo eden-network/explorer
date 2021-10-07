@@ -62,9 +62,9 @@ export default function AccountTxTable({ transactions }) {
                   </th>
                   <th
                     scope="col"
-                    className="px-2 sm:px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider"
+                    className="px-2 sm:px-0 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider"
                   >
-                    % Above
+                    % Txs Above
                   </th>
                   <th
                     scope="col"
@@ -142,7 +142,7 @@ export default function AccountTxTable({ transactions }) {
                     >
                       {tx.status}
                     </td>
-                    <td className="px-2 sm:px-6 py-4 whitespace-nowrap flex justify-center">
+                    <td className="px-2 sm:px-0 py-4 whitespace-nowrap">
                       {Math.round((tx.index / tx.blockTxCount) * 100)} %
                     </td>
                     <td className="px-2 sm:px-6 py-4 whitespace-nowrap">

@@ -15,7 +15,7 @@ export default function StakerHeroStats({
             <dl className="rounded-lg bg-green sm:grid sm:grid-cols-3 text-blue shadow-lg">
               <div className="flex flex-col border-b border-blue p-6 text-center sm:border-0 sm:border-r">
                 <dt className="order-2 mt-2 text-lg leading-6 font-medium text-blue-light">
-                  Rank
+                  Staker Rank
                 </dt>
                 <dd className="order-1 text-5xl font-extrabold text-blue">
                   {stakerRank !== -1 ? `#${stakerRank + 1}` : '∞'}
