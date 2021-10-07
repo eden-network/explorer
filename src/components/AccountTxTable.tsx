@@ -1,16 +1,7 @@
 import moment from 'moment';
 
+import { formatAddress, formatTxHash } from '../modules/formatter';
 import ClipboardButton from './ClipboardButton';
-
-const formatTxHash = (tx) => {
-  return `${tx.slice(0, 4)}...${tx.slice(tx.length - 4, tx.length)}`;
-};
-const formatAddress = (address) => {
-  return `${address.slice(0, 6)}...${address.slice(
-    address.length - 4,
-    address.length
-  )}`;
-};
 
 export default function AccountTxTable({ transactions }) {
   return (
@@ -31,6 +22,12 @@ export default function AccountTxTable({ transactions }) {
                     scope="col"
                     className="px-2 sm:px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider"
                   >
+                    Hash
+                  </th>
+                  <th
+                    scope="col"
+                    className="px-2 sm:px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  >
                     Eden
                   </th>
                   <th
@@ -44,12 +41,6 @@ export default function AccountTxTable({ transactions }) {
                     className="px-2 sm:pl-2 sm:pr-12 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider"
                   >
                     Timestamp
-                  </th>
-                  <th
-                    scope="col"
-                    className="px-2 sm:px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider"
-                  >
-                    Hash
                   </th>
                   <th
                     scope="col"
@@ -83,6 +74,22 @@ export default function AccountTxTable({ transactions }) {
                     <td className="px-2 sm:px-1 py-4 whitespace-nowrap">
                       {tx.nonce}
                     </td>
+                    <td className="px-2 sm:px-1 py-4 whitespace-nowrap">
+                      <span className="flex items-center justify-center">
+                        <ClipboardButton
+                          className="pr-2 block"
+                          copyText={tx.hash}
+                        />
+                        <a
+                          href={`https://etherscan.io/tx/${tx.hash}`}
+                          className=" hover:text-green block"
+                          target="_blank"
+                          rel="noreferrer"
+                        >
+                          {formatTxHash(tx.hash)}
+                        </a>
+                      </span>
+                    </td>
                     <td
                       className={`px-2 sm:px-1 py-4 whitespace-nowrap capitalize ${
                         tx.isEden ? 'text-green' : 'text-white'
@@ -108,22 +115,6 @@ export default function AccountTxTable({ transactions }) {
                     </td>
                     <td className="px-2 sm:px-1 py-4 whitespace-nowrap">
                       {moment(tx.timestamp * 1e3).format('D MMM YYYY H:mm')}
-                    </td>
-                    <td className="px-2 sm:px-1 py-4 whitespace-nowrap">
-                      <span className="flex items-center justify-center">
-                        <ClipboardButton
-                          className="pr-2 block"
-                          copyText={tx.hash}
-                        />
-                        <a
-                          href={`https://etherscan.io/tx/${tx.hash}`}
-                          className=" hover:text-green block"
-                          target="_blank"
-                          rel="noreferrer"
-                        >
-                          {formatTxHash(tx.hash)}
-                        </a>
-                      </span>
                     </td>
                     <td className="px-2 sm:px-1 py-4 whitespace-nowrap">
                       <span className="flex items-center justify-center">

@@ -4,21 +4,12 @@ import cx from 'classnames';
 import { useRouter } from 'next/router';
 
 import useWindowSize from '../hooks/useWindowSize.hook';
+import { formatAddress, formatTxHash } from '../modules/formatter';
 import { AppConfig } from '../utils/AppConfig';
 import ClipboardButton from './ClipboardButton';
 import TableSortLabel from './table/TableSortLabel';
 
 const rowColorSettings = AppConfig.blockInsightRowColorByPriority;
-
-const formatTxHash = (tx) => {
-  return `${tx.slice(0, 6)}...${tx.slice(tx.length - 4, tx.length)}`;
-};
-const formatAddress = (address) => {
-  return `${address.slice(0, 6)}...${address.slice(
-    address.length - 4,
-    address.length
-  )}`;
-};
 
 const getRowColor = (tx) => {
   switch (tx.type) {
