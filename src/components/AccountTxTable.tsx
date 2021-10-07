@@ -1,3 +1,5 @@
+import moment from 'moment';
+
 import ClipboardButton from './ClipboardButton';
 
 const formatTxHash = (tx) => {
@@ -105,7 +107,7 @@ export default function AccountTxTable({ transactions }) {
                       </span>
                     </td>
                     <td className="px-2 sm:px-1 py-4 whitespace-nowrap">
-                      {new Date(tx.timestamp * 1e3).toLocaleString()}
+                      {moment(tx.timestamp * 1e3).format('D MMM YYYY H:mm')}
                     </td>
                     <td className="px-2 sm:px-1 py-4 whitespace-nowrap">
                       <span className="flex items-center justify-center">
