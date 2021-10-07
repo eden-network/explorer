@@ -1,7 +1,13 @@
 import moment from 'moment';
+import Image from 'next/image';
 
+import edenLogoSvg from '../../public/eden-logo.svg';
+import ethLogoSvg from '../../public/eth-logo.svg';
 import { formatAddress, formatTxHash } from '../modules/formatter';
 import ClipboardButton from './ClipboardButton';
+
+const EthLogo = <Image src={ethLogoSvg} width={20} />;
+const EdenLogo = <Image src={edenLogoSvg} width={20} />;
 
 export default function AccountTxTable({ transactions }) {
   return (
@@ -26,9 +32,9 @@ export default function AccountTxTable({ transactions }) {
                   </th>
                   <th
                     scope="col"
-                    className="px-2 sm:px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider"
+                    className="px-2 sm:px-0 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider"
                   >
-                    Eden
+                    Block-Type
                   </th>
                   <th
                     scope="col"
@@ -95,7 +101,7 @@ export default function AccountTxTable({ transactions }) {
                         tx.isEden ? 'text-green' : 'text-white'
                       }`}
                     >
-                      {tx.isEden ? 'Yes' : 'No'}
+                      {tx.isEden ? EdenLogo : EthLogo}
                     </td>
                     <td className="px-2 sm:px-1 py-4 whitespace-nowrap">
                       <span className="flex items-center justify-center">
