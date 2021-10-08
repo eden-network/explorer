@@ -52,7 +52,7 @@ export default function BlockPagination({
       )}
       <div
         className={cx(
-          'flex text-center my-1 sm:my-0 flex-grow justify-center pr-4',
+          'flex text-center my-1 sm:my-0 flex-grow justify-center pr-2',
           {
             'md:pr-44': onChangePageSize,
           }
