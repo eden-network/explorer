@@ -1,8 +1,10 @@
 /* eslint-disable react/button-has-type */
-import React from 'react';
+import React, { useEffect } from 'react';
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import cx from 'classnames';
+
+import usePrevious from '../hooks/usePrevious.hook';
 
 interface BlockPaginationProps {
   next: () => void;
@@ -13,10 +15,9 @@ interface BlockPaginationProps {
   currentPage: number;
   pageSize?: number;
   onChangePageSize?: (_pageSize: number) => void;
-  scrollToTop?: () => void;
 }
 
-const PAGE_SIZE = [15, 25, 50, 100, 500];
+const PAGE_SIZE = [15, 25, 50, 100];
 
 export default function BlockPagination({
   next,
@@ -27,11 +28,18 @@ export default function BlockPagination({
   currentPage,
   pageSize,
   onChangePageSize,
-  scrollToTop,
 }: BlockPaginationProps) {
-  React.useEffect(() => {
-    window.scrollTo(0, 0);
-  }, [pageSize, currentPage, scrollToTop]);
+  const prevPageSize = usePrevious(pageSize);
+  const prevCurrentPage = usePrevious(currentPage);
+
+  useEffect(() => {
+    if (
+      typeof prevPageSize !== 'undefined' &&
+      typeof prevCurrentPage !== 'undefined'
+    ) {
+      window.scrollTo(0, 175);
+    }
+  }, [prevPageSize, prevCurrentPage]);
 
   return (
     <div className="w-full flex items-center flex-wrap py-3">
@@ -48,6 +56,9 @@ export default function BlockPagination({
               {size}
             </option>
           ))}
+          <option key="all" value={Number.MAX_SAFE_INTEGER}>
+            All
+          </option>
         </select>
       )}
       <div
