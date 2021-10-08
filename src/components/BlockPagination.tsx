@@ -13,6 +13,7 @@ interface BlockPaginationProps {
   currentPage: number;
   pageSize?: number;
   onChangePageSize?: (_pageSize: number) => void;
+  scrollToTop?: () => void;
 }
 
 const PAGE_SIZE = [15, 25, 50, 100, 500];
@@ -26,7 +27,12 @@ export default function BlockPagination({
   currentPage,
   pageSize,
   onChangePageSize,
+  scrollToTop,
 }: BlockPaginationProps) {
+  React.useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [pageSize, currentPage, scrollToTop]);
+
   return (
     <div className="w-full flex items-center flex-wrap py-3">
       {onChangePageSize && (
@@ -37,24 +43,18 @@ export default function BlockPagination({
           value={pageSize}
           onChange={(e) => onChangePageSize(Number(e.target.value))}
         >
-          {PAGE_SIZE.map((size) =>
-            size === pageSize ? (
-              <option key={size} value={size} selected>
-                {size}
-              </option>
-            ) : (
-              <option key={size} value={size}>
-                {size}
-              </option>
-            )
-          )}
+          {PAGE_SIZE.map((size) => (
+            <option key={size} value={size}>
+              {size}
+            </option>
+          ))}
         </select>
       )}
       <div
         className={cx(
           'flex text-center my-1 sm:my-0 flex-grow justify-center pr-4',
           {
-            'md:pr-48': onChangePageSize,
+            'md:pr-44': onChangePageSize,
           }
         )}
       >
