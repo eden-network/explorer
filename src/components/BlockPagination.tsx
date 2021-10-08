@@ -54,7 +54,7 @@ export default function BlockPagination({
         className={cx(
           'flex text-center my-1 sm:my-0 flex-grow justify-center pr-4',
           {
-            'md:pr-32': onChangePageSize,
+            'md:pr-36': onChangePageSize,
           }
         )}
       >
