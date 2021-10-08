@@ -9,3 +9,14 @@
 .Toastify__toast-container--bottom-right {
     right: 32px !important;
 }
+
+.custom-select {
+	width: 80px;
+	height: calc(1.5em + .8rem + 2px);
+	padding-top: .4rem;
+	padding-bottom: .4rem;
+	padding-left: 1rem;
+	line-height: 1.5;
+	background-clip: padding-box;
+	transition: border-color .15s ease-in-out,box-shadow .15s ease-in-out;
+}
