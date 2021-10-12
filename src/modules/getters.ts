@@ -31,7 +31,12 @@ export const getTxCountForAccount = async (_address) => {
 };
 
 export const getAddressForENS = async (_ens: string) => {
-  return provider.resolveName(_ens);
+  try {
+    return await provider.resolveName(_ens);
+  } catch (e) {
+    console.log(`Error resolving ENS: ${e}`);
+    return null;
+  }
 };
 
 export const getCapForSlots = () => {

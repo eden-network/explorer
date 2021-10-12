@@ -5,6 +5,7 @@ import { useRouter } from 'next/router';
 
 import AccountTxTable from '../../components/AccountTxTable';
 import EndlessPagination from '../../components/EndlessPagination';
+import ErrorMsg from '../../components/ErrorMsg';
 import EtherscanLink from '../../components/EtherscanLink';
 import StakerHeroStats from '../../components/StakerHeroStats';
 import usePagination from '../../hooks/usePagination.hook';
@@ -16,7 +17,7 @@ import { validate as ensValidator } from '../../modules/validator/ens';
 
 const PAGE_SIZE = 10;
 
-export default function Address({ accountOverview, transactions }) {
+export default function Address({ accountOverview, transactions, error }) {
   const router = useRouter();
   const pageNum = router.query.page ? Number(router.query.page) : 1;
 
@@ -35,6 +36,22 @@ export default function Address({ accountOverview, transactions }) {
     }
   }, [currentPage, router]);
 
+  if (error) {
+    return (
+      <ErrorMsg errorMsg={`Couldn't fetch data for the account:`}>
+        <div className="text-center pb-2">
+          <a
+            href={`https://etherscan.io/address/${router.query.address}`}
+            target="_blank"
+            className="hover:text-green"
+            rel="noreferrer"
+          >
+            <b>{router.query.address}</b>
+          </a>
+        </div>
+      </ErrorMsg>
+    );
+  }
   return (
     <Shell
       meta={
@@ -74,27 +91,41 @@ export default function Address({ accountOverview, transactions }) {
 }
 
 export async function getServerSideProps(context) {
-  const pageNum = context.query.page || 1;
-  // Find address if ENS
-  let { address } = context.query;
-  if (ensValidator(address)) {
-    address = await getAddressForENS(address);
+  try {
+    const pageNum = context.query.page || 1;
+    // Find address if ENS
+    let { address } = context.query;
+    if (ensValidator(address)) {
+      const addressForENS = await getAddressForENS(address);
+      if (addressForENS === null) {
+        throw new Error('Invalid ENS');
+      }
+      address = addressForENS;
+    }
+    const [contractLike, accountInfo] = await Promise.all([
+      checkIfContractlike(address),
+      getAccountInfo(address.toLowerCase(), PAGE_SIZE, pageNum),
+    ]);
+    // Change address to ENS if available
+    if (context.query.address.toLowerCase() !== address.toLowerCase()) {
+      accountInfo.accountOverview.ens = context.query.address.toLowerCase();
+    }
+    // Contracts have tx-count of one
+    if (contractLike) {
+      accountInfo.accountOverview.txCount = 0;
+    }
+    return {
+      props: {
+        ...accountInfo,
+        error: false,
+      },
+    };
+  } catch (e) {
+    console.log(e); // eslint-disable-line no-console
+    return {
+      props: {
+        error: true,
+      },
+    };
   }
-  const [contractLike, accountInfo] = await Promise.all([
-    checkIfContractlike(address),
-    getAccountInfo(address.toLowerCase(), PAGE_SIZE, pageNum),
-  ]);
-  // Change address to ENS if available
-  if (context.query.address.toLowerCase() !== address.toLowerCase()) {
-    accountInfo.accountOverview.ens = context.query.address.toLowerCase();
-  }
-  // Contracts have tx-count of one
-  if (contractLike) {
-    accountInfo.accountOverview.txCount = 0;
-  }
-  return {
-    props: {
-      ...accountInfo,
-    },
-  };
 }
