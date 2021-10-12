@@ -9,7 +9,11 @@ import ClipboardButton from './ClipboardButton';
 const EthLogo = <Image src={ethLogoSvg} width={20} />;
 const EdenLogo = <Image src={edenLogoSvg} width={20} />;
 
-export default function AccountTxTable({ transactions, account }) {
+export default function AccountTxTable({
+  transactions,
+  accountAddress,
+  accountENS,
+}) {
   return (
     <div className="flex flex-col">
       <div className="-my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
@@ -122,12 +126,13 @@ export default function AccountTxTable({ transactions, account }) {
                     <td className="px-2 sm:px-1 py-4 whitespace-nowrap">
                       <span
                         className={`flex items-center justify-center ${
-                          account.toLowerCase() === tx.from.toLowerCase()
+                          accountAddress.toLowerCase() === tx.from.toLowerCase()
                             ? 'text-gray-300'
                             : ''
                         }`}
                       >
-                        {account.toLowerCase() !== tx.from.toLowerCase() ? (
+                        {accountAddress.toLowerCase() !==
+                        tx.from.toLowerCase() ? (
                           <ClipboardButton
                             className="pr-2"
                             copyText={tx.from}
@@ -135,7 +140,8 @@ export default function AccountTxTable({ transactions, account }) {
                         ) : (
                           ''
                         )}
-                        {account.toLowerCase() !== tx.from.toLowerCase() ? (
+                        {accountAddress.toLowerCase() !==
+                        tx.from.toLowerCase() ? (
                           <a
                             href={`/address/${tx.from}`}
                             className=" hover:text-green block"
@@ -145,24 +151,26 @@ export default function AccountTxTable({ transactions, account }) {
                             {formatAddress(tx.from)}
                           </a>
                         ) : (
-                          formatAddress(tx.from)
+                          accountENS || formatAddress(tx.from)
                         )}
                       </span>
                     </td>
                     <td className="px-2 sm:px-1 py-4 whitespace-nowrap">
                       <span
                         className={`flex items-center justify-center ${
-                          account.toLowerCase() === tx.to.toLowerCase()
+                          accountAddress.toLowerCase() === tx.to.toLowerCase()
                             ? 'text-gray-300'
                             : ''
                         }`}
                       >
-                        {account.toLowerCase() !== tx.to.toLowerCase() ? (
+                        {accountAddress.toLowerCase() !==
+                        tx.to.toLowerCase() ? (
                           <ClipboardButton className="pr-2" copyText={tx.to} />
                         ) : (
                           ''
                         )}
-                        {account.toLowerCase() !== tx.to.toLowerCase() ? (
+                        {accountAddress.toLowerCase() !==
+                        tx.to.toLowerCase() ? (
                           <a
                             href={`/address/${tx.to}`}
                             className=" hover:text-green block"
@@ -172,7 +180,7 @@ export default function AccountTxTable({ transactions, account }) {
                             {formatAddress(tx.to)}
                           </a>
                         ) : (
-                          formatAddress(tx.to)
+                          accountENS || formatAddress(tx.to)
                         )}
                       </span>
                     </td>

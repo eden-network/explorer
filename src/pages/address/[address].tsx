@@ -48,8 +48,8 @@ export default function Address({ accountOverview, transactions }) {
         <div className="max-w-4xl mx-auto text-center">
           <h2 className="text-2xl font-extrabold sm:text-4xl hover:text-green break-all">
             <EtherscanLink
-              text={accountOverview.address}
-              path={`address/${accountOverview.address}`}
+              text={accountOverview.ens || accountOverview.address}
+              path={`address/${accountOverview.ens || accountOverview.address}`}
             />
           </h2>
         </div>
@@ -61,7 +61,8 @@ export default function Address({ accountOverview, transactions }) {
             <div className="flex-1 mt-4">
               <AccountTxTable
                 transactions={transactions}
-                account={accountOverview.address}
+                accountAddress={accountOverview.address}
+                accountENS={accountOverview.ens}
               />
             </div>
             <EndlessPagination nextClick={next} prevClick={prev} />
@@ -85,7 +86,7 @@ export async function getServerSideProps(context) {
   ]);
   // Change address to ENS if available
   if (context.query.address.toLowerCase() !== address.toLowerCase()) {
-    accountInfo.accountOverview.address = context.query.address.toLowerCase();
+    accountInfo.accountOverview.ens = context.query.address.toLowerCase();
   }
   // Contracts have tx-count of one
   if (contractLike) {

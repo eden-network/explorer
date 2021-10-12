@@ -27,6 +27,7 @@ interface AccountOverview {
   stakerRank: number;
   txCount: number;
   address: string;
+  ens?: string;
 }
 
 async function getEdenTxsForAccount(_account, _txPerPage, _page) {
