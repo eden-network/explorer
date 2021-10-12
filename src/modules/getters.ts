@@ -211,6 +211,21 @@ export const getTxsForAccount = async (_account, _offset = 10, _page = 1) => {
   return result;
 };
 
+export const getEdenRPCTxs = async (_txs) => {
+  const monitorEndpointEdenRPC = 'https://api.edennetwork.io/v1/monitor';
+  const query = {
+    method: 'eth_getTransactionsByHash',
+    params: [_txs],
+    jsonrpc: '2.0',
+    id: Date.now(),
+  };
+  return fetch(monitorEndpointEdenRPC, {
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(query),
+    method: 'POST',
+  }).then((r) => r.json());
+};
+
 export const filterForEdenBlocks = async (_blocks) => {
   // GraphQL returns max of 1000 entries per call
   return request(

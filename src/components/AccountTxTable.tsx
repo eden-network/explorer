@@ -8,6 +8,38 @@ import ClipboardButton from './ClipboardButton';
 
 const EthLogo = <Image src={ethLogoSvg} width={20} />;
 const EdenLogo = <Image src={edenLogoSvg} width={20} />;
+const LockClosed = (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    className="h-5 w-5"
+    fill="none"
+    viewBox="0 0 24 24"
+    stroke="currentColor"
+  >
+    <path
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      strokeWidth={2}
+      d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
+    />
+  </svg>
+);
+const LockOpen = (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    className="h-5 w-5"
+    fill="none"
+    viewBox="0 0 24 24"
+    stroke="currentColor"
+  >
+    <path
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      strokeWidth={2}
+      d="M8 11V7a4 4 0 118 0m-4 8v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2z"
+    />
+  </svg>
+);
 
 export default function AccountTxTable({
   transactions,
@@ -72,9 +104,15 @@ export default function AccountTxTable({
                   </th>
                   <th
                     scope="col"
-                    className="px-2 sm:px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider"
+                    className="px-2 sm:px-0 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider"
                   >
                     Priority Fee
+                  </th>
+                  <th
+                    scope="col"
+                    className="px-2 sm:px- py-3 text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  >
+                    Via Eden RPC
                   </th>
                 </tr>
               </thead>
@@ -194,8 +232,15 @@ export default function AccountTxTable({
                     <td className="px-2 sm:px-0 py-4 whitespace-nowrap">
                       {Math.round((tx.index / tx.blockTxCount) * 100)} %
                     </td>
-                    <td className="px-2 sm:px-6 py-4 whitespace-nowrap">
+                    <td className="px-2 sm:px-0 py-4 whitespace-nowrap">
                       {tx.priorityFee} Gwei
+                    </td>
+                    <td
+                      className={`px-2 sm:px-0 py-6 whitespace-nowrap flex justify-center${
+                        tx.viaEdenRPC ? ' text-green' : ''
+                      }`}
+                    >
+                      {tx.viaEdenRPC ? LockClosed : LockOpen}
                     </td>
                   </tr>
                 ))}
