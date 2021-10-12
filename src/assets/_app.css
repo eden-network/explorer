@@ -20,3 +20,17 @@
 	background-clip: padding-box;
 	transition: border-color .15s ease-in-out,box-shadow .15s ease-in-out;
 }
+
+.react-datepicker__input-container input{
+	color: white;
+    background: #171c47;
+    text-align: center;
+    padding: 4px 8px;
+	width: 200px;
+	font-size: 14px;
+    border-radius: 8px;
+}
+
+.react-datepicker-wrapper {
+	width: 200px !important;
+}

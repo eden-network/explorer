@@ -1,5 +1,9 @@
+import { useState } from 'react';
+
 import { blocksPaged } from '@eden-network/data';
+import moment from 'moment';
 import { useRouter } from 'next/router';
+import DatePicker from 'react-datepicker';
 
 import Blocks from '../components/Blocks';
 import EndlessPagination from '../components/EndlessPagination';
@@ -11,6 +15,9 @@ const PER_PAGE = 10;
 
 export default function BlocksPage({ blocks }) {
   const router = useRouter();
+  const [endDate, setEndDate] = useState(() =>
+    router.query.endDate ? new Date(Number(router.query.endDate)) : new Date()
+  );
 
   const nextClick = () => {
     router.push(
@@ -32,6 +39,25 @@ export default function BlocksPage({ blocks }) {
     );
   };
 
+  const handleChangeDate = (date) => {
+    router.push(
+      `/blocks?skip=${
+        router.query.skip === undefined || Number(router.query.skip) === 0
+          ? 0
+          : Number(router.query.skip) - PER_PAGE
+      }&endDate=${date.getTime()}`
+    );
+    setEndDate(date);
+  };
+
+  const handleInputChangeRaw = (e) => {
+    const date = moment(e.target.value, 'MMMM d, yyyy h:mm aa');
+
+    if (date.isValid()) {
+      handleChangeDate(date);
+    }
+  };
+
   return (
     <Shell
       meta={
@@ -44,6 +70,20 @@ export default function BlocksPage({ blocks }) {
       <div className="max-w-4xl mx-auto grid gap-5">
         <div className="flex flex-col rounded-lg shadow-lg sm:overflow-hidden bg-blue">
           <div className="p-3 flex-1 sm:p-6 flex flex-col justify-between">
+            <div>
+              <div className="flex items-center float-right">
+                <p className="text-gray-500 w-32 text-sm">
+                  Filter By End Date:
+                </p>
+                <DatePicker
+                  selected={endDate}
+                  onChange={handleChangeDate}
+                  showTimeSelect
+                  dateFormat="MMMM d, yyyy h:mm aa"
+                  onChangeRaw={handleInputChangeRaw}
+                />
+              </div>
+            </div>
             <div className="flex-1 mt-4">
               <Blocks blocks={blocks} />
             </div>
