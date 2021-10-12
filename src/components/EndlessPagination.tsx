@@ -2,11 +2,7 @@
 export default function EndlessPagination({
   nextClick,
   prevClick,
-  page,
-  total,
 }: {
-  page?: number;
-  total?: number;
   nextClick?: () => void;
   prevClick?: () => void;
 }) {
@@ -15,18 +11,13 @@ export default function EndlessPagination({
       <div className="flex items-center justify-between w-full">
         <button
           onClick={prevClick}
-          className="relative inline-flex items-center px-4 py-2 bg-blue-light text-sm font-medium rounded-md hover:bg-green hover:text-blue cursor-pointer select-none"
+          className="w-14 py-2 mx-1 bg-blue-light text-sm font-medium rounded-md betterhover:hover:bg-green betterhover:hover:text-blue cursor-pointer select-none betterhover:disabled:opacity-50 betterhover:disabled:bg-blue-light betterhover:disabled:text-white"
         >
-          Previous
+          Back
         </button>
-        {total && (
-          <span className="text-white">
-            {page + 1} of {total}
-          </span>
-        )}
         <button
           onClick={nextClick}
-          className="ml-3 relative inline-flex items-center px-4 py-2 bg-blue-light text-sm font-medium rounded-md hover:bg-green hover:text-blue cursor-pointer select-none"
+          className="w-14 py-2 mx-1 bg-blue-light text-sm font-medium rounded-md betterhover:hover:bg-green betterhover:hover:text-blue cursor-pointer select-none betterhover:disabled:opacity-50 betterhover:disabled:bg-blue-light betterhover:disabled:text-white"
         >
           Next
         </button>

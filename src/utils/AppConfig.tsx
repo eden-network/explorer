@@ -11,7 +11,7 @@ export const AppConfig = {
   cacheBlockConfirmations: process.env.CACHE_BLOCK_CONFIRMATIONS || '10',
   providerEndpoint: process.env.RPC_HTTP_MAINNET,
   flashbotsAPIEndpoint: process.env.FLASHBOTS_API,
-  covalentAPIKey: process.env.COVALENT_API_TOKEN,
+  etherscanAPIKey: process.env.ETHERSCAN_API_TOKEN,
   proxyAuthToken: process.env.PROXY_AUTH_TOKEN,
   network: process.env.NETWORK || 'mainnet',
   blockInsightRowColorByPriority: {

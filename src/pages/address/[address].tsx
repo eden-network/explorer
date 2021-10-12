@@ -4,14 +4,14 @@ import { useEffect } from 'react';
 import { useRouter } from 'next/router';
 
 import AccountTxTable from '../../components/AccountTxTable';
-import BlockPagination from '../../components/BlockPagination';
+import EndlessPagination from '../../components/EndlessPagination';
 import EtherscanLink from '../../components/EtherscanLink';
 import StakerHeroStats from '../../components/StakerHeroStats';
 import usePagination from '../../hooks/usePagination.hook';
 import { Meta } from '../../layout/Meta';
 import Shell from '../../layout/Shell';
 import { getAccountInfo } from '../../modules/account-info';
-import { getAddressForENS } from '../../modules/getters';
+import { getAddressForENS, checkIfContractlike } from '../../modules/getters';
 import { validate as ensValidator } from '../../modules/validator/ens';
 
 const PAGE_SIZE = 10;
@@ -20,8 +20,8 @@ export default function Address({ accountOverview, transactions }) {
   const router = useRouter();
   const pageNum = router.query.page ? Number(router.query.page) : 1;
 
-  const { next, prev, begin, end, maxPage, currentPage } = usePagination(
-    accountOverview.txCount,
+  const { next, prev, currentPage } = usePagination(
+    999999999,
     PAGE_SIZE,
     pageNum
   );
@@ -59,16 +59,12 @@ export default function Address({ accountOverview, transactions }) {
         <div className="flex flex-col rounded-lg shadow-lg overflow-hidden bg-blue">
           <div className="p-3 flex-1 sm:p-6 flex flex-col justify-between">
             <div className="flex-1 mt-4">
-              <AccountTxTable transactions={transactions} />
+              <AccountTxTable
+                transactions={transactions}
+                account={accountOverview.address}
+              />
             </div>
-            <BlockPagination
-              prev={prev}
-              next={next}
-              end={end}
-              begin={begin}
-              maxPage={maxPage}
-              currentPage={currentPage}
-            />
+            <EndlessPagination nextClick={next} prevClick={prev} />
           </div>
         </div>
       </div>
@@ -83,17 +79,16 @@ export async function getServerSideProps(context) {
   if (ensValidator(address)) {
     address = await getAddressForENS(address);
   }
-  const accountInfo = await getAccountInfo(
-    address.toLowerCase(),
-    PAGE_SIZE,
-    pageNum
-  );
+  const [contractLike, accountInfo] = await Promise.all([
+    checkIfContractlike(address),
+    getAccountInfo(address.toLowerCase(), PAGE_SIZE, pageNum),
+  ]);
   // Change address to ENS if available
   if (context.query.address.toLowerCase() !== address.toLowerCase()) {
     accountInfo.accountOverview.address = context.query.address.toLowerCase();
   }
   // Contracts have tx-count of one
-  if (accountInfo.transactions.length === 0) {
+  if (contractLike) {
     accountInfo.accountOverview.txCount = 0;
   }
   return {

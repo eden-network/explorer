@@ -11,15 +11,14 @@ import { weiToGwei } from './utils';
 
 interface TxOverview {
   status: 'success' | 'fail';
-  toLabel: string | null;
   blockTxCount: number;
   priorityFee: number;
   timestamp: number;
   isEden: boolean;
   block: number;
-  nonce: number;
   index: number;
   hash: string;
+  from: string;
   to: string;
 }
 
@@ -32,8 +31,7 @@ interface AccountOverview {
 
 async function getEdenTxsForAccount(_account, _txPerPage, _page) {
   const txsForAccount = await getTxsForAccount(_account, _txPerPage, _page);
-  const txsFromSender = txsForAccount.filter((tx) => tx.from === _account);
-  const blocksForAccount = txsFromSender
+  const blocksForAccount = txsForAccount
     .map((tx) => tx.blockNumber)
     .filter((b, i, a) => a.indexOf(b) === i); // Remove duplicates
   const [edenBlocks, blockInfos] = await Promise.all([
@@ -47,7 +45,7 @@ async function getEdenTxsForAccount(_account, _txPerPage, _page) {
   const infoForBlock = Object.fromEntries(
     blockInfos.map((r) => [r.id, r.result])
   );
-  const txsForAccountEnriched = txsFromSender.map((tx) => {
+  const txsForAccountEnriched = txsForAccount.map((tx) => {
     const blockInfo = infoForBlock[tx.blockNumber];
     tx.blockTxCount = blockInfo.transactions.length;
     tx.baseFee = blockInfo.baseFeePerGas || 0;
@@ -80,14 +78,14 @@ export const getAccountInfo = async (
   const formatTx = (_tx) => ({
     to: ethers.utils.getAddress(_tx.to || ethers.constants.AddressZero),
     priorityFee: weiToGwei(_tx.gasPrice) - weiToGwei(_tx.baseFee),
+    status: _tx.isError === '0' ? 'success' : 'fail',
     blockTxCount: parseInt(_tx.blockTxCount, 16),
-    status: _tx.successful ? 'success' : 'fail',
-    timestamp: Date.parse(_tx.timestamp) / 1e3,
-    nonce: accountTxCount - _tx.nonceOffset,
+    index: parseInt(_tx.transactionIndex, 10),
+    block: parseInt(_tx.blockNumber, 10),
+    nonce: parseInt(_tx.nonce, 10),
     isEden: _tx.fromEdenProducer,
-    block: _tx.blockNumber,
-    toLabel: _tx.toLabel,
-    index: _tx.index,
+    timestamp: _tx.timeStamp,
+    from: _tx.from,
     hash: _tx.hash,
   });
   const transactions: Array<TxOverview> = txsForAccount.map(formatTx);

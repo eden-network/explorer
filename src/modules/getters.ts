@@ -11,7 +11,7 @@ const {
   flashbotsAPIEndpoint,
   providerEndpoint,
   cacheBlockParams,
-  covalentAPIKey,
+  etherscanAPIKey,
   proxyAuthToken,
   cacheTxParams,
   slotGasCap,
@@ -179,40 +179,36 @@ export const getMinerAlias = (_minerAddress) => {
   return minerAlias[_minerAddress.toLowerCase()] || null;
 };
 
-export const getTxsForAccount = async (_account, _pageSize = 10, _page = 1) => {
-  // Setup
-  const endpoint = `https://api.covalenthq.com/v1/1/address/${_account}/transactions_v2/`;
+export const checkIfContractlike = async (_address) => {
+  // Returns false for empty contracts (eg. 0xd8253352f6044cfe55bcc0748c3fa37b7df81f98)
+  const code = await provider.send('eth_getCode', [_address]);
+  return code !== '0x';
+};
+
+export const getTxsForAccount = async (_account, _offset = 10, _page = 1) => {
+  const endpoint = 'https://api.etherscan.io/api';
   const query: any = {
-    match: `{from_address: ${_account}}`,
-    skip: (_page - 1) * _pageSize,
-    'block-signed-at-asc': false,
-    key: covalentAPIKey,
-    limit: _pageSize,
-    'no-logs': true,
+    apikey: etherscanAPIKey,
+    endblock: 99999999,
+    address: _account,
+    module: 'account',
+    action: 'txlist',
+    offset: _offset,
+    startblock: 0,
+    sort: 'desc',
+    page: _page,
   };
-  // Fetch data
-  const queryString: any = new URLSearchParams(query);
-  const url = new URL(endpoint);
+  const queryString = new URLSearchParams(query);
+  const url: any = new URL(endpoint);
   url.search = queryString;
-  const res = await fetch(url.href).then((r) => r.json());
-  // Response
-  if (res.error) {
-    console.log(`Covalent request failed: ${res.error_message}`);
+  const { status, message, result } = await fetch(url.href).then((r) =>
+    r.json()
+  );
+  if (status !== '1') {
+    console.log(`Etherscan request failed: ${message}`);
     return [];
   }
-  return res.data.items.map((tx, i) => ({
-    to: tx.to_address || ethers.constants.AddressZero,
-    nonceOffset: (_page - 1) * _pageSize + i + 1,
-    fromLabel: tx.from_address_label,
-    timestamp: tx.block_signed_at,
-    toLabel: tx.to_address_label,
-    blockNumber: tx.block_height,
-    successful: tx.successful,
-    gasPrice: tx.gas_price,
-    from: tx.from_address,
-    index: tx.tx_offset,
-    hash: tx.tx_hash,
-  }));
+  return result;
 };
 
 export const filterForEdenBlocks = async (_blocks) => {

@@ -9,7 +9,7 @@ import ClipboardButton from './ClipboardButton';
 const EthLogo = <Image src={ethLogoSvg} width={20} />;
 const EdenLogo = <Image src={edenLogoSvg} width={20} />;
 
-export default function AccountTxTable({ transactions }) {
+export default function AccountTxTable({ transactions, account }) {
   return (
     <div className="flex flex-col">
       <div className="-my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
@@ -18,12 +18,6 @@ export default function AccountTxTable({ transactions }) {
             <table className="min-w-full">
               <thead className="bg-blue-light">
                 <tr>
-                  <th
-                    scope="col"
-                    className="px-2 sm:px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider"
-                  >
-                    Nonce
-                  </th>
                   <th
                     scope="col"
                     className="px-2 sm:px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider"
@@ -47,6 +41,12 @@ export default function AccountTxTable({ transactions }) {
                     className="px-2 sm:pl-2 sm:pr-12 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider"
                   >
                     Timestamp
+                  </th>
+                  <th
+                    scope="col"
+                    className="px-2 sm:px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  >
+                    From
                   </th>
                   <th
                     scope="col"
@@ -77,9 +77,6 @@ export default function AccountTxTable({ transactions }) {
               <tbody className="divide-y divide-blue-light border-b border-blue-light">
                 {transactions.map((tx) => (
                   <tr key={tx.hash}>
-                    <td className="px-2 sm:px-1 py-4 whitespace-nowrap">
-                      {tx.nonce}
-                    </td>
                     <td className="px-2 sm:px-1 py-4 whitespace-nowrap">
                       <span className="flex items-center justify-center">
                         <ClipboardButton
@@ -123,16 +120,60 @@ export default function AccountTxTable({ transactions }) {
                       {moment(tx.timestamp * 1e3).format('D MMM YYYY H:mm')}
                     </td>
                     <td className="px-2 sm:px-1 py-4 whitespace-nowrap">
-                      <span className="flex items-center justify-center">
-                        <ClipboardButton className="pr-2" copyText={tx.to} />
-                        <a
-                          href={`/address/${tx.to}`}
-                          className=" hover:text-green block"
-                          target="_blank"
-                          rel="noreferrer"
-                        >
-                          {tx.toLabel || formatAddress(tx.to)}
-                        </a>
+                      <span
+                        className={`flex items-center justify-center ${
+                          account.toLowerCase() === tx.from.toLowerCase()
+                            ? 'text-gray-300'
+                            : ''
+                        }`}
+                      >
+                        {account.toLowerCase() !== tx.from.toLowerCase() ? (
+                          <ClipboardButton
+                            className="pr-2"
+                            copyText={tx.from}
+                          />
+                        ) : (
+                          ''
+                        )}
+                        {account.toLowerCase() !== tx.from.toLowerCase() ? (
+                          <a
+                            href={`/address/${tx.from}`}
+                            className=" hover:text-green block"
+                            target="_blank"
+                            rel="noreferrer"
+                          >
+                            {formatAddress(tx.from)}
+                          </a>
+                        ) : (
+                          formatAddress(tx.from)
+                        )}
+                      </span>
+                    </td>
+                    <td className="px-2 sm:px-1 py-4 whitespace-nowrap">
+                      <span
+                        className={`flex items-center justify-center ${
+                          account.toLowerCase() === tx.to.toLowerCase()
+                            ? 'text-gray-300'
+                            : ''
+                        }`}
+                      >
+                        {account.toLowerCase() !== tx.to.toLowerCase() ? (
+                          <ClipboardButton className="pr-2" copyText={tx.to} />
+                        ) : (
+                          ''
+                        )}
+                        {account.toLowerCase() !== tx.to.toLowerCase() ? (
+                          <a
+                            href={`/address/${tx.to}`}
+                            className=" hover:text-green block"
+                            target="_blank"
+                            rel="noreferrer"
+                          >
+                            {formatAddress(tx.to)}
+                          </a>
+                        ) : (
+                          formatAddress(tx.to)
+                        )}
                       </span>
                     </td>
                     <td
