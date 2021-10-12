@@ -98,6 +98,39 @@ export const getStakersStake = async (_accounts, _blockNumber) => {
   );
 };
 
+export const getBlocksPaged = async ({
+  fromActiveProducerOnly,
+  beforeTimestamp,
+  start,
+  num,
+}) => {
+  return request(
+    graphNetworkEndpoint,
+    gql`{
+        blocks(
+          where: {
+            ${beforeTimestamp ? `timestamp_lte: ${beforeTimestamp}` : ''}
+            fromActiveProducer: ${fromActiveProducerOnly},
+          }
+          orderDirection: desc
+          orderBy: number, 
+          skip: ${start}, 
+          first: ${num}, 
+        ) {
+          timestamp,
+          author,
+          number,
+        }
+    }`
+  ).then((r) =>
+    r.blocks.map((blockInfo) => {
+      blockInfo.timestamp = parseInt(blockInfo.timestamp, 10);
+      blockInfo.number = parseInt(blockInfo.number, 10);
+      return blockInfo;
+    })
+  );
+};
+
 export const getBundledTxs = async (_blockNumber) => {
   return safeFetch(
     `${flashbotsAPIEndpoint}/v1/blocks?block_number=${_blockNumber}`,

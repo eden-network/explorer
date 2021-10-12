@@ -1,6 +1,5 @@
 import { useState } from 'react';
 
-import { blocksPaged } from '@eden-network/data';
 import moment from 'moment';
 import { useRouter } from 'next/router';
 import DatePicker from 'react-datepicker';
@@ -10,6 +9,7 @@ import EndlessPagination from '../components/EndlessPagination';
 import { Meta } from '../layout/Meta';
 import Shell from '../layout/Shell';
 import { getBlockInsightAndCache } from '../modules/eden-block-insight';
+import { getBlocksPaged } from '../modules/getters';
 
 const PER_PAGE = 10;
 
@@ -25,7 +25,9 @@ export default function BlocksPage({ blocks }) {
         router.query.skip === undefined
           ? PER_PAGE
           : Number(router.query.skip) + PER_PAGE
-      }`
+      }${router.query.endDate ? `&endDate=${router.query.endDate}` : ''}`,
+      null,
+      { scroll: false }
     );
   };
 
@@ -35,18 +37,16 @@ export default function BlocksPage({ blocks }) {
         router.query.skip === undefined || Number(router.query.skip) === 0
           ? 0
           : Number(router.query.skip) - PER_PAGE
-      }`
+      }${router.query.endDate ? `&endDate=${router.query.endDate}` : ''}`,
+      null,
+      { scroll: false }
     );
   };
 
   const handleChangeDate = (date) => {
-    router.push(
-      `/blocks?skip=${
-        router.query.skip === undefined || Number(router.query.skip) === 0
-          ? 0
-          : Number(router.query.skip) - PER_PAGE
-      }&endDate=${date.getTime()}`
-    );
+    router.push(`/blocks?skip=0&endDate=${date.getTime()}`, null, {
+      scroll: false,
+    });
     setEndDate(date);
   };
 
@@ -97,12 +97,13 @@ export default function BlocksPage({ blocks }) {
 
 export async function getServerSideProps(context) {
   const skip = context.query.skip ?? 0;
+  const endDate = context.query.endDate / 1e3 || null;
   try {
-    const blocks = await blocksPaged({
-      start: skip,
-      num: PER_PAGE,
+    const blocks = await getBlocksPaged({
       fromActiveProducerOnly: true,
-      network: 'mainnet',
+      beforeTimestamp: endDate,
+      num: PER_PAGE,
+      start: skip,
     });
     const blocksWithInsight = await Promise.all(
       blocks.map(async (block) => {
