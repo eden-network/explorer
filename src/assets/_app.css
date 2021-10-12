@@ -33,4 +33,5 @@
 
 .react-datepicker-wrapper {
 	width: 200px !important;
+	margin-right: 1px;
 }
