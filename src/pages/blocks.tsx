@@ -15,8 +15,10 @@ const PER_PAGE = 10;
 
 export default function BlocksPage({ blocks }) {
   const router = useRouter();
-  const [endDate, setEndDate] = useState(() =>
-    router.query.endDate ? new Date(Number(router.query.endDate)) : new Date()
+  const [beforeEpoch, setbeforeEpoch] = useState(() =>
+    router.query.beforeEpoch
+      ? new Date(Number(router.query.beforeEpoch))
+      : new Date()
   );
 
   const nextClick = () => {
@@ -25,7 +27,11 @@ export default function BlocksPage({ blocks }) {
         router.query.skip === undefined
           ? PER_PAGE
           : Number(router.query.skip) + PER_PAGE
-      }${router.query.endDate ? `&endDate=${router.query.endDate}` : ''}`,
+      }${
+        router.query.beforeEpoch
+          ? `&beforeEpoch=${router.query.beforeEpoch}`
+          : ''
+      }`,
       null,
       { scroll: false }
     );
@@ -37,17 +43,21 @@ export default function BlocksPage({ blocks }) {
         router.query.skip === undefined || Number(router.query.skip) === 0
           ? 0
           : Number(router.query.skip) - PER_PAGE
-      }${router.query.endDate ? `&endDate=${router.query.endDate}` : ''}`,
+      }${
+        router.query.beforeEpoch
+          ? `&beforeEpoch=${router.query.beforeEpoch}`
+          : ''
+      }`,
       null,
       { scroll: false }
     );
   };
 
   const handleChangeDate = (date) => {
-    router.push(`/blocks?skip=0&endDate=${date.getTime()}`, null, {
+    router.push(`/blocks?skip=0&beforeEpoch=${date.getTime() / 1e3}`, null, {
       scroll: false,
     });
-    setEndDate(date);
+    setbeforeEpoch(date);
   };
 
   const handleInputChangeRaw = (e) => {
@@ -76,7 +86,7 @@ export default function BlocksPage({ blocks }) {
                   Filter By End Date:
                 </p>
                 <DatePicker
-                  selected={endDate}
+                  selected={beforeEpoch}
                   onChange={handleChangeDate}
                   showTimeSelect
                   dateFormat="MMMM d, yyyy h:mm aa"
@@ -97,11 +107,11 @@ export default function BlocksPage({ blocks }) {
 
 export async function getServerSideProps(context) {
   const skip = context.query.skip ?? 0;
-  const endDate = context.query.endDate / 1e3 || null;
+  const beforeEpoch = context.query.beforeEpoch || null;
   try {
     const blocks = await getBlocksPaged({
       fromActiveProducerOnly: true,
-      beforeTimestamp: endDate,
+      beforeTimestamp: beforeEpoch,
       num: PER_PAGE,
       start: skip,
     });
