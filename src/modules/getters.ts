@@ -3,7 +3,7 @@ import { ethers } from 'ethers';
 import { request, gql } from 'graphql-request';
 
 import { AppConfig } from '../utils/AppConfig';
-import { safeFetch } from './utils';
+import { safeFetch, sendRawJsonRPCRequest } from './utils';
 
 const {
   cacheBlockConfirmations,
@@ -23,6 +23,30 @@ export const provider = new ethers.providers.JsonRpcProvider(
   providerEndpoint,
   network
 );
+
+export const getTxReceipt = (_txHash) => {
+  return sendRawJsonRPCRequest(
+    'eth_getTransactionReceipt',
+    [_txHash],
+    providerEndpoint
+  );
+};
+
+export const getTxRequest = (_txHash) => {
+  return sendRawJsonRPCRequest(
+    'eth_getTransactionByHash',
+    [_txHash],
+    providerEndpoint
+  );
+};
+
+export const getTxInfoByEdenRPC = (_txHash) => {
+  return sendRawJsonRPCRequest(
+    'eth_getTransactionByHash',
+    [_txHash],
+    'https://api.edennetwork.io/v1/monitor'
+  );
+};
 
 export const getTxCountForAccount = async (_address) => {
   return provider
