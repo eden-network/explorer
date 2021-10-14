@@ -94,3 +94,7 @@ li.react-datepicker__time-list-item:hover {
 .react-datepicker__triangle::after {
 	border-bottom-color: #171c47 !important;
 }
+
+.react-datepicker__time-box {
+	border-right: 1px solid rgb(115, 115, 115);
+}

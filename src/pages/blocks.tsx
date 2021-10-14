@@ -95,8 +95,8 @@ export default function BlocksPage({ blocks }) {
       <div className="max-w-4xl mx-auto grid gap-5">
         <div className="flex flex-col rounded-lg shadow-lg sm:overflow-hidden bg-blue">
           <div className="p-3 flex-1 sm:p-6 flex flex-col justify-between">
-            <div>
-              <div className="flex items-center float-right">
+            <div className="w-100">
+              <div className="flex items-center sm:float-right">
                 <p className="text-gray-500 w-28 text-sm mr-2">
                   Filter By End Date:
                 </p>
