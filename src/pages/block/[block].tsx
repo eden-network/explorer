@@ -133,7 +133,10 @@ export default function Block({
   return (
     <Shell
       meta={
-        <Meta title="Block" description="Eden Network Explorer Block Page" />
+        <Meta
+          title={`Block | ${block}`}
+          description="Eden Network Explorer Block Page"
+        />
       }
     >
       <div className="px-0 sm:px-4 max-w-full mx-auto grid gap-5 ">
