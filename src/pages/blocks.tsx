@@ -1,5 +1,7 @@
-import { useState } from 'react';
+/* eslint-disable react/button-has-type */
+import { useCallback, useMemo, useState } from 'react';
 
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import moment from 'moment';
 import { useRouter } from 'next/router';
 import DatePicker from 'react-datepicker';
@@ -17,8 +19,8 @@ export default function BlocksPage({ blocks }) {
   const router = useRouter();
   const [beforeEpoch, setbeforeEpoch] = useState(() =>
     router.query.beforeEpoch
-      ? new Date(Number(router.query.beforeEpoch))
-      : new Date()
+      ? router.query.beforeEpoch
+      : new Date().getTime() / 1e3
   );
 
   const nextClick = () => {
@@ -54,10 +56,11 @@ export default function BlocksPage({ blocks }) {
   };
 
   const handleChangeDate = (date) => {
-    router.push(`/blocks?skip=0&beforeEpoch=${date.getTime() / 1e3}`, null, {
+    const epoch = Math.ceil(date.getTime() / 1e3);
+    router.push(`/blocks?skip=0&beforeEpoch=${epoch}`, null, {
       scroll: false,
     });
-    setbeforeEpoch(date);
+    setbeforeEpoch(epoch);
   };
 
   const handleInputChangeRaw = (e) => {
@@ -67,6 +70,18 @@ export default function BlocksPage({ blocks }) {
       handleChangeDate(date);
     }
   };
+
+  const selectedTime = useMemo(
+    () => new Date(Number(beforeEpoch) * 1000),
+    [beforeEpoch]
+  );
+
+  const handleResetBeforeEpoch = useCallback(() => {
+    router.push(`/blocks?skip=0`, null, {
+      scroll: false,
+    });
+    setbeforeEpoch(new Date().getTime() / 1e3);
+  }, [router]);
 
   return (
     <Shell
@@ -82,16 +97,22 @@ export default function BlocksPage({ blocks }) {
           <div className="p-3 flex-1 sm:p-6 flex flex-col justify-between">
             <div>
               <div className="flex items-center float-right">
-                <p className="text-gray-500 w-32 text-sm">
+                <p className="text-gray-500 w-28 text-sm mr-2">
                   Filter By End Date:
                 </p>
                 <DatePicker
-                  selected={beforeEpoch}
+                  selected={selectedTime}
                   onChange={handleChangeDate}
                   showTimeSelect
                   dateFormat="MMMM d, yyyy h:mm aa"
                   onChangeRaw={handleInputChangeRaw}
                 />
+                <button
+                  onClick={handleResetBeforeEpoch}
+                  className="ml-1 px-2 py-1 text-sm font-medium rounded-md betterhover:hover:bg-green betterhover:hover:text-blue cursor-pointer select-none betterhover:disabled:opacity-50 betterhover:disabled:bg-blue-light betterhover:disabled:text-white"
+                >
+                  <FontAwesomeIcon icon="sync" />
+                </button>
               </div>
             </div>
             <div className="flex-1 mt-4">

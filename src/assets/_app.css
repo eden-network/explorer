@@ -23,12 +23,21 @@
 
 .react-datepicker__input-container input{
 	color: white;
-    background: #171c47;
+	border: 1px solid rgb(115, 115, 115);
+    background-color: rgb(43, 48, 90);
     text-align: center;
     padding: 4px 8px;
 	width: 200px;
 	font-size: 14px;
-    border-radius: 8px;
+    border-radius: 6px;
+	
+}
+
+.react-datepicker__input-container input:focus {
+	outline-width: 2px;
+	outline-offset: 0px;
+  	outline-color: rgb(202, 255, 0);
+	border-color: transparent;
 }
 
 .react-datepicker-wrapper {
