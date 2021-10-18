@@ -34,7 +34,7 @@ export const getAddressForENS = async (_ens: string) => {
   try {
     return await provider.resolveName(_ens);
   } catch (e) {
-    console.log(`Error resolving ENS: ${e}`);
+    console.error(`Error resolving ENS: ${e}`);
     return null;
   }
 };
@@ -184,6 +184,11 @@ export const getMinerAlias = (_minerAddress) => {
   return minerAlias[_minerAddress.toLowerCase()] || null;
 };
 
+export const getLabelForAddress = (_address) => {
+  // Future support for ENS, contract-names, ...
+  return getMinerAlias(_address);
+};
+
 export const checkIfContractlike = async (_address) => {
   // Returns false for empty contracts (eg. 0xd8253352f6044cfe55bcc0748c3fa37b7df81f98)
   const code = await provider.send('eth_getCode', [_address]);
@@ -210,7 +215,7 @@ export const getTxsForAccount = async (_account, _offset = 10, _page = 1) => {
     r.json()
   );
   if (status !== '1') {
-    console.log(`Etherscan request failed: ${message}`);
+    console.error(`Etherscan request failed: ${message}`);
     return [];
   }
   return result;

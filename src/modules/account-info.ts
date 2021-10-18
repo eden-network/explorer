@@ -4,6 +4,7 @@ import {
   getBlockInfoForBlocks,
   getTxCountForAccount,
   filterForEdenBlocks,
+  getLabelForAddress,
   getTxsForAccount,
   getSlotDelegates,
   getLatestStake,
@@ -27,6 +28,7 @@ interface TxOverview {
 
 interface AccountOverview {
   slotDelegate: number | null;
+  label: string | null;
   edenStaked: number;
   stakerRank: number;
   txCount: number;
@@ -86,6 +88,7 @@ export const getAccountInfo = async (
     slotDelegate: slotDelegates[_account.toLowerCase()] ?? null,
     stakerRank: stakerRank && parseInt(stakerRank, 10),
     edenStaked: parseInt(edenStaked, 10) / 1e18,
+    label: getLabelForAddress(_account) || null,
     address: ethers.utils.getAddress(_account),
     txCount: accountTxCount,
   };

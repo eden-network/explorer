@@ -44,7 +44,7 @@ const LockOpen = (
 export default function AccountTxTable({
   transactions,
   accountAddress,
-  accountENS,
+  accountLabel,
 }) {
   return (
     <div className="flex flex-col">
@@ -189,7 +189,7 @@ export default function AccountTxTable({
                             {formatAddress(tx.from)}
                           </a>
                         ) : (
-                          accountENS || formatAddress(tx.from)
+                          accountLabel || formatAddress(tx.from)
                         )}
                       </span>
                     </td>
@@ -218,7 +218,7 @@ export default function AccountTxTable({
                             {formatAddress(tx.to)}
                           </a>
                         ) : (
-                          accountENS || formatAddress(tx.to)
+                          accountLabel || formatAddress(tx.to)
                         )}
                       </span>
                     </td>

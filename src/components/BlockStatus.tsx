@@ -39,7 +39,7 @@ export default function BlockStatus({
         <Info.Label>Miner</Info.Label>
         <Info.Description>
           <a
-            href={`https://etherscan.io/address/${block.miner}`}
+            href={`/address/${block.miner}`}
             className="hover:text-green"
             target="_blank"
             rel="noreferrer"
