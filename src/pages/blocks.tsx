@@ -17,11 +17,9 @@ const PER_PAGE = 10;
 
 export default function BlocksPage({ blocks }) {
   const router = useRouter();
-  const [beforeEpoch, setbeforeEpoch] = useState(() =>
-    router.query.beforeEpoch
-      ? router.query.beforeEpoch
-      : new Date().getTime() / 1e3
-  );
+  const [beforeEpoch, setbeforeEpoch] = useState(() => {
+    return router.query.beforeEpoch ?? new Date().getTime() / 1e3;
+  });
 
   const nextClick = () => {
     router.push(
@@ -93,7 +91,7 @@ export default function BlocksPage({ blocks }) {
       }
     >
       <div className="max-w-4xl mx-auto grid gap-5">
-        <div className="flex flex-col rounded-lg shadow-lg sm:overflow-hidden bg-blue">
+        <div className="flex flex-col rounded-lg shadow-lg overflow-hidden bg-blue">
           <div className="p-3 flex-1 sm:p-6 flex flex-col justify-between">
             <div className="w-100">
               <div className="flex items-center sm:float-right">
@@ -156,7 +154,7 @@ export async function getServerSideProps(context) {
             number: block.number,
           };
         } catch (e) {
-          console.log(e); // eslint-disable-line no-console
+          console.error(e); // eslint-disable-line no-console
           return block;
         }
       })

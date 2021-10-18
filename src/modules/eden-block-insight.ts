@@ -86,7 +86,7 @@ export const getBlockInsightAndCache = async (_blockNumber) => {
     const blockInsight = await readFromBucket(blockNumberStr);
     // Check cache validity
     if (!checkIfValidCache(blockInsight)) {
-      console.log('Invalid cache');
+      console.error('Invalid cache');
       throw new Error('Invalid cache');
     }
     // Only responses from successfull calls were cached
@@ -98,7 +98,7 @@ export const getBlockInsightAndCache = async (_blockNumber) => {
     isBlockSecure(_blockNumber).then((isSecure) => {
       if (isSecure) {
         writeToBucket(blockNumberStr, blockInsight).catch((e) => {
-          console.log(`Couldn't write to storage:`, e); // eslint-disable-line no-console
+          console.error(`Couldn't write to storage:`, e); // eslint-disable-line no-console
         });
       }
     });

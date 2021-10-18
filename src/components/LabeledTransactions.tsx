@@ -1,19 +1,15 @@
+import { useRef, useEffect, useState, useCallback } from 'react';
+
+import cx from 'classnames';
+import { useRouter } from 'next/router';
+
 import useWindowSize from '../hooks/useWindowSize.hook';
+import { formatAddress, formatTxHash } from '../modules/formatter';
 import { AppConfig } from '../utils/AppConfig';
 import ClipboardButton from './ClipboardButton';
 import TableSortLabel from './table/TableSortLabel';
 
 const rowColorSettings = AppConfig.blockInsightRowColorByPriority;
-
-const formatTxHash = (tx) => {
-  return `${tx.slice(0, 6)}...${tx.slice(tx.length - 4, tx.length)}`;
-};
-const formatAddress = (address) => {
-  return `${address.slice(0, 6)}...${address.slice(
-    address.length - 4,
-    address.length
-  )}`;
-};
 
 const getRowColor = (tx) => {
   switch (tx.type) {
@@ -35,13 +31,43 @@ export default function LabeledTransactions({
   order,
 }) {
   const { width } = useWindowSize();
+  const router = useRouter();
+  const fieldRef = useRef(null);
   const isMobile = width < AppConfig.breakpoints.small;
+
+  const selectedTx = router.query.tx ? router.query.tx : null;
+
+  const [selectedRow, setSelectedRow] = useState(null);
+
+  useEffect(() => {
+    if (fieldRef.current) {
+      fieldRef.current.scrollIntoView({
+        behavior: 'smooth',
+        block: 'center',
+        inline: 'nearest',
+      });
+      fieldRef.current.focus();
+      setSelectedRow(selectedTx);
+    }
+  }, []);
+
+  const handleClickRow = (row) => {
+    if (row.hash === selectedRow) {
+      setSelectedRow(null);
+    } else {
+      setSelectedRow(row.hash);
+    }
+  };
+
+  const handleClickLink = useCallback((event) => {
+    event.stopPropagation();
+  }, []);
 
   return (
     <div className="flex flex-col">
-      <div className="overflow-scroll sm:overflow-hidden -my-2 sm:-mx-6 lg:-mx-8">
+      <div className="overflow-x-auto -my-2 sm:-mx-6 lg:-mx-8">
         <div className="py-2 align-middle inline-block min-w-full sm:px-4 lg:px-8">
-          <div className="overflow-scroll sm:overflow-hidden sm:rounded-lg">
+          <div className="overflow-x-auto sm:rounded-lg">
             <table className="min-w-full">
               <thead className="bg-blue-light">
                 <tr>
@@ -187,7 +213,15 @@ export default function LabeledTransactions({
                 {labeledTxs.map((tx) => {
                   const rowColor = getRowColor(tx);
                   return (
-                    <tr key={tx.hash} className="text-gray-300">
+                    <tr
+                      key={tx.hash}
+                      ref={tx.hash === selectedTx ? fieldRef : null}
+                      className={cx('text-gray-300', {
+                        'outline-none ring ring-red-300 border-transparent':
+                          selectedRow === tx.hash,
+                      })}
+                      onClick={() => handleClickRow(tx)}
+                    >
                       <td className="py-4 text-center whitespace-nowrap">
                         {tx.position}
                       </td>
@@ -199,9 +233,10 @@ export default function LabeledTransactions({
                           />
                           <a
                             href={`https://etherscan.io/tx/${tx.hash}`}
-                            className=" hover:text-green block"
+                            className=" hover:text-green block w-26"
                             target="_blank"
                             rel="noreferrer"
+                            onClick={handleClickLink}
                           >
                             {formatTxHash(tx.hash)}{' '}
                           </a>
@@ -214,10 +249,11 @@ export default function LabeledTransactions({
                             copyText={tx.from}
                           />
                           <a
-                            href={`https://etherscan.io/address/${tx.from}`}
-                            className="  hover:text-green block"
+                            href={`/address/${tx.from}`}
+                            className=" hover:text-green block w-26"
                             target="_blank"
                             rel="noreferrer"
+                            onClick={handleClickLink}
                           >
                             {miner === tx.from
                               ? 'Miner'
@@ -232,10 +268,11 @@ export default function LabeledTransactions({
                             copyText={tx.to}
                           />
                           <a
-                            href={`https://etherscan.io/address/${tx.to}`}
-                            className=" hover:text-green block"
+                            href={`/address/${tx.to}`}
+                            className=" hover:text-green block w-26"
                             target="_blank"
                             rel="noreferrer"
+                            onClick={handleClickLink}
                           >
                             {miner === tx.to ? 'Miner' : formatAddress(tx.to)}{' '}
                           </a>

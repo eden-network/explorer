@@ -11,6 +11,7 @@ const {
   flashbotsAPIEndpoint,
   providerEndpoint,
   cacheBlockParams,
+  etherscanAPIKey,
   proxyAuthToken,
   cacheTxParams,
   slotGasCap,
@@ -23,8 +24,19 @@ export const provider = new ethers.providers.JsonRpcProvider(
   network
 );
 
+export const getTxCountForAccount = async (_address) => {
+  return provider
+    .send('eth_getTransactionCount', [_address])
+    .then((txCount) => parseInt(txCount, 16));
+};
+
 export const getAddressForENS = async (_ens: string) => {
-  return provider.resolveName(_ens);
+  try {
+    return await provider.resolveName(_ens);
+  } catch (e) {
+    console.error(`Error resolving ENS: ${e}`);
+    return null;
+  }
 };
 
 export const withinSlotGasCap = (_gas) => slotGasCap >= _gas;
@@ -39,6 +51,20 @@ export const checkIfValidCache = (_cache) => {
         return typeof _cache.transactions[0][param] === cacheTxParams[param];
       }))
   );
+};
+
+export const getBlockInfoForBlocks = async (_blockNums) => {
+  const makeRequest = (_block) => ({
+    jsonrpc: '2.0',
+    id: _block,
+    method: 'eth_getBlockByNumber',
+    params: [`0x${parseInt(_block, 10).toString(16)}`, false],
+  });
+  const requests = _blockNums.map(makeRequest);
+  return fetch(AppConfig.providerEndpoint, {
+    method: 'POST',
+    body: JSON.stringify(requests),
+  }).then((r) => r.json());
 };
 
 export const isBlockSecure = async (_blockNumber) => {
@@ -59,7 +85,7 @@ export const isFromEdenProducer = async (_blockNumber) => {
   return blocksInfo[0].fromActiveProducer;
 };
 
-export const getSlotDelegates = async (_blockNumber) => {
+export const getSlotDelegates = async (_blockNumber?) => {
   const slotsInfo = await edenData.slots({
     block: _blockNumber,
     network: network as Network,
@@ -187,4 +213,92 @@ export const getBlockInfo = async (_blockNumber) => {
 
 export const getMinerAlias = (_minerAddress) => {
   return minerAlias[_minerAddress.toLowerCase()] || null;
+};
+
+export const getLabelForAddress = (_address) => {
+  // Future support for ENS, contract-names, ...
+  return getMinerAlias(_address);
+};
+
+export const checkIfContractlike = async (_address) => {
+  // Returns false for empty contracts (eg. 0xd8253352f6044cfe55bcc0748c3fa37b7df81f98)
+  const code = await provider.send('eth_getCode', [_address]);
+  return code !== '0x';
+};
+
+export const getTxsForAccount = async (_account, _offset = 10, _page = 1) => {
+  const endpoint = 'https://api.etherscan.io/api';
+  const query: any = {
+    apikey: etherscanAPIKey,
+    endblock: 99999999,
+    address: _account,
+    module: 'account',
+    action: 'txlist',
+    offset: _offset,
+    startblock: 0,
+    sort: 'desc',
+    page: _page,
+  };
+  const queryString = new URLSearchParams(query);
+  const url: any = new URL(endpoint);
+  url.search = queryString;
+  const { status, message, result } = await fetch(url.href).then((r) =>
+    r.json()
+  );
+  if (status !== '1') {
+    console.error(`Etherscan request failed: ${message}`);
+    return [];
+  }
+  return result;
+};
+
+export const getEdenRPCTxs = async (_txs) => {
+  const monitorEndpointEdenRPC = 'https://api.edennetwork.io/v1/monitor';
+  const query = {
+    method: 'eth_getTransactionsByHash',
+    params: [_txs],
+    jsonrpc: '2.0',
+    id: Date.now(),
+  };
+  return fetch(monitorEndpointEdenRPC, {
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(query),
+    method: 'POST',
+  }).then((r) => r.json());
+};
+
+export const filterForEdenBlocks = async (_blocks) => {
+  // GraphQL returns max of 1000 entries per call
+  return request(
+    graphNetworkEndpoint,
+    gql`{
+          blocks(
+            first: 1000,
+            where : { 
+                fromActiveProducer: true, 
+                number_in: [${_blocks.join()}]
+            }
+          ) {
+            number
+          }
+      }`
+  );
+};
+
+export const getLatestStake = async (_staker) => {
+  const response = await request(
+    graphNetworkEndpoint,
+    gql`{
+          staker(
+            id: "${_staker.toLowerCase()}"
+          ) {
+            staked, 
+            rank
+          }
+      }`
+  ).then((r) => r.staker);
+  if (response === null) {
+    return { rank: null, staked: 0 };
+  }
+  return response;
 };

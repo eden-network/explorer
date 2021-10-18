@@ -1,7 +1,6 @@
-import Link from 'next/link';
-
 import useWindowSize from '../hooks/useWindowSize.hook';
 import { AppConfig } from '../utils/AppConfig';
+import ClipboardButton from './ClipboardButton';
 
 export default function Stakers({
   stakers,
@@ -33,7 +32,7 @@ export default function Stakers({
                   </th>
                   <th
                     scope="col"
-                    className="px-2 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                    className="px-2 sm:px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider"
                   >
                     Address
                   </th>
@@ -51,8 +50,17 @@ export default function Stakers({
                         : '< 1'}
                     </td>
                     <td className="px-2 sm:px-6 py-4 whitespace-nowrap">
-                      <Link href={`/address/${staker.id}`}>
-                        <a className="text-green">
+                      <span className="flex items-center justify-center">
+                        <ClipboardButton
+                          className="pr-2"
+                          copyText={staker.id}
+                        />
+                        <a
+                          className="hover:text-green block w-44 sm:w-90"
+                          href={`/address/${staker.id}`}
+                          target="_blank"
+                          rel="noreferrer"
+                        >
                           {isMobileView
                             ? `${staker.id.slice(0, 16)}...${staker.id.slice(
                                 36,
@@ -60,7 +68,7 @@ export default function Stakers({
                               )}`
                             : staker.id}
                         </a>
-                      </Link>
+                      </span>
                     </td>
                   </tr>
                 ))}

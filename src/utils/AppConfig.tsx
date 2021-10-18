@@ -1,4 +1,5 @@
 export const AppConfig = {
+  firstEdenBlock: 12965000,
   site_name: 'Eden Network Explorer',
   title: 'Home',
   description: 'Eden Network block and stacking view',
@@ -10,6 +11,7 @@ export const AppConfig = {
   cacheBlockConfirmations: process.env.CACHE_BLOCK_CONFIRMATIONS || '10',
   providerEndpoint: process.env.RPC_HTTP_MAINNET,
   flashbotsAPIEndpoint: process.env.FLASHBOTS_API,
+  etherscanAPIKey: process.env.ETHERSCAN_API_TOKEN,
   proxyAuthToken: process.env.PROXY_AUTH_TOKEN,
   network: process.env.NETWORK || 'mainnet',
   blockInsightRowColorByPriority: {

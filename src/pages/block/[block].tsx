@@ -96,7 +96,8 @@ export default function Block({
         'Unable to retrieve Flashbot bundles, please try again in a few minutes!'
       );
     }
-  }, [notify, block, bundledTxsCallSuccess]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [router]);
 
   if (!isValidBlock) {
     return (
@@ -207,11 +208,11 @@ export async function getServerSideProps(context) {
     const blockInsight = await getBlockInsightAndCache(blockNum);
     return {
       props: {
+        bundledTxsCallSuccess: blockInsight.bundledTxsCallSuccess,
         isEdenBlock: blockInsight.fromEdenProducer,
         block: normailizeBlockInfo(blockInsight),
         labeledTxs: blockInsight.transactions,
         isValidBlock: true,
-        bundledTxsCallSuccess: blockInsight.bundledTxsCallSuccess,
       },
     };
   } catch (e) {
