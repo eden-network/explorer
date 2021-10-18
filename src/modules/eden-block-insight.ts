@@ -2,9 +2,9 @@ import { readFromBucket, writeToBucket } from './gcloud-cache';
 import {
   isFromEdenProducer,
   checkIfValidCache,
+  withinSlotGasCap,
   getSlotDelegates,
   getStakersStake,
-  getCapForSlots,
   isBlockSecure,
   getBundledTxs,
   getBlockInfo,
@@ -25,7 +25,6 @@ export const getBlockInsight = async (_blockNumber) => {
     blockInfo.transactions.map((tx) => tx.from)
   );
   const stakersStake = await getStakersStake(uniqueSenders, _blockNumber - 1);
-  const slotAvlGas = getCapForSlots();
   const labeledTxs = [];
   transactions.forEach((tx) => {
     const toSlotDelegate = slotDelegates[tx.to.toLowerCase()];
@@ -46,9 +45,8 @@ export const getBlockInsight = async (_blockNumber) => {
     if (
       fromEdenProducer &&
       labeledTx.toSlot !== false &&
-      slotAvlGas[labeledTx.toSlot] > tx.gasLimit
+      withinSlotGasCap(tx.gasLimit)
     ) {
-      slotAvlGas[labeledTx.toSlot] -= tx.gasLimit;
       labeledTx.type = 'slot';
     } else if (labeledTx.bundleIndex !== null) {
       labeledTx.type = 'fb-bundle';

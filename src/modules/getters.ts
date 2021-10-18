@@ -27,9 +27,7 @@ export const getAddressForENS = async (_ens: string) => {
   return provider.resolveName(_ens);
 };
 
-export const getCapForSlots = () => {
-  return { 0: slotGasCap, 1: slotGasCap, 2: slotGasCap };
-};
+export const withinSlotGasCap = (_gas) => slotGasCap >= _gas;
 
 export const checkIfValidCache = (_cache) => {
   return (
