@@ -42,11 +42,24 @@ export const getBlockInsight = async (_blockNumber) => {
       to: tx.to,
       type: '',
     };
-    if (
-      fromEdenProducer &&
-      labeledTx.toSlot !== false &&
-      withinSlotGasCap(tx.gasLimit)
-    ) {
+    const hasSlotPriority = () => {
+      if (
+        fromEdenProducer &&
+        labeledTx.toSlot !== false &&
+        withinSlotGasCap(tx.gasLimit)
+      ) {
+        // Check that there is no lower nonce to non-slot or higher-slot delegate
+        const inferiorSlotTxForAccount = labeledTxs
+          .filter((_tx) => _tx.from === labeledTx.from)
+          .find((_tx) => _tx.toSlot === false || _tx.toSlot > labeledTx.toSlot);
+        if (inferiorSlotTxForAccount === undefined) {
+          return true;
+        }
+      }
+      return false;
+    };
+
+    if (hasSlotPriority()) {
       labeledTx.type = 'slot';
     } else if (labeledTx.bundleIndex !== null) {
       labeledTx.type = 'fb-bundle';
