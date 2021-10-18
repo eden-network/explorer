@@ -66,9 +66,7 @@ export default function Address({ accountOverview, transactions, error }) {
           <h2 className="text-2xl font-extrabold sm:text-4xl hover:text-green break-all">
             <EtherscanLink
               text={accountOverview.label || accountOverview.address}
-              path={`address/${
-                accountOverview.label || accountOverview.address
-              }`}
+              path={`address/${accountOverview.ens || accountOverview.address}`}
             />
           </h2>
         </div>
@@ -110,6 +108,7 @@ export async function getServerSideProps(context) {
     ]);
     // Change address to ENS if available
     if (context.query.address.toLowerCase() !== address.toLowerCase()) {
+      accountInfo.accountOverview.ens = context.query.address.toLowerCase();
       accountInfo.accountOverview.label = context.query.address.toLowerCase();
     }
     // Contracts have tx-count of one

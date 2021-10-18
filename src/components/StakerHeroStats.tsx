@@ -18,7 +18,7 @@ export default function StakerHeroStats({
         <div className="relative max-w-30xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="max-w-4xl mx-auto">
             <dl
-              className={`rounded-lg bg-green sm:grid sm:grid-cols-${fieldsLen} text-blue shadow-lg`}
+              className={`rounded-lg bg-green sm:grid 'sm:grid-cols-2' ${`sm:grid-cols-${fieldsLen.toString()}`} text-blue shadow-lg`}
             >
               {stakerRank !== null ? (
                 <div className="flex flex-col border-b border-blue p-6 text-center sm:border-0 sm:border-r">
