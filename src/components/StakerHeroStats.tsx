@@ -18,7 +18,7 @@ export default function StakerHeroStats({
                   Staker Rank
                 </dt>
                 <dd className="order-1 text-5xl font-extrabold text-blue">
-                  {stakerRank !== -1 ? `#${stakerRank + 1}` : '∞'}
+                  {stakerRank !== -1 ? `#${stakerRank + 1}` : '-'}
                 </dd>
               </div>
               <div className="flex flex-col border-t border-b border-blue p-6 text-center sm:border-0 sm:border-l sm:border-r">
