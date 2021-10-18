@@ -8,8 +8,9 @@ import Header from '../layout/Header';
 
 import '../config/fontawsome';
 
-import '../assets/_app.css';
+import 'react-datepicker/dist/react-datepicker.css';
 import 'react-toastify/dist/ReactToastify.css';
+import '../assets/_app.css';
 
 function MyApp({ Component, pageProps }) {
   return (
