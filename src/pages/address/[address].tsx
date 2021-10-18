@@ -56,7 +56,7 @@ export default function Address({ accountOverview, transactions, error }) {
     <Shell
       meta={
         <Meta
-          title="Address"
+          title={`Address ${router.query.address}`}
           description="Eden Network Explorer Address Page"
         />
       }
