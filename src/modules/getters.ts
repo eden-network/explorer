@@ -87,7 +87,7 @@ export const isFromEdenProducer = async (_blockNumber) => {
   return blocksInfo[0].fromActiveProducer;
 };
 
-export const getSlotDelegates = async (_blockNumber) => {
+export const getSlotDelegates = async (_blockNumber?) => {
   const slotsInfo = await edenData.slots({
     block: _blockNumber,
     network: network as Network,
@@ -262,7 +262,7 @@ export const getLatestStake = async (_staker) => {
       }`
   ).then((r) => r.staker);
   if (response === null) {
-    return { rank: -1, staked: 0 };
+    return { rank: null, staked: 0 };
   }
   return response;
 };

@@ -5,6 +5,7 @@ import {
   getTxCountForAccount,
   filterForEdenBlocks,
   getTxsForAccount,
+  getSlotDelegates,
   getLatestStake,
   getEdenRPCTxs,
 } from './getters';
@@ -25,6 +26,7 @@ interface TxOverview {
 }
 
 interface AccountOverview {
+  slotDelegate: number | null;
   edenStaked: number;
   stakerRank: number;
   txCount: number;
@@ -73,15 +75,18 @@ export const getAccountInfo = async (
     txsForAccount,
     { staked: edenStaked, rank: stakerRank },
     accountTxCount,
+    slotDelegates,
   ] = await Promise.all([
     getEdenTxsForAccount(_account.toLowerCase(), _txPerPage, _page),
     getLatestStake(_account.toLowerCase()),
     getTxCountForAccount(_account),
+    getSlotDelegates(),
   ]);
   const accountOverview: AccountOverview = {
+    slotDelegate: slotDelegates[_account.toLowerCase()] ?? null,
+    stakerRank: stakerRank && parseInt(stakerRank, 10),
     edenStaked: parseInt(edenStaked, 10) / 1e18,
     address: ethers.utils.getAddress(_account),
-    stakerRank: parseInt(stakerRank, 10),
     txCount: accountTxCount,
   };
   const formatTx = (_tx) => ({
