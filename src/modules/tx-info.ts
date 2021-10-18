@@ -29,6 +29,8 @@ interface TxInfo {
   index: number | null;
 }
 
+export type { TxInfo };
+
 export const getTransactionInfo = async (_txHash) => {
   // Get general transaction info
   const [txRequest, txReceipt, edenRPCInfo] = await Promise.all([
@@ -43,7 +45,7 @@ export const getTransactionInfo = async (_txHash) => {
   const pendingInPublicMempool = !mined && txRequest !== null;
 
   if (!(pendingInPublicMempool || pendingInEdenMempool || mined)) {
-    console.log(`Can't find any info for transaction ${_txHash}`);
+    console.error(`Can't find any info for transaction ${_txHash}`);
     return null;
   }
 
