@@ -39,9 +39,7 @@ export const getAddressForENS = async (_ens: string) => {
   }
 };
 
-export const getCapForSlots = () => {
-  return { 0: slotGasCap, 1: slotGasCap, 2: slotGasCap };
-};
+export const withinSlotGasCap = (_gas) => slotGasCap >= _gas;
 
 export const checkIfValidCache = (_cache) => {
   return (
@@ -121,6 +119,39 @@ export const getStakersStake = async (_accounts, _blockNumber) => {
       staker.id,
       Number(BigInt(staker.staked) / weiBN),
     ])
+  );
+};
+
+export const getBlocksPaged = async ({
+  fromActiveProducerOnly,
+  beforeTimestamp,
+  start,
+  num,
+}) => {
+  return request(
+    graphNetworkEndpoint,
+    gql`{
+        blocks(
+          where: {
+            ${beforeTimestamp ? `timestamp_lte: ${beforeTimestamp}` : ''}
+            fromActiveProducer: ${fromActiveProducerOnly},
+          }
+          orderDirection: desc
+          orderBy: number, 
+          skip: ${start}, 
+          first: ${num}, 
+        ) {
+          timestamp,
+          author,
+          number,
+        }
+    }`
+  ).then((r) =>
+    r.blocks.map((blockInfo) => {
+      blockInfo.timestamp = parseInt(blockInfo.timestamp, 10);
+      blockInfo.number = parseInt(blockInfo.number, 10);
+      return blockInfo;
+    })
   );
 };
 

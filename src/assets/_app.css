@@ -10,3 +10,91 @@
     right: 32px !important;
 }
 
+.custom-select {
+	width: 80px;
+	height: calc(1.5em + .8rem + 2px);
+	padding-top: .4rem;
+	padding-bottom: .4rem;
+	padding-left: 1rem;
+	line-height: 1.5;
+	background-clip: padding-box;
+	transition: border-color .15s ease-in-out,box-shadow .15s ease-in-out;
+}
+
+.react-datepicker__input-container input{
+	color: white;
+	border: 1px solid rgb(115, 115, 115);
+    background-color: rgb(43, 48, 90);
+    text-align: center;
+    padding: 4px 8px;
+	width: 200px;
+	font-size: 14px;
+    border-radius: 6px;
+	
+}
+
+.react-datepicker__input-container input:focus {
+	outline-width: 2px;
+	outline-offset: 0px;
+  	outline-color: rgb(202, 255, 0);
+	border-color: transparent;
+}
+
+.react-datepicker-wrapper {
+	width: 200px !important;
+	margin-right: 1px;
+}
+
+.react-datepicker__header {
+	background-color: #171c47;
+	border-bottom: 1px solid rgb(115, 115, 115);
+}
+.react-datepicker__month-container, .react-datepicker__time-box {
+	background-color: #2b305a;
+}
+
+.react-datepicker__current-month, .react-datepicker-time__header, .react-datepicker-year-header, .react-datepicker__time-list-item  {
+	color: #fff;
+}
+
+.react-datepicker__day-name, .react-datepicker__day, .react-datepicker__time-name {
+	color: #fff;
+}
+
+.react-datepicker {
+	border: 1px solid rgb(115, 115, 115);
+	background-color: #2b305a;
+}
+
+.react-datepicker__navigation--previous {
+	top: 7px;
+}
+
+.react-datepicker__navigation-icon--next {
+	top: 4.4px;
+}
+
+.react-datepicker__day--selected, 
+li.react-datepicker__time-list-item--selected {
+	background: rgb(202, 255, 0) !important;
+	color: #171c47 !important;
+}
+
+.react-datepicker__day:hover, 
+li.react-datepicker__time-list-item:hover {
+	background: rgba(202, 255, 0, 0.9) !important;
+	color: #171c47 !important;
+}
+
+.react-datepicker__day--today {
+	font-weight: bold;
+	background-color: #2b305a;
+}
+
+.react-datepicker__triangle::after {
+	border-bottom-color: #171c47 !important;
+}
+
+.react-datepicker__time-box {
+	border-right: 1px solid rgb(115, 115, 115);
+}

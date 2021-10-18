@@ -1,5 +1,5 @@
 /* eslint-disable react/button-has-type */
-import { useCallback, useEffect, useState, useMemo } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useRouter } from 'next/router';
@@ -9,6 +9,7 @@ import BlockStatus from '../../components/BlockStatus';
 import ErrorMsg from '../../components/ErrorMsg';
 import LabeledTransactions from '../../components/LabeledTransactions';
 import toast from '../../components/Toast';
+import useLocalStorage from '../../hooks/useLocalStorage.hook';
 import usePagination from '../../hooks/usePagination.hook';
 import { Meta } from '../../layout/Meta';
 import Shell from '../../layout/Shell';
@@ -34,21 +35,21 @@ export default function Block({
   bundledTxsCallSuccess,
 }: BlockProps) {
   const router = useRouter();
-
-  const initialPage = useMemo(() => {
-    const selectedTx = router.query.tx ? router.query.tx : null;
-    if (selectedTx) {
-      const ind = labeledTxs.findIndex((tx) => tx.hash === selectedTx);
-      if (ind > 0) {
-        return Math.floor(ind / PAGE_SIZE) + 1;
-      }
-    }
-    return 1;
-  }, [router, labeledTxs]);
-
-  const { setCurrentPage, currentPage, maxPage, begin, next, prev, end } =
-    usePagination(labeledTxs.length, PAGE_SIZE, initialPage);
-
+  const [initialPageSize, setInitialPageSize] = useLocalStorage(
+    'block_pagination_page_size',
+    PAGE_SIZE
+  );
+  const {
+    next,
+    prev,
+    begin,
+    end,
+    maxPage,
+    currentPage,
+    resetCurrentPage,
+    updatePageSize,
+    pageSize,
+  } = usePagination(labeledTxs.length, initialPageSize, 1, setInitialPageSize);
   const [order, setOrder] = useState('asc');
   const [orderBy, setOrderBy] = useState('position');
 
@@ -60,7 +61,7 @@ export default function Block({
     }
     setOrder(newOrder);
     setOrderBy(property);
-    setCurrentPage(1);
+    resetCurrentPage();
   };
 
   const parsedTxs = labeledTxs.map((v) => {
@@ -72,8 +73,8 @@ export default function Block({
 
   const sortedRows = stableSort(parsedTxs, getSorting(order, orderBy));
   const currentTxs = sortedRows.slice(
-    (currentPage - 1) * PAGE_SIZE,
-    currentPage * PAGE_SIZE
+    (currentPage - 1) * pageSize,
+    currentPage * pageSize
   );
 
   const handleClickPrev = useCallback(() => {
@@ -180,6 +181,8 @@ export default function Block({
               end={end}
               begin={begin}
               maxPage={maxPage}
+              pageSize={pageSize}
+              onChangePageSize={updatePageSize}
               currentPage={currentPage}
             />
           </div>
