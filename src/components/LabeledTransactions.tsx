@@ -159,7 +159,7 @@ export default function LabeledTransactions({
                   </th>
                   <th
                     scope="col"
-                    className="px-2 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider"
+                    className="px-0 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider"
                   >
                     <TableSortLabel
                       active={orderBy === 'parsedMaxPriorityFee'}
@@ -173,53 +173,21 @@ export default function LabeledTransactions({
                     scope="col"
                     className="px-2 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider"
                   >
-                    <span className="flex float-right">
-                      <span className="w-28">
-                        <TableSortLabel
-                          active={orderBy === 'type'}
-                          direction={order}
-                          onClick={() => handleRequestSort('type')}
-                        >
-                          Priority By
-                        </TableSortLabel>
-                      </span>
+                    <span className="w-28">
+                      <TableSortLabel
+                        active={orderBy === 'type'}
+                        direction={order}
+                        onClick={() => handleRequestSort('type')}
+                      >
+                        Priority By
+                      </TableSortLabel>
                     </span>
                   </th>
                   <th
                     scope="col"
                     className="px-2 py-1 sm:px-4 text-center text-xs font-medium text-gray-500 uppercase tracking-wider w-1/100"
                   >
-                    <TableSortLabel
-                      active={orderBy === 'toSlot'}
-                      direction={order}
-                      onClick={() => handleRequestSort('toSlot')}
-                    >
-                      To Slot
-                    </TableSortLabel>
-                  </th>
-                  <th
-                    scope="col"
-                    className="px-2 py-1 sm:px-4 text-center text-xs font-medium text-gray-500 uppercase tracking-wider w-1/100"
-                  >
-                    <TableSortLabel
-                      active={orderBy === 'bundleIndex'}
-                      direction={order}
-                      onClick={() => handleRequestSort('bundleIndex')}
-                    >
-                      Bundle Index
-                    </TableSortLabel>
-                  </th>
-                  <th
-                    scope="col"
-                    className="px-2 py-1 sm:px-4 text-center text-xs font-medium text-gray-500 uppercase tracking-wider w-1/100"
-                  >
-                    <TableSortLabel
-                      active={orderBy === 'senderStake'}
-                      direction={order}
-                      onClick={() => handleRequestSort('senderStake')}
-                    >
-                      Sender Stake
-                    </TableSortLabel>
+                    Extra
                   </th>
                 </tr>
               </thead>
@@ -300,7 +268,7 @@ export default function LabeledTransactions({
                         {tx.maxPriorityFee.toLocaleString()}
                       </td>
                       <td
-                        className={`px-2 py-4 whitespace-nowrap ${
+                        className={`px-0 py-4 whitespace-nowrap ${
                           tx.viaEdenRPC ? ' text-green' : ''
                         }`}
                       >
@@ -308,23 +276,43 @@ export default function LabeledTransactions({
                           {tx.viaEdenRPC ? LockClosed : LockOpen}
                         </span>
                       </td>
-                      <td className="px-2 py-3 flex float-right text-center whitespace-nowrap">
+                      <td className="px-0 py-4 whitespace-nowrap text-center">
                         <span
                           className={`w-28 rounded-3xl py-2 bg-${rowColor} inline-block text-xs text-bold text-blue-light shadow-sm font-bold`}
                         >
                           {AppConfig.labelsToUI[tx.type]}
                         </span>
                       </td>
-                      <td className="px-2 sm:px-4 py-4 text-center whitespace-nowrap w-1/100">
-                        {tx.toSlot !== false ? tx.toSlot : ''}
-                      </td>
-                      <td className="px-2 sm:px-4 py-4 text-center whitespace-nowrap w-1/100">
-                        {tx.bundleIndex !== null ? tx.bundleIndex : ''}
-                      </td>
-                      <td className="px-2 sm:px-4 py-4 text-center whitespace-nowrap w-1/100">
-                        {tx.senderStake >= 100
-                          ? tx.senderStake.toLocaleString()
-                          : ''}
+                      <td className="px-2 py-4 whitespace-nowrap text-center">
+                        <div className="flex float-center justify-start">
+                          {tx.toSlot !== false ? (
+                            <span
+                              className={`p-4 m-1 rounded-3xl py-2 bg-${rowColor} inline-block text-xs text-bold text-blue-light shadow-sm font-bold`}
+                            >
+                              To slot #{tx.toSlot}
+                            </span>
+                          ) : (
+                            ''
+                          )}
+                          {tx.bundleIndex !== null ? (
+                            <span
+                              className={`p-4 m-1 rounded-3xl py-2 bg-${rowColor} inline-block text-xs text-bold text-blue-light shadow-sm font-bold`}
+                            >
+                              To bundle #{tx.bundleIndex}
+                            </span>
+                          ) : (
+                            ''
+                          )}
+                          {tx.senderStake >= 100 ? (
+                            <span
+                              className={`p-4 m-1 rounded-3xl py-2 bg-${rowColor} inline-block text-xs text-bold text-blue-light shadow-sm font-bold`}
+                            >
+                              Staked: {tx.senderStake.toLocaleString()}
+                            </span>
+                          ) : (
+                            ''
+                          )}
+                        </div>
                       </td>
                     </tr>
                   );
