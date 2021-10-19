@@ -1,5 +1,6 @@
 import { readFromBucket, writeToBucket } from './gcloud-cache';
 import {
+  getLabelForAddress,
   isFromEdenProducer,
   checkIfValidCache,
   withinSlotGasCap,
@@ -34,6 +35,8 @@ export const getBlockInsight = async (_blockNumber) => {
       bundleIndex: bundleIndex !== undefined ? bundleIndex : null,
       senderStake: stakersStake[tx.from.toLowerCase()] || 0,
       maxPriorityFee: BNToGwei(tx.maxPriorityFee), // Format for serialization
+      fromLabel: getLabelForAddress(tx.from),
+      toLabel: getLabelForAddress(tx.to),
       position: tx.transactionIndex,
       gasLimit: tx.gasLimit,
       nonce: tx.nonce,

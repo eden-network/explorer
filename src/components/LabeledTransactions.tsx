@@ -27,7 +27,6 @@ const getRowColor = (tx) => {
 
 export default function LabeledTransactions({
   labeledTxs,
-  miner,
   handleRequestSort,
   orderBy,
   order,
@@ -51,7 +50,7 @@ export default function LabeledTransactions({
       fieldRef.current.focus();
       setSelectedRow(selectedTx);
     }
-  }, []);
+  }, [selectedTx]);
 
   const handleClickRow = (row) => {
     if (row.hash === selectedRow) {
@@ -257,9 +256,7 @@ export default function LabeledTransactions({
                             rel="noreferrer"
                             onClick={handleClickLink}
                           >
-                            {miner === tx.from
-                              ? 'Miner'
-                              : formatAddress(tx.from)}{' '}
+                            {tx.fromLabel || formatAddress(tx.from)}{' '}
                           </a>
                         </span>
                       </td>
@@ -276,7 +273,7 @@ export default function LabeledTransactions({
                             rel="noreferrer"
                             onClick={handleClickLink}
                           >
-                            {miner === tx.to ? 'Miner' : formatAddress(tx.to)}{' '}
+                            {tx.toLabel || formatAddress(tx.to)}{' '}
                           </a>
                         </span>
                       </td>
