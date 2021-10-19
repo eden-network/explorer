@@ -180,6 +180,7 @@ export default function Block({
               <div className="lg:mr-8">
                 <a
                   role="button"
+                  title="Go to the previous block"
                   onClick={handleClickPrev}
                   onKeyDown={null}
                   tabIndex={0}
@@ -192,6 +193,7 @@ export default function Block({
                 </span>
                 <a
                   role="button"
+                  title="Go to the next block"
                   onClick={handleClickNext}
                   onKeyDown={null}
                   tabIndex={0}
@@ -201,6 +203,7 @@ export default function Block({
                 </a>
                 <a
                   role="button"
+                  title="Go to the latest block"
                   onClick={handleClickFastForward}
                   onKeyDown={null}
                   tabIndex={0}
@@ -210,6 +213,7 @@ export default function Block({
                 </a>
                 <a
                   role="button"
+                  title="Reload page"
                   onClick={handleClickRefresh}
                   onKeyDown={null}
                   tabIndex={0}
@@ -219,6 +223,7 @@ export default function Block({
                 </a>
                 <a
                   role="button"
+                  title="See block on Etherscan"
                   href={`https://etherscan.io/block/${block.number}`}
                   target="_blank"
                   rel="noreferrer"
