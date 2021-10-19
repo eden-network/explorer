@@ -6,6 +6,7 @@ import {
   withinSlotGasCap,
   getSlotDelegates,
   getStakersStake,
+  getEdenRPCTxs,
   isBlockSecure,
   getBundledTxs,
   getBlockInfo,
@@ -25,7 +26,14 @@ export const getBlockInsight = async (_blockNumber) => {
   const uniqueSenders = makeArrayUnique(
     blockInfo.transactions.map((tx) => tx.from)
   );
-  const stakersStake = await getStakersStake(uniqueSenders, _blockNumber - 1);
+  const txHashes = blockInfo.transactions.map((tx) => tx.hash);
+  const [stakersStake, edenRPCTxs] = await Promise.all([
+    getStakersStake(uniqueSenders, _blockNumber - 1),
+    getEdenRPCTxs(txHashes),
+  ]);
+  const edenRPCInfoForTx = Object.fromEntries(
+    edenRPCTxs.result.map((tx) => [tx.hash, tx.blocknumber])
+  );
   const labeledTxs = [];
   transactions.forEach((tx) => {
     const toSlotDelegate = slotDelegates[tx.to.toLowerCase()];
@@ -34,6 +42,7 @@ export const getBlockInsight = async (_blockNumber) => {
       toSlot: (toSlotDelegate !== undefined ? toSlotDelegate : false) as any,
       bundleIndex: bundleIndex !== undefined ? bundleIndex : null,
       senderStake: stakersStake[tx.from.toLowerCase()] || 0,
+      viaEdenRPC: edenRPCInfoForTx[tx.hash] !== undefined,
       maxPriorityFee: BNToGwei(tx.maxPriorityFee), // Format for serialization
       fromLabel: getLabelForAddress(tx.from),
       toLabel: getLabelForAddress(tx.to),

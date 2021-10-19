@@ -1,14 +1,10 @@
 // eslint-disable-next-line import/no-extraneous-dependencies
 import moment from 'moment';
-import Image from 'next/image';
 
-import edenLogoSvg from '../../public/eden-logo.svg';
-import ethLogoSvg from '../../public/eth-logo.svg';
 import { getMinerAlias } from '../modules/getters';
+import { EthLogo, EdenLogo } from '../modules/icons';
 import { NormalizedBlockType } from '../utils/type';
 
-const EthLogo = <Image src={ethLogoSvg} width={14} />;
-const EdenLogo = <Image src={edenLogoSvg} width={14} />;
 const Container = ({ children }) => (
   <p className="leading-7 pr-4 xl:pr-4 line-height">{children}</p>
 );

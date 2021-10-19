@@ -2,10 +2,8 @@
 import { useCallback, useEffect, useState } from 'react';
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import Image from 'next/image';
 import { useRouter } from 'next/router';
 
-import etherscanLogoSvg from '../../../public/etherscan-logo.svg';
 import BlockPagination from '../../components/BlockPagination';
 import BlockStatus from '../../components/BlockStatus';
 import ErrorMsg from '../../components/ErrorMsg';
@@ -17,6 +15,7 @@ import { Meta } from '../../layout/Meta';
 import Shell from '../../layout/Shell';
 import { getBlockInsight } from '../../modules/eden-block-insight';
 import { getLatestBlock } from '../../modules/getters';
+import { EtherscanLogo } from '../../modules/icons';
 import { stableSort, getSorting } from '../../modules/table/sort';
 import { NormalizedBlockType } from '../../utils/type';
 
@@ -155,7 +154,7 @@ export default function Block({
                 role="button"
                 rel="noreferrer"
               >
-                <Image src={etherscanLogoSvg} width={20} height={20} />
+                {EtherscanLogo}
               </a>
             </div>
           </div>
@@ -231,7 +230,7 @@ export default function Block({
                   tabIndex={0}
                   className="ml-3 relative inline-flex items-center px-3 py-2 text-sm font-medium rounded-md bg-blue-light betterhover:hover:bg-green betterhover:hover:text-blue cursor-pointer select-none"
                 >
-                  <Image src={etherscanLogoSvg} width={14} height={14} />
+                  {EtherscanLogo}
                 </a>
               </div>
               <BlockStatus block={block} isEdenBlock={isEdenBlock} />

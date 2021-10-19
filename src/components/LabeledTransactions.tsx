@@ -5,6 +5,7 @@ import { useRouter } from 'next/router';
 
 import useWindowSize from '../hooks/useWindowSize.hook';
 import { formatAddress, formatTxHash } from '../modules/formatter';
+import { LockClosed, LockOpen } from '../modules/icons';
 import { AppConfig } from '../utils/AppConfig';
 import ClipboardButton from './ClipboardButton';
 import TableSortLabel from './table/TableSortLabel';
@@ -158,6 +159,18 @@ export default function LabeledTransactions({
                   </th>
                   <th
                     scope="col"
+                    className="px-2 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  >
+                    <TableSortLabel
+                      active={orderBy === 'parsedMaxPriorityFee'}
+                      direction={order}
+                      onClick={() => handleRequestSort('parsedMaxPriorityFee')}
+                    >
+                      Via Eden RPC
+                    </TableSortLabel>
+                  </th>
+                  <th
+                    scope="col"
                     className="px-2 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider"
                   >
                     <span className="flex float-right">
@@ -285,6 +298,15 @@ export default function LabeledTransactions({
                       </td>
                       <td className="px-2 py-4 text-right whitespace-nowrap">
                         {tx.maxPriorityFee.toLocaleString()}
+                      </td>
+                      <td
+                        className={`px-2 py-4 whitespace-nowrap ${
+                          tx.viaEdenRPC ? ' text-green' : ''
+                        }`}
+                      >
+                        <span className="flex justify-center">
+                          {tx.viaEdenRPC ? LockClosed : LockOpen}
+                        </span>
                       </td>
                       <td className="px-2 py-3 flex float-right text-center whitespace-nowrap">
                         <span
