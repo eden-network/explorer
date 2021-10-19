@@ -59,21 +59,6 @@ export default function BlockStatus({
         <Info.Label>Gas-used</Info.Label>
         <Info.Description>{block.gasUsed}</Info.Description>
       </Info.Container>
-      <Info.Container>
-        <Info.Description>
-          <a
-            href={`https://etherscan.io/block/${block.number}`}
-            className="hover:text-green"
-            target="_blank"
-            rel="noreferrer"
-          >
-            See block on Etherscan{' '}
-            <sup>
-              <FontAwesomeIcon icon="external-link-alt" size="xs" />
-            </sup>
-          </a>
-        </Info.Description>
-      </Info.Container>
     </div>
   );
 }

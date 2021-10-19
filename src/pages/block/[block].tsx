@@ -29,7 +29,6 @@ interface BlockProps {
 }
 
 const PAGE_SIZE = 15;
-const ETHERSCAN_LOGO = <Image src={etherscanLogoSvg} width={20} height={20} />;
 const FAST_FORWARD_ICON = (
   <svg
     aria-hidden="true"
@@ -164,7 +163,7 @@ export default function Block({
                 role="button"
                 rel="noreferrer"
               >
-                {ETHERSCAN_LOGO}
+                <Image src={etherscanLogoSvg} width={20} height={20} />
               </a>
             </div>
           </div>
@@ -216,6 +215,26 @@ export default function Block({
                   className="ml-3 relative inline-flex items-center px-3 py-2 text-sm font-medium rounded-md bg-blue-light betterhover:hover:bg-green betterhover:hover:text-blue cursor-pointer select-none"
                 >
                   {FAST_FORWARD_ICON}
+                </a>
+                <a
+                  role="button"
+                  onClick={handleClickRefresh}
+                  onKeyDown={null}
+                  tabIndex={0}
+                  className="ml-3 relative inline-flex items-center px-3 py-2 text-sm font-medium rounded-md bg-blue-light betterhover:hover:bg-green betterhover:hover:text-blue cursor-pointer select-none"
+                >
+                  <FontAwesomeIcon icon="sync" />
+                </a>
+                <a
+                  role="button"
+                  href={`https://etherscan.io/block/${block.number}`}
+                  target="_blank"
+                  rel="noreferrer"
+                  onKeyDown={null}
+                  tabIndex={0}
+                  className="ml-3 relative inline-flex items-center px-3 py-2 text-sm font-medium rounded-md bg-blue-light betterhover:hover:bg-green betterhover:hover:text-blue cursor-pointer select-none"
+                >
+                  <Image src={etherscanLogoSvg} width={14} height={14} />
                 </a>
               </div>
               <BlockStatus block={block} isEdenBlock={isEdenBlock} />
