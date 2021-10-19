@@ -24,6 +24,10 @@ export const provider = new ethers.providers.JsonRpcProvider(
   network
 );
 
+export const getLatestBlock = async () => {
+  return provider.getBlockNumber();
+};
+
 export const getTxCountForAccount = async (_address) => {
   return provider
     .send('eth_getTransactionCount', [_address])

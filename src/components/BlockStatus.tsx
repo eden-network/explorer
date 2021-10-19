@@ -6,7 +6,7 @@ import { getMinerAlias } from '../modules/getters';
 import { NormalizedBlockType } from '../utils/type';
 
 const Container = ({ children }) => (
-  <p className="leading-7 pr-4 xl:pr-6 line-height">{children}</p>
+  <p className="leading-7 pr-4 xl:pr-3 line-height">{children}</p>
 );
 const Label = ({ children }) => (
   <span className="pr-1 sm:text-sm text-gray-500">{children}:</span>
