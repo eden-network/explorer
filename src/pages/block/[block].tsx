@@ -2,8 +2,10 @@
 import { useCallback, useEffect, useState } from 'react';
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import Image from 'next/image';
 import { useRouter } from 'next/router';
 
+import etherscanLogoSvg from '../../../public/etherscan-logo.svg';
 import BlockPagination from '../../components/BlockPagination';
 import BlockStatus from '../../components/BlockStatus';
 import ErrorMsg from '../../components/ErrorMsg';
@@ -27,6 +29,7 @@ interface BlockProps {
 }
 
 const PAGE_SIZE = 15;
+const ETHERSCAN_LOGO = <Image src={etherscanLogoSvg} width={20} height={20} />;
 const FAST_FORWARD_ICON = (
   <svg
     aria-hidden="true"
@@ -95,9 +98,13 @@ export default function Block({
     currentPage * pageSize
   );
 
-  const handleClickReset = useCallback(() => {
+  const handleClickFastForward = useCallback(() => {
     router.push(`/block/latest`);
   }, [router]);
+
+  const handleClickRefresh = useCallback(() => {
+    router.push(`/block/${block.number ?? router.query.block}`);
+  }, [router, block]);
 
   const handleClickPrev = useCallback(() => {
     router.push(`/block/${block.number - 1}`);
@@ -123,7 +130,9 @@ export default function Block({
 
   if (!isValidBlock) {
     return (
-      <ErrorMsg errorMsg="Couldn't fetch data for the block">
+      <ErrorMsg
+        errorMsg={`Couldn't fetch data for the block: ${router.query.block}`}
+      >
         <div className="text-center pb-2">
           <a
             href={`https://etherscan.io/block/${block.number}`}
@@ -133,20 +142,32 @@ export default function Block({
           >
             View block on Etherscan
           </a>
-          <div className="pb-4 my-10">
-            <button
-              onClick={handleClickPrev}
-              className="mx-3 relative inline-flex items-center px-4 py-2 bg-blue-light text-sm font-medium rounded-md betterhover:hover:bg-green betterhover:hover:text-blue cursor-pointer select-none"
-            >
-              Previous
-            </button>
-            <span className="text-white">{block.number}</span>
-            <button
-              onClick={handleClickNext}
-              className="mx-3 relative inline-flex items-center px-6 py-2 bg-blue-light text-sm font-medium rounded-md betterhover:hover:bg-green betterhover:hover:text-blue cursor-pointer select-none"
-            >
-              Next
-            </button>
+          <div className="w-full flex items-center flex-wrap py-3">
+            <div className="flex text-center my-1 sm:my-0 flex-grow justify-center pr-2">
+              <button
+                onClick={handleClickFastForward}
+                className="mx-1 relative inline-flex items-center px-3 py-3 bg-blue-light text-sm font-medium rounded-md betterhover:hover:bg-green betterhover:hover:text-blue cursor-pointer select-none"
+              >
+                See latest block
+              </button>
+              <button
+                onClick={handleClickRefresh}
+                className="mx-1 relative inline-flex items-center px-3 py-3 bg-blue-light text-sm font-medium rounded-md betterhover:hover:bg-green betterhover:hover:text-blue cursor-pointer select-none"
+              >
+                <FontAwesomeIcon icon="sync" />
+              </button>
+              <a
+                className="button mx-1 relative inline-flex items-center px-3 py-3 bg-blue-light text-sm font-medium rounded-md betterhover:hover:bg-green betterhover:hover:text-blue cursor-pointer select-none"
+                href={`https://etherscan.io/block/${
+                  block.number ?? router.query.block
+                }`}
+                target="_blank"
+                role="button"
+                rel="noreferrer"
+              >
+                {ETHERSCAN_LOGO}
+              </a>
+            </div>
           </div>
         </div>
       </ErrorMsg>
@@ -190,7 +211,7 @@ export default function Block({
                 </a>
                 <a
                   role="button"
-                  onClick={handleClickReset}
+                  onClick={handleClickFastForward}
                   onKeyDown={null}
                   tabIndex={0}
                   className="ml-3 relative inline-flex items-center px-3 py-2 text-sm font-medium rounded-md bg-blue-light betterhover:hover:bg-green betterhover:hover:text-blue cursor-pointer select-none"
