@@ -132,14 +132,6 @@ export default function Block({
         errorMsg={`Couldn't fetch data for the block: ${router.query.block}`}
       >
         <div className="text-center pb-2">
-          <a
-            href={`https://etherscan.io/block/${block.number}`}
-            target="_blank"
-            className="text-green"
-            rel="noreferrer"
-          >
-            View block on Etherscan
-          </a>
           <div className="w-full flex items-center flex-wrap py-3">
             <div className="flex text-center my-1 sm:my-0 flex-grow justify-center pr-2">
               <button
