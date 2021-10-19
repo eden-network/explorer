@@ -35,8 +35,8 @@ export default function BlocksPage({ blocks }) {
 
   const nextClick = () => {
     router.push(
-      `/blocks?page=${
-        router.query.page === undefined ? 2 : Number(router.query.page) + 1
+      `/blocks?p=${
+        router.query.p === undefined ? 2 : Number(router.query.p) + 1
       }${
         router.query.beforeEpoch
           ? `&beforeEpoch=${router.query.beforeEpoch}`
@@ -49,8 +49,8 @@ export default function BlocksPage({ blocks }) {
 
   const prevClick = () => {
     router.push(
-      `/blocks?page=${
-        router.query.page === undefined ? 1 : Number(router.query.page) - 1
+      `/blocks?p=${
+        router.query.p === undefined ? 1 : Number(router.query.p) - 1
       }${
         router.query.beforeEpoch
           ? `&beforeEpoch=${router.query.beforeEpoch}`
@@ -126,7 +126,7 @@ export default function BlocksPage({ blocks }) {
             </div>
             <EndlessPagination
               end={blocks.length < PER_PAGE}
-              currentPage={router.query.page ? Number(router.query.page) : 1}
+              currentPage={router.query.p ? Number(router.query.p) : 1}
               nextClick={nextClick}
               prevClick={prevClick}
               reset={reset}
@@ -139,7 +139,7 @@ export default function BlocksPage({ blocks }) {
 }
 
 export async function getServerSideProps(context) {
-  const page = context.query.page ?? 1;
+  const page = context.query.p ?? 1;
   const beforeEpoch = context.query.beforeEpoch || null;
   try {
     const skip = (page - 1) * PER_PAGE;

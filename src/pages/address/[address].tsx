@@ -19,7 +19,7 @@ const PAGE_SIZE = 10;
 
 export default function Address({ accountOverview, transactions, error }) {
   const router = useRouter();
-  const pageNum = router.query.page ? Number(router.query.page) : 1;
+  const pageNum = router.query.p ? Number(router.query.p) : 1;
 
   const { next, prev, currentPage, resetCurrentPage } = usePagination(
     999999999,
@@ -27,12 +27,10 @@ export default function Address({ accountOverview, transactions, error }) {
     pageNum
   );
   useEffect(() => {
-    if (currentPage !== Number(router.query.page)) {
-      router.push(
-        `/address/${router.query.address}?page=${currentPage}`,
-        null,
-        { scroll: false }
-      );
+    if (currentPage !== Number(router.query.p)) {
+      router.push(`/address/${router.query.address}?p=${currentPage}`, null, {
+        scroll: false,
+      });
     }
   }, [currentPage, router]);
 
@@ -98,7 +96,7 @@ export default function Address({ accountOverview, transactions, error }) {
 
 export async function getServerSideProps(context) {
   try {
-    const pageNum = context.query.page || 1;
+    const pageNum = context.query.p || 1;
     // Find address if ENS
     let { address } = context.query;
     if (ensValidator(address)) {
