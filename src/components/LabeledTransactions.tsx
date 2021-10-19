@@ -18,6 +18,8 @@ const getRowColor = (tx) => {
       return rowColorSettings[tx.type];
     case 'fb-bundle':
       return rowColorSettings[`bundle-${tx.bundleIndex % 2}`];
+    case 'local-tx':
+      return rowColorSettings[`local-tx`];
     default:
       return rowColorSettings['priority-fee'];
   }

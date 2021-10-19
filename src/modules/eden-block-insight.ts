@@ -65,6 +65,8 @@ export const getBlockInsight = async (_blockNumber) => {
       labeledTx.type = 'fb-bundle';
     } else if (fromEdenProducer && labeledTx.senderStake >= 100) {
       labeledTx.type = 'stake';
+    } else if (labeledTx.from.toLowerCase() === blockInfo.miner.toLowerCase()) {
+      labeledTx.type = 'local-tx';
     } else {
       labeledTx.type = 'priority-fee';
     }

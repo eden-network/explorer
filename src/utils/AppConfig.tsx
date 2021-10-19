@@ -18,8 +18,9 @@ export const AppConfig = {
     'priority-fee': 'gray-300',
     'bundle-0': 'purple',
     'bundle-1': 'pink',
-    stake: 'yellow',
-    slot: 'indigo',
+    'local-tx': 'yellow',
+    stake: 'indigo',
+    slot: 'green',
   },
   slotGasCap: 1.5e6,
   labelsToUI: {
@@ -27,6 +28,7 @@ export const AppConfig = {
     'priority-fee': 'PRIORITY FEE',
     stake: 'STAKE',
     slot: 'SLOT',
+    'local-tx': 'LOCAL TX',
   },
   breakpoints: {
     small: 575,

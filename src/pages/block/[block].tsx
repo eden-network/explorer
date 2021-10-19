@@ -15,7 +15,7 @@ import useLocalStorage from '../../hooks/useLocalStorage.hook';
 import usePagination from '../../hooks/usePagination.hook';
 import { Meta } from '../../layout/Meta';
 import Shell from '../../layout/Shell';
-import { getBlockInsightAndCache } from '../../modules/eden-block-insight';
+import { getBlockInsight } from '../../modules/eden-block-insight';
 import { getLatestBlock } from '../../modules/getters';
 import { stableSort, getSorting } from '../../modules/table/sort';
 import { NormalizedBlockType } from '../../utils/type';
@@ -269,7 +269,7 @@ export async function getServerSideProps(context) {
   }
   const blockNum = Number.parseInt(context.query.block, 10);
   try {
-    const blockInsight = await getBlockInsightAndCache(blockNum);
+    const blockInsight = await getBlockInsight(blockNum);
     return {
       props: {
         bundledTxsCallSuccess: blockInsight.bundledTxsCallSuccess,
