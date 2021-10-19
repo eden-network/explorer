@@ -1,18 +1,22 @@
 // eslint-disable-next-line import/no-extraneous-dependencies
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import moment from 'moment';
+import Image from 'next/image';
 
+import edenLogoSvg from '../../public/eden-logo.svg';
+import ethLogoSvg from '../../public/eth-logo.svg';
 import { getMinerAlias } from '../modules/getters';
 import { NormalizedBlockType } from '../utils/type';
 
+const EthLogo = <Image src={ethLogoSvg} width={14} />;
+const EdenLogo = <Image src={edenLogoSvg} width={14} />;
 const Container = ({ children }) => (
-  <p className="leading-7 pr-4 xl:pr-3 line-height">{children}</p>
+  <p className="leading-7 pr-4 xl:pr-4 line-height">{children}</p>
 );
 const Label = ({ children }) => (
   <span className="pr-1 sm:text-sm text-gray-500">{children}:</span>
 );
 const Description = ({ children }) => (
-  <span className=" text-gray-300">{children}</span>
+  <span className=" text-gray-300 inline-flex">{children}</span>
 );
 const Info = { Container, Label, Description };
 
@@ -26,29 +30,9 @@ export default function BlockStatus({
   return (
     <div className="text-small font-medium sm:flex sm:flex-wrap sm:justify-between">
       <Info.Container>
-        <Info.Label>Eden Producer</Info.Label>
-        <Info.Description>{isEdenBlock ? 'YES' : 'NO'}</Info.Description>
-      </Info.Container>
-      <Info.Container>
         <Info.Label>Timestamp</Info.Label>
         <Info.Description>
           {moment(block.timestamp * 1000).format('ddd, DD MMM YYYY H:mm:ss A')}
-        </Info.Description>
-      </Info.Container>
-      <Info.Container>
-        <Info.Label>Miner</Info.Label>
-        <Info.Description>
-          <a
-            href={`/address/${block.miner}`}
-            className="hover:text-green"
-            target="_blank"
-            rel="noreferrer"
-          >
-            {getMinerAlias(block.miner) || `${block.miner.slice(0, 6)}...`}{' '}
-            <sup>
-              <FontAwesomeIcon icon="external-link-alt" size="xs" />
-            </sup>
-          </a>
         </Info.Description>
       </Info.Container>
       <Info.Container>
@@ -58,6 +42,22 @@ export default function BlockStatus({
       <Info.Container>
         <Info.Label>Gas-used</Info.Label>
         <Info.Description>{block.gasUsed}</Info.Description>
+      </Info.Container>
+      <Info.Container>
+        <div className="inline-flex items-center">
+          <Info.Label>Miner</Info.Label>
+          <Info.Description>
+            <a
+              href={`/address/${block.miner}`}
+              className="hover:text-green inline-flex"
+              target="_blank"
+              rel="noreferrer"
+            >
+              {getMinerAlias(block.miner) || `${block.miner.slice(0, 6)}...`}
+              <sup className="px-1">{isEdenBlock ? EdenLogo : EthLogo}</sup>
+            </a>
+          </Info.Description>
+        </div>
       </Info.Container>
     </div>
   );
