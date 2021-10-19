@@ -127,7 +127,6 @@ export default function Block({
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [router]);
-
   if (!isValidBlock) {
     return (
       <ErrorMsg
@@ -159,7 +158,7 @@ export default function Block({
               <a
                 className="button mx-1 relative inline-flex items-center px-3 py-3 bg-blue-light text-sm font-medium rounded-md betterhover:hover:bg-green betterhover:hover:text-blue cursor-pointer select-none"
                 href={`https://etherscan.io/block/${
-                  block.number ?? router.query.block
+                  block.number || router.query.block
                 }`}
                 target="_blank"
                 role="button"
