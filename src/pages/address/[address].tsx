@@ -21,7 +21,7 @@ export default function Address({ accountOverview, transactions, error }) {
   const router = useRouter();
   const pageNum = router.query.page ? Number(router.query.page) : 1;
 
-  const { next, prev, currentPage } = usePagination(
+  const { next, prev, currentPage, resetCurrentPage } = usePagination(
     999999999,
     PAGE_SIZE,
     pageNum
@@ -82,7 +82,13 @@ export default function Address({ accountOverview, transactions, error }) {
                 accountLabel={accountOverview.label}
               />
             </div>
-            <EndlessPagination nextClick={next} prevClick={prev} />
+            <EndlessPagination
+              end={transactions.length < PAGE_SIZE}
+              currentPage={currentPage}
+              reset={resetCurrentPage}
+              nextClick={next}
+              prevClick={prev}
+            />
           </div>
         </div>
       </div>

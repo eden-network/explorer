@@ -21,6 +21,18 @@ export default function BlocksPage({ blocks }) {
     return router.query.beforeEpoch ?? new Date().getTime() / 1e3;
   });
 
+  const reset = () => {
+    router.push(
+      `/blocks${
+        router.query.beforeEpoch
+          ? `?beforeEpoch=${router.query.beforeEpoch}`
+          : ''
+      }`,
+      null,
+      { scroll: false }
+    );
+  };
+
   const nextClick = () => {
     router.push(
       `/blocks?skip=${
@@ -55,7 +67,7 @@ export default function BlocksPage({ blocks }) {
 
   const handleChangeDate = (date) => {
     const epoch = Math.ceil(date.getTime() / 1e3);
-    router.push(`/blocks?skip=0&beforeEpoch=${epoch}`, null, {
+    router.push(`/blocks?beforeEpoch=${epoch}`, null, {
       scroll: false,
     });
     setbeforeEpoch(epoch);
@@ -75,7 +87,7 @@ export default function BlocksPage({ blocks }) {
   );
 
   const handleResetBeforeEpoch = useCallback(() => {
-    router.push(`/blocks?skip=0`, null, {
+    router.push(`/blocks`, null, {
       scroll: false,
     });
     setbeforeEpoch(new Date().getTime() / 1e3);
@@ -116,7 +128,15 @@ export default function BlocksPage({ blocks }) {
             <div className="flex-1 mt-4">
               <Blocks blocks={blocks} />
             </div>
-            <EndlessPagination nextClick={nextClick} prevClick={prevClick} />
+            <EndlessPagination
+              end={blocks.length < PER_PAGE}
+              currentPage={
+                router.query.skip ? 1 + Number(router.query.skip) / PER_PAGE : 1
+              }
+              nextClick={nextClick}
+              prevClick={prevClick}
+              reset={reset}
+            />
           </div>
         </div>
       </div>
