@@ -14,7 +14,7 @@ import usePagination from '../../hooks/usePagination.hook';
 import { Meta } from '../../layout/Meta';
 import Shell from '../../layout/Shell';
 import { getBlockInsight } from '../../modules/eden-block-insight';
-import { getLatestBlock } from '../../modules/getters';
+import { getLastSupportedBlock } from '../../modules/getters';
 import { EtherscanLogo } from '../../modules/icons';
 import { stableSort, getSorting } from '../../modules/table/sort';
 import { NormalizedBlockType } from '../../utils/type';
@@ -272,7 +272,7 @@ const normailizeBlockInfo = (block): NormalizedBlockType => {
 
 export async function getServerSideProps(context) {
   if (context.query.block === 'latest') {
-    const latestBlock = await getLatestBlock();
+    const latestBlock = await getLastSupportedBlock();
     return {
       props: {},
       redirect: {

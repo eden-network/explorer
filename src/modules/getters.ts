@@ -276,17 +276,32 @@ export const filterForEdenBlocks = async (_blocks) => {
   return request(
     graphNetworkEndpoint,
     gql`{
-          blocks(
-            first: 1000,
-            where : { 
-                fromActiveProducer: true, 
-                number_in: [${_blocks.join()}]
-            }
-          ) {
-            number
-          }
-      }`
+      blocks(
+        first: 1000,
+        where : { 
+          fromActiveProducer: true, 
+          number_in: [${_blocks.join()}]
+        }
+      ) {
+        number
+      }
+    }`
   );
+};
+
+export const getLastSupportedBlock = async () => {
+  return request(
+    graphNetworkEndpoint,
+    gql`
+      {
+        blocks(orderDirection: desc, orderBy: number, first: 1) {
+          number
+        }
+      }
+    `
+  ).then((res) => {
+    return parseInt(res.blocks[0].number, 10);
+  });
 };
 
 export const getLatestStake = async (_staker) => {
