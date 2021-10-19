@@ -13,11 +13,11 @@ import useLocalStorage from '../../hooks/useLocalStorage.hook';
 import usePagination from '../../hooks/usePagination.hook';
 import { Meta } from '../../layout/Meta';
 import Shell from '../../layout/Shell';
-import { getBlockInsightAndCache } from '../../modules/eden-block-insight';
+import { getBlockInsight } from '../../modules/eden-block-insight';
+import { getLastSupportedBlock } from '../../modules/getters';
+import { EtherscanLogo } from '../../modules/icons';
 import { stableSort, getSorting } from '../../modules/table/sort';
 import { NormalizedBlockType } from '../../utils/type';
-
-const PAGE_SIZE = 15;
 
 interface BlockProps {
   labeledTxs: Array<any>;
@@ -26,6 +26,25 @@ interface BlockProps {
   isValidBlock: boolean;
   bundledTxsCallSuccess: boolean;
 }
+
+const PAGE_SIZE = 15;
+const FAST_FORWARD_ICON = (
+  <svg
+    aria-hidden="true"
+    focusable="false"
+    data-prefix="fas"
+    data-icon="forward-fast"
+    className="svg-inline--fa fa-forward-fast"
+    role="img"
+    xmlns="http://www.w3.org/2000/svg"
+    viewBox="0 0 512 512"
+  >
+    <path
+      fill="currentColor"
+      d="M512 96.03v319.9c0 17.67-14.33 31.1-31.1 31.1C462.3 447.1 448 433.6 448 415.1V284.1l-171.5 156.5C255.9 457.7 224 443.3 224 415.1V284.1l-171.5 156.5C31.88 457.7 0 443.3 0 415.1V96.03c0-27.37 31.88-41.74 52.5-24.62L224 226.8V96.03c0-27.37 31.88-41.74 52.5-24.62L448 226.8V96.03c0-17.67 14.33-31.1 31.1-31.1C497.7 64.03 512 78.36 512 96.03z"
+    />
+  </svg>
+);
 
 export default function Block({
   labeledTxs,
@@ -77,6 +96,14 @@ export default function Block({
     currentPage * pageSize
   );
 
+  const handleClickFastForward = useCallback(() => {
+    router.push(`/block/latest`);
+  }, [router]);
+
+  const handleClickRefresh = useCallback(() => {
+    router.push(`/block/${block.number ?? router.query.block}`);
+  }, [router, block]);
+
   const handleClickPrev = useCallback(() => {
     router.push(`/block/${block.number - 1}`);
   }, [router, block]);
@@ -98,33 +125,38 @@ export default function Block({
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [router]);
-
   if (!isValidBlock) {
     return (
-      <ErrorMsg errorMsg="Couldn't fetch data for the block">
+      <ErrorMsg
+        errorMsg={`Couldn't fetch data for the block: ${router.query.block}`}
+      >
         <div className="text-center pb-2">
-          <a
-            href={`https://etherscan.io/block/${block.number}`}
-            target="_blank"
-            className="text-green"
-            rel="noreferrer"
-          >
-            View block on Etherscan
-          </a>
-          <div className="pb-4 my-10">
-            <button
-              onClick={handleClickPrev}
-              className="mx-3 relative inline-flex items-center px-4 py-2 bg-blue-light text-sm font-medium rounded-md betterhover:hover:bg-green betterhover:hover:text-blue cursor-pointer select-none"
-            >
-              Previous
-            </button>
-            <span className="text-white">{block.number}</span>
-            <button
-              onClick={handleClickNext}
-              className="mx-3 relative inline-flex items-center px-6 py-2 bg-blue-light text-sm font-medium rounded-md betterhover:hover:bg-green betterhover:hover:text-blue cursor-pointer select-none"
-            >
-              Next
-            </button>
+          <div className="w-full flex items-center flex-wrap py-3">
+            <div className="flex text-center my-1 sm:my-0 flex-grow justify-center pr-2">
+              <button
+                onClick={handleClickFastForward}
+                className="mx-1 relative inline-flex items-center px-3 py-3 bg-blue-light text-sm font-medium rounded-md betterhover:hover:bg-green betterhover:hover:text-blue cursor-pointer select-none"
+              >
+                See latest block
+              </button>
+              <button
+                onClick={handleClickRefresh}
+                className="mx-1 relative inline-flex items-center px-3 py-3 bg-blue-light text-sm font-medium rounded-md betterhover:hover:bg-green betterhover:hover:text-blue cursor-pointer select-none"
+              >
+                <FontAwesomeIcon icon="sync" />
+              </button>
+              <a
+                className="button mx-1 relative inline-flex items-center px-3 py-3 bg-blue-light text-sm font-medium rounded-md betterhover:hover:bg-green betterhover:hover:text-blue cursor-pointer select-none"
+                href={`https://etherscan.io/block/${
+                  block.number || router.query.block
+                }`}
+                target="_blank"
+                role="button"
+                rel="noreferrer"
+              >
+                {EtherscanLogo}
+              </a>
+            </div>
           </div>
         </div>
       </ErrorMsg>
@@ -135,7 +167,7 @@ export default function Block({
     <Shell
       meta={
         <Meta
-          title={`Block ${router.query.block}`}
+          title={`Block ${block.number}`}
           description="Eden Network Explorer Block Page"
         />
       }
@@ -143,10 +175,11 @@ export default function Block({
       <div className="px-0 sm:px-4 max-w-full mx-auto grid gap-5 ">
         <div className="flex flex-col rounded-lg shadow-lg overflow-hidden bg-blue">
           <div className="p-3 sm:p-6 flex-1 flex flex-col justify-between">
-            <div className="p-0 sm:px-2 xl:flex xl:justify-between xl:flex-wrap items-center">
+            <div className="p-0 sm:px-3 xl:flex xl:justify-between xl:flex-wrap items-center">
               <div className="lg:mr-8">
                 <a
                   role="button"
+                  title="Go to the previous block"
                   onClick={handleClickPrev}
                   onKeyDown={null}
                   tabIndex={0}
@@ -159,6 +192,7 @@ export default function Block({
                 </span>
                 <a
                   role="button"
+                  title="Go to the next block"
                   onClick={handleClickNext}
                   onKeyDown={null}
                   tabIndex={0}
@@ -166,13 +200,44 @@ export default function Block({
                 >
                   <FontAwesomeIcon icon="chevron-right" />
                 </a>
+                <a
+                  role="button"
+                  title="Go to the latest block"
+                  onClick={handleClickFastForward}
+                  onKeyDown={null}
+                  tabIndex={0}
+                  className="ml-3 relative inline-flex items-center px-3 py-2 text-sm font-medium rounded-md bg-blue-light betterhover:hover:bg-green betterhover:hover:text-blue cursor-pointer select-none"
+                >
+                  {FAST_FORWARD_ICON}
+                </a>
+                <a
+                  role="button"
+                  title="Reload page"
+                  onClick={handleClickRefresh}
+                  onKeyDown={null}
+                  tabIndex={0}
+                  className="ml-3 relative inline-flex items-center px-3 py-2 text-sm font-medium rounded-md bg-blue-light betterhover:hover:bg-green betterhover:hover:text-blue cursor-pointer select-none"
+                >
+                  <FontAwesomeIcon icon="sync" />
+                </a>
+                <a
+                  role="button"
+                  title="See block on Etherscan"
+                  href={`https://etherscan.io/block/${block.number}`}
+                  target="_blank"
+                  rel="noreferrer"
+                  onKeyDown={null}
+                  tabIndex={0}
+                  className="ml-3 relative inline-flex items-center px-3 py-2 text-sm font-medium rounded-md bg-blue-light betterhover:hover:bg-green betterhover:hover:text-blue cursor-pointer select-none"
+                >
+                  {EtherscanLogo}
+                </a>
               </div>
               <BlockStatus block={block} isEdenBlock={isEdenBlock} />
             </div>
             <div className="flex-1 mt-4">
               <LabeledTransactions
                 labeledTxs={currentTxs}
-                miner={block.miner}
                 handleRequestSort={handleRequestSort}
                 orderBy={orderBy}
                 order={order}
@@ -206,9 +271,19 @@ const normailizeBlockInfo = (block): NormalizedBlockType => {
 };
 
 export async function getServerSideProps(context) {
+  if (context.query.block === 'latest') {
+    const latestBlock = await getLastSupportedBlock();
+    return {
+      props: {},
+      redirect: {
+        destination: `/block/${latestBlock}`,
+        permanent: false,
+      },
+    };
+  }
   const blockNum = Number.parseInt(context.query.block, 10);
   try {
-    const blockInsight = await getBlockInsightAndCache(blockNum);
+    const blockInsight = await getBlockInsight(blockNum);
     return {
       props: {
         bundledTxsCallSuccess: blockInsight.bundledTxsCallSuccess,
