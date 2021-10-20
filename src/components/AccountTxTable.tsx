@@ -6,6 +6,7 @@ import edenLogoSvg from '../../public/eden-logo.svg';
 import ethLogoSvg from '../../public/eth-logo.svg';
 import { formatAddress, formatTxHash } from '../modules/formatter';
 import ClipboardButton from './ClipboardButton';
+import NoSSr from './NoSsr';
 
 const EthLogo = (
   <Image
@@ -85,10 +86,10 @@ export default function AccountTxTable({
                   <th
                     scope="col"
                     className="px-2 sm:px-0 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider"
-                    data-tip
-                    data-for="thBlockType"
                   >
-                    Block-Type
+                    <span data-tip data-for="thBlockType">
+                      Block-Type
+                    </span>
                   </th>
                   <th
                     scope="col"
@@ -123,10 +124,10 @@ export default function AccountTxTable({
                   <th
                     scope="col"
                     className="px-2 sm:px-0 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider"
-                    data-tip
-                    data-for="thTxsAbove"
                   >
-                    % Txs Above
+                    <span data-tip data-for="thTxsAbove">
+                      % Txs Above
+                    </span>
                   </th>
                   <th
                     scope="col"
@@ -137,10 +138,10 @@ export default function AccountTxTable({
                   <th
                     scope="col"
                     className="px-2 sm:px- py-3 text-xs font-medium text-gray-500 uppercase tracking-wider"
-                    data-tip
-                    data-for="thViaEdenRPC"
                   >
-                    Via Eden RPC
+                    <span data-tip data-for="thViaEdenRPC">
+                      Via Eden RPC{' '}
+                    </span>
                   </th>
                 </tr>
               </thead>
@@ -277,82 +278,67 @@ export default function AccountTxTable({
           </div>
         </div>
       </div>
-      <ReactToolTip
-        id="edenLogoTip"
-        place="top"
-        offset={{ top: -10, left: 2 }}
-        effect="solid"
-        backgroundColor="#5b509a"
-        arrowColor="#5b509a"
-        clickable
-      >
-        Block was mined by Eden producer
-      </ReactToolTip>
-      <ReactToolTip
-        id="ethLogoTip"
-        place="top"
-        offset={{ top: -10, left: 2 }}
-        effect="solid"
-        backgroundColor="#5b509a"
-        arrowColor="#5b509a"
-        clickable
-      >
-        Block was not mined by Eden producer
-      </ReactToolTip>
-      <ReactToolTip
-        id="lockOpenTip"
-        place="top"
-        effect="solid"
-        backgroundColor="#5b509a"
-        arrowColor="#5b509a"
-        clickable
-      >
-        Transaction was submitted to Eden RPC
-      </ReactToolTip>
-      <ReactToolTip
-        id="lockClosedTip"
-        place="top"
-        effect="solid"
-        backgroundColor="#5b509a"
-        arrowColor="#5b509a"
-        clickable
-      >
-        Transaction was not submitted to Eden RPC
-      </ReactToolTip>
-      <ReactToolTip
-        id="thBlockType"
-        place="bottom"
-        effect="solid"
-        offset={{ top: 10 }}
-        backgroundColor="#5b509a"
-        arrowColor="#5b509a"
-        clickable
-      >
-        Percentage of transactions in the block with lower transaction index
-      </ReactToolTip>
-      <ReactToolTip
-        id="thTxsAbove"
-        place="bottom"
-        effect="solid"
-        offset={{ top: 10 }}
-        backgroundColor="#5b509a"
-        arrowColor="#5b509a"
-        clickable
-      >
-        Did user submitted transaction through Eden RPC (past submissions not
-        supported)
-      </ReactToolTip>
-      <ReactToolTip
-        id="thViaEdenRPC"
-        place="bottom"
-        effect="solid"
-        offset={{ top: 10 }}
-        backgroundColor="#5b509a"
-        arrowColor="#5b509a"
-        clickable
-      >
-        Transaction was not submitted to Eden RPC
-      </ReactToolTip>
+      <NoSSr>
+        <ReactToolTip
+          id="edenLogoTip"
+          place="top"
+          effect="solid"
+          offset={{ top: -10, left: 2 }}
+          arrowColor="#303F9F"
+        >
+          Block was mined by Eden producer
+        </ReactToolTip>
+        <ReactToolTip
+          id="ethLogoTip"
+          place="top"
+          offset={{ top: -10, left: 2 }}
+          effect="solid"
+          arrowColor="#303F9F"
+        >
+          Block was not mined by Eden producer
+        </ReactToolTip>
+        <ReactToolTip
+          id="lockOpenTip"
+          place="top"
+          effect="solid"
+          arrowColor="#303F9F"
+        >
+          Transaction was not submitted to Eden RPC
+        </ReactToolTip>
+        <ReactToolTip
+          id="lockClosedTip"
+          place="top"
+          effect="solid"
+          arrowColor="#303F9F"
+        >
+          Transaction was submitted to Eden RPC
+        </ReactToolTip>
+        <ReactToolTip
+          id="thBlockType"
+          place="top"
+          effect="solid"
+          arrowColor="#303F9F"
+        >
+          Was block mined by Eden producer
+        </ReactToolTip>
+        <ReactToolTip
+          id="thTxsAbove"
+          place="top"
+          effect="solid"
+          arrowColor="#303F9F"
+        >
+          Percentage of transactions in the block with lower transaction index
+        </ReactToolTip>
+        <ReactToolTip
+          id="thViaEdenRPC"
+          place="top"
+          effect="solid"
+          arrowColor="#303F9F"
+        >
+          Did user submitted transaction through Eden RPC (past submissions not
+          supported)
+        </ReactToolTip>
+      </NoSSr>
     </div>
   );
 }
