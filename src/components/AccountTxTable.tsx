@@ -1,68 +1,10 @@
 import moment from 'moment';
-import Image from 'next/image';
 import ReactToolTip from 'react-tooltip';
 
-import edenLogoSvg from '../../public/eden-logo.svg';
-import ethLogoSvg from '../../public/eth-logo.svg';
 import { formatAddress, formatTxHash } from '../modules/formatter';
+import { EthLogo, EdenLogo, LockClosed, LockOpen } from '../modules/icons';
 import ClipboardButton from './ClipboardButton';
 import NoSSr from './NoSsr';
-
-const EthLogo = (
-  <Image
-    src={ethLogoSvg}
-    alt="ether logo image"
-    width={20}
-    data-tip
-    data-for="ethLogoTip"
-  />
-);
-const EdenLogo = (
-  <Image
-    src={edenLogoSvg}
-    alt="ether logo image"
-    width={20}
-    data-tip
-    data-for="edenLogoTip"
-  />
-);
-
-const LockClosed = (
-  <svg
-    xmlns="http://www.w3.org/2000/svg"
-    className="h-5 w-5"
-    fill="none"
-    viewBox="0 0 24 24"
-    stroke="currentColor"
-    data-tip
-    data-for="lockClosedTip"
-  >
-    <path
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      strokeWidth={2}
-      d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
-    />
-  </svg>
-);
-const LockOpen = (
-  <svg
-    xmlns="http://www.w3.org/2000/svg"
-    className="h-5 w-5"
-    fill="none"
-    viewBox="0 0 24 24"
-    stroke="currentColor"
-    data-tip
-    data-for="lockOpenTip"
-  >
-    <path
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      strokeWidth={2}
-      d="M8 11V7a4 4 0 118 0m-4 8v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2z"
-    />
-  </svg>
-);
 
 export default function AccountTxTable({
   transactions,
@@ -169,7 +111,12 @@ export default function AccountTxTable({
                         tx.isEden ? 'text-green' : 'text-white'
                       }`}
                     >
-                      {tx.isEden ? EdenLogo : EthLogo}
+                      <span
+                        data-tip
+                        data-for={tx.isEden ? 'EdenLogoTip' : 'EthLogoTip'}
+                      >
+                        {tx.isEden ? EdenLogo : EthLogo}
+                      </span>
                     </td>
                     <td className="px-2 sm:px-1 py-4 whitespace-nowrap">
                       <span className="flex items-center justify-center">
@@ -269,7 +216,14 @@ export default function AccountTxTable({
                         tx.viaEdenRPC ? ' text-green' : ''
                       }`}
                     >
-                      {tx.viaEdenRPC ? LockClosed : LockOpen}
+                      <span
+                        data-tip
+                        data-for={
+                          tx.viaEdenRPC ? 'LockClosedTip' : 'LockOpenTip'
+                        }
+                      >
+                        {tx.viaEdenRPC ? LockClosed : LockOpen}
+                      </span>
                     </td>
                   </tr>
                 ))}
@@ -280,25 +234,25 @@ export default function AccountTxTable({
       </div>
       <NoSSr>
         <ReactToolTip
-          id="edenLogoTip"
+          id="EdenLogoTip"
           place="top"
           effect="solid"
-          offset={{ top: -10, left: 2 }}
+          offset={{ left: 2 }}
           arrowColor="#303F9F"
         >
           Block was mined by Eden producer
         </ReactToolTip>
         <ReactToolTip
-          id="ethLogoTip"
+          id="EthLogoTip"
           place="top"
-          offset={{ top: -10, left: 2 }}
+          offset={{ left: 2 }}
           effect="solid"
           arrowColor="#303F9F"
         >
           Block was not mined by Eden producer
         </ReactToolTip>
         <ReactToolTip
-          id="lockOpenTip"
+          id="LockOpenTip"
           place="top"
           effect="solid"
           arrowColor="#303F9F"
@@ -306,7 +260,7 @@ export default function AccountTxTable({
           Transaction was not submitted to Eden RPC
         </ReactToolTip>
         <ReactToolTip
-          id="lockClosedTip"
+          id="LockClosedTip"
           place="top"
           effect="solid"
           arrowColor="#303F9F"

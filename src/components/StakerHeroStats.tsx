@@ -54,7 +54,7 @@ export default function StakerHeroStats({
                     Delegate for slot
                   </dt>
                   <dd className="order-1 text-5xl font-extrabold text-blue">
-                    {slotDelegate.toLocaleString()}
+                    #{slotDelegate.toLocaleString()}
                   </dd>
                 </div>
               ) : (
