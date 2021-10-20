@@ -1,3 +1,4 @@
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import moment from 'moment';
 import ReactToolTip from 'react-tooltip';
 
@@ -30,7 +31,7 @@ export default function AccountTxTable({
                     className="px-2 sm:px-0 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider"
                   >
                     <span data-tip data-for="thBlockType">
-                      Block-Type
+                      <FontAwesomeIcon icon="question-circle" /> Block-Type
                     </span>
                   </th>
                   <th
@@ -68,7 +69,7 @@ export default function AccountTxTable({
                     className="px-2 sm:px-0 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider"
                   >
                     <span data-tip data-for="thTxsAbove">
-                      % Txs Above
+                      <FontAwesomeIcon icon="question-circle" /> % Txs Above
                     </span>
                   </th>
                   <th
@@ -82,7 +83,7 @@ export default function AccountTxTable({
                     className="px-2 sm:px- py-3 text-xs font-medium text-gray-500 uppercase tracking-wider"
                   >
                     <span data-tip data-for="thViaEdenRPC">
-                      Via Eden RPC{' '}
+                      <FontAwesomeIcon icon="question-circle" /> Via Eden RPC
                     </span>
                   </th>
                 </tr>
@@ -238,7 +239,7 @@ export default function AccountTxTable({
           place="top"
           effect="solid"
           offset={{ left: 2 }}
-          arrowColor="#303F9F"
+          arrowColor="#737373"
         >
           Block was mined by Eden producer
         </ReactToolTip>
@@ -247,7 +248,7 @@ export default function AccountTxTable({
           place="top"
           offset={{ left: 2 }}
           effect="solid"
-          arrowColor="#303F9F"
+          arrowColor="#737373"
         >
           Block was not mined by Eden producer
         </ReactToolTip>
@@ -255,7 +256,7 @@ export default function AccountTxTable({
           id="LockOpenTip"
           place="top"
           effect="solid"
-          arrowColor="#303F9F"
+          arrowColor="#737373"
         >
           Transaction was not submitted to Eden RPC
         </ReactToolTip>
@@ -263,7 +264,7 @@ export default function AccountTxTable({
           id="LockClosedTip"
           place="top"
           effect="solid"
-          arrowColor="#303F9F"
+          arrowColor="#737373"
         >
           Transaction was submitted to Eden RPC
         </ReactToolTip>
@@ -271,7 +272,7 @@ export default function AccountTxTable({
           id="thBlockType"
           place="top"
           effect="solid"
-          arrowColor="#303F9F"
+          arrowColor="#737373"
         >
           Was block mined by Eden producer
         </ReactToolTip>
@@ -279,18 +280,21 @@ export default function AccountTxTable({
           id="thTxsAbove"
           place="top"
           effect="solid"
-          arrowColor="#303F9F"
+          arrowColor="#737373"
         >
-          Percentage of transactions in the block with lower transaction index
+          Percentage of transactions in the block
+          <br />
+          with lower transaction index
         </ReactToolTip>
         <ReactToolTip
           id="thViaEdenRPC"
           place="top"
           effect="solid"
-          arrowColor="#303F9F"
+          arrowColor="#737373"
         >
-          Did user submitted transaction through Eden RPC (past submissions not
-          supported)
+          Did user submitted transaction through
+          <br />
+          Eden RPC (past submissions not supported)
         </ReactToolTip>
       </NoSSr>
     </div>

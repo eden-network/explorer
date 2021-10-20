@@ -100,17 +100,12 @@ li.react-datepicker__time-list-item:hover {
 }
 
 .__react_component_tooltip {
-	max-width: 200px !important;
+	max-width: 240px !important;
 	border-radius: 5px !important;
-	border: 1px solid #303F9F !important;
-	background: #303F9F !important;
-	padding: 5px 10px !important;
+	border: 1px solid #737373 !important;
+	background: #171c47 !important;
+	padding: 4px 8px !important;
+	font-size: 12px !important;
 	color: #fff !important;
 	z-index: 100 !important;
   }
-
-.tooltip {
-	padding: 0px;
-	margin: 0px;
-	max-width: 200px;
-}
