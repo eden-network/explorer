@@ -2,6 +2,7 @@ import { ethers } from 'ethers';
 
 import {
   isFromEdenProducer,
+  getSlotDelegates,
   getEdenRPCTxs,
   getBundledTxs,
   getTxRequest,
@@ -25,6 +26,7 @@ interface TxInfo {
   logs: Array<Object> | null;
   blockNumber: number | null;
   priorityFee: number | null;
+  toSlot: number | null;
   gasUsed: number | null;
   baseFee: number | null;
   status: number | null;
@@ -103,11 +105,16 @@ export const getTransactionInfo = async (_txHash) => {
     }
 
     if (mined) {
-      const [fromEdenProducer, bundledTxsRes] = await Promise.all([
-        isFromEdenProducer(parseInt(txRequest.blockNumber, 16)),
-        getBundledTxs(parseInt(txRequest.blockNumber, 16)),
-      ]);
+      const blockNum = parseInt(txRequest.blockNumber, 16);
+      const [fromEdenProducer, bundledTxsRes, slotDelegates] =
+        await Promise.all([
+          isFromEdenProducer(blockNum),
+          getBundledTxs(blockNum),
+          getSlotDelegates(blockNum - 1),
+        ]);
       transactionInfo.fromEdenProducer = fromEdenProducer;
+      transactionInfo.toSlot =
+        slotDelegates[txRequest.to.toLowerCase()] ?? null;
       if (bundledTxsRes[0]) {
         transactionInfo.inBundle =
           bundledTxsRes[1][txRequest.hash] !== undefined;

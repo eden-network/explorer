@@ -80,7 +80,7 @@ export default function TransactionPage({ txInfo }: { txInfo: TxInfo }) {
                       rel="noreferrer"
                     >
                       {txInfo.hash}
-                      <sup>
+                      <sup className="px-1">
                         <FontAwesomeIcon icon="external-link-alt" size="xs" />
                       </sup>
                     </a>
@@ -98,7 +98,7 @@ export default function TransactionPage({ txInfo }: { txInfo: TxInfo }) {
                       rel="noreferrer"
                     >
                       {txInfo.from}
-                      <sup>
+                      <sup className="px-1">
                         <FontAwesomeIcon icon="external-link-alt" size="xs" />
                       </sup>
                     </a>
@@ -115,8 +115,11 @@ export default function TransactionPage({ txInfo }: { txInfo: TxInfo }) {
                       target="_blank"
                       rel="noreferrer"
                     >
-                      {txInfo.to}
-                      <sup>
+                      {txInfo.to}{' '}
+                      {txInfo.toSlot !== null
+                        ? ` - SLOT #${txInfo.toSlot}`
+                        : ''}
+                      <sup className="px-1">
                         <FontAwesomeIcon icon="external-link-alt" size="xs" />
                       </sup>
                     </a>
@@ -135,6 +138,9 @@ export default function TransactionPage({ txInfo }: { txInfo: TxInfo }) {
                         rel="noreferrer"
                       >
                         {txInfo.blockNumber}
+                        <sup className="px-1">
+                          <FontAwesomeIcon icon="external-link-alt" size="xs" />
+                        </sup>
                         <span className="px-1">
                           {txInfo.fromEdenProducer ? EdenLogo : EthLogo}
                         </span>
