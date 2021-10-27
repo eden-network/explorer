@@ -19,26 +19,34 @@ export const weiToGwei = (_wei) => {
   return Math.round(parseInt(_wei, base) / 1e9);
 };
 
+export const safeParseResponse = async (_resObj) => {
+  const parsed = await _resObj.text();
+  try {
+    return JSON.parse(parsed);
+  } catch (e) {
+    return parsed;
+  }
+};
+
 export const safeFetch = async (url, options, callback) => {
-  const failResponse = [false, []];
+  const handleFailResponse = (_res) => callback({ success: false, res: _res });
   try {
     const res: any = await fetch(url, options).catch((e) => {
       // eslint-disable-next-line no-console
-      console.log(`REST call failed:`, e);
-      return failResponse;
+      console.error(`REST call failed:`, e);
+      return handleFailResponse(res);
     });
     const resText = await res.text();
     if (res.status !== 200) {
       // eslint-disable-next-line no-console
-      console.log('REST call failed due to external error: ', res.status);
-      return failResponse;
+      console.error('REST call failed due to external error: ', resText);
+      return handleFailResponse(resText);
     }
     const resJson = JSON.parse(resText);
-    const callbackRes = await callback(resJson);
-    return [true, callbackRes];
+    return callback({ success: true, res: resJson });
   } catch (e) {
     // eslint-disable-next-line no-console
-    console.log('REST call failed due to internal error:', e);
-    return failResponse;
+    console.error('REST call failed due to internal error:', e);
+    return handleFailResponse(e);
   }
 };

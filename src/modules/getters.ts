@@ -163,23 +163,28 @@ export const getBundledTxs = async (_blockNumber) => {
   return safeFetch(
     `${flashbotsAPIEndpoint}/v1/blocks?block_number=${_blockNumber}`,
     { method: 'GET', headers: { Auth: proxyAuthToken } },
-    (resJson) => {
-      if (!resJson || !resJson.blocks || !resJson.latest_block_number) {
-        throw new Error(`Invalid response format:\n${JSON.stringify(resJson)}`);
+    ({ success, res }) => {
+      if (!success) {
+        console.error(`request to flashbots api failed: ${res}`);
+        return [false, []];
       }
-      if (resJson.latest_block_number < _blockNumber) {
+      if (!res || !res.blocks || !res.latest_block_number) {
+        throw new Error(`Invalid response format:\n${JSON.stringify(res)}`);
+      }
+      if (res.latest_block_number < _blockNumber) {
         throw new Error(
-          `Querying block ${_blockNumber}, but latest avl block is ${resJson.latest_block_number}`
+          `Querying block ${_blockNumber}, but latest avl block is ${res.latest_block_number}`
         );
       }
-      if (resJson.blocks.length === 0) {
-        return [];
+      if (res.blocks.length === 0) {
+        return [false, []];
       }
-      return Object.fromEntries(
-        resJson.blocks[0].transactions
+      const bundledTxs = Object.fromEntries(
+        res.blocks[0].transactions
           .filter((tx) => tx.bundle_type === 'flashbots') // Exclude rogue
           .map((tx) => [tx.transaction_hash, tx.bundle_index])
       );
+      return [true, bundledTxs];
     }
   );
 };
@@ -264,11 +269,22 @@ export const getEdenRPCTxs = async (_txs) => {
     jsonrpc: '2.0',
     id: Date.now(),
   };
-  return fetch(monitorEndpointEdenRPC, {
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(query),
-    method: 'POST',
-  }).then((r) => r.json());
+  const response = await safeFetch(
+    monitorEndpointEdenRPC,
+    {
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(query),
+      method: 'POST',
+    },
+    ({ success, res }) => {
+      if (!success) {
+        console.error(`request to eden-monitor api failed: ${res}`);
+        return { result: [] };
+      }
+      return res;
+    }
+  );
+  return response;
 };
 
 export const filterForEdenBlocks = async (_blocks) => {
