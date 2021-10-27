@@ -2,6 +2,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import TimeAgo from 'javascript-time-ago';
 import en from 'javascript-time-ago/locale/en';
 
+import { EthLogo, EdenLogo } from '../modules/icons';
 import { TxInfo } from '../modules/tx-info';
 
 TimeAgo.addDefaultLocale(en);
@@ -171,7 +172,7 @@ export default function TransactionPage({ txInfo }: { txInfo: TxInfo }) {
                     <td className="px-2 sm:px-6 py-4 whitespace-nowrap">
                       Block Number:
                     </td>
-                    <td className="px-2 sm:px-6 py-4 whitespace-nowrap">
+                    <td className="px-2 sm:px-6 py-4 whitespace-nowrap inline-flex">
                       <a
                         href={`/block/${txInfo.blockNumber}?tx=${txInfo.hash}`}
                         className="text-green"
@@ -179,9 +180,9 @@ export default function TransactionPage({ txInfo }: { txInfo: TxInfo }) {
                         rel="noreferrer"
                       >
                         {txInfo.blockNumber}
-                        <sup>
-                          <FontAwesomeIcon icon="external-link-alt" size="xs" />
-                        </sup>
+                        <span className="px-1">
+                          {txInfo.fromEdenProducer ? EdenLogo : EthLogo}
+                        </span>
                       </a>
                     </td>
                   </tr>

@@ -1,6 +1,7 @@
 import { ethers } from 'ethers';
 
 import {
+  isFromEdenProducer,
   getEdenRPCTxs,
   getBundledTxs,
   getTxRequest,
@@ -20,6 +21,7 @@ interface TxInfo {
   from: string;
   hash: string;
   to: string;
+  fromEdenProducer: boolean | null;
   logs: Array<Object> | null;
   blockNumber: number | null;
   priorityFee: number | null;
@@ -101,12 +103,14 @@ export const getTransactionInfo = async (_txHash) => {
     }
 
     if (mined) {
-      // Check if tx was in bundle
-      const [success, bundledTxs] = await getBundledTxs(
-        parseInt(txRequest.blockNumber, 16)
-      );
-      if (success) {
-        transactionInfo.inBundle = bundledTxs[txRequest.hash] !== undefined;
+      const [fromEdenProducer, bundledTxsRes] = await Promise.all([
+        isFromEdenProducer(parseInt(txRequest.blockNumber, 16)),
+        getBundledTxs(parseInt(txRequest.blockNumber, 16)),
+      ]);
+      transactionInfo.fromEdenProducer = fromEdenProducer;
+      if (bundledTxsRes[0]) {
+        transactionInfo.inBundle =
+          bundledTxsRes[1][txRequest.hash] !== undefined;
       }
       // use tx-receipt object
       transactionInfo.gasUsed = parseInt(txReceipt.gasUsed, 16);
