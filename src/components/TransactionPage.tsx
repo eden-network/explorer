@@ -117,10 +117,13 @@ export default function TransactionPage({ txInfo }: { txInfo: TxInfo }) {
                       target="_blank"
                       rel="noreferrer"
                     >
-                      {txInfo.to}{' '}
-                      {txInfo.toSlot !== null
-                        ? ` - SLOT #${txInfo.toSlot}`
-                        : ''}
+                      {txInfo.to}
+                      <span className="text-green">
+                        {' '}
+                        {txInfo.toSlot !== null
+                          ? ` - SLOT #${txInfo.toSlot}`
+                          : ''}
+                      </span>
                     </a>
                   </td>
                 </tr>
