@@ -89,7 +89,7 @@ export default function AccountTxTable({
                           copyText={tx.hash}
                         />
                         <a
-                          href={`https://etherscan.io/tx/${tx.hash}`}
+                          href={`/tx/${tx.hash}`}
                           className=" hover:text-green block"
                           target="_blank"
                           rel="noreferrer"

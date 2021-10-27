@@ -9,7 +9,7 @@ export default function Tx({ txInfo }) {
     <Shell
       meta={
         <Meta
-          title={`Tx | ${txInfo.hash}`}
+          title={`Tx ${txInfo.hash}`}
           description="Eden Network Explorer Transaction page"
         />
       }
