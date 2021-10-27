@@ -1,6 +1,7 @@
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import TimeAgo from 'javascript-time-ago';
 import en from 'javascript-time-ago/locale/en';
+import moment from 'moment';
 
 import {
   clockSVG,
@@ -152,6 +153,18 @@ export default function TransactionPage({ txInfo }: { txInfo: TxInfo }) {
                 ) : (
                   ''
                 )}
+                {txInfo.blockNumber ? (
+                  <tr key="Timestamp">
+                    <td className="px-2 sm:px-6 py-4 whitespace-nowrap">
+                      Timestamp:
+                    </td>
+                    <td className="px-2 sm:px-6 py-4 whitespace-nowrap inline-flex">
+                      {moment(txInfo.timestamp * 1e3).format('D MMM YYYY H:mm')}
+                    </td>
+                  </tr>
+                ) : (
+                  ''
+                )}
                 <tr key="Submission">
                   <td className="px-2 sm:px-6 py-4 whitespace-nowrap">
                     Submission:
@@ -191,7 +204,9 @@ export default function TransactionPage({ txInfo }: { txInfo: TxInfo }) {
                     Transaction Index:
                   </td>
                   <td className="px-2 sm:px-6 py-4 whitespace-nowrap">
-                    {txInfo.index.toLocaleString()}
+                    {txInfo.index.toLocaleString()} of{' '}
+                    {txInfo.blockTxCount.toLocaleString()} (
+                    {100 * Math.round(txInfo.index / txInfo.blockTxCount)}%)
                   </td>
                 </tr>
                 <tr key="Nonce">

@@ -1,6 +1,7 @@
 import { ethers } from 'ethers';
 
 import {
+  getBlockInfoForBlocks,
   isFromEdenProducer,
   getSlotDelegates,
   getStakerInfo,
@@ -24,11 +25,13 @@ interface TxInfo {
   hash: string;
   to: string;
   fromEdenProducer: boolean | null;
+  blockTxCount: number | null;
   senderStake: number | null;
-  senderRank: number | null;
   logs: Array<Object> | null;
   blockNumber: number | null;
   priorityFee: number | null;
+  senderRank: number | null;
+  timestamp: number | null;
   toSlot: number | null;
   gasUsed: number | null;
   baseFee: number | null;
@@ -78,7 +81,6 @@ export const getTransactionInfo = async (_txHash) => {
     transactionInfo.gasPrice = weiToGwei(edenRPCInfo.gasPrice);
     transactionInfo.from = getChecksumAddress(edenRPCInfo.from);
     transactionInfo.gasLimit = parseInt(edenRPCInfo.gas, 16);
-    transactionInfo.value = weiToETH(edenRPCInfo.value);
     transactionInfo.nonce = parseInt(edenRPCInfo.nonce, 10);
     transactionInfo.input = edenRPCInfo.input;
     transactionInfo.hash = edenRPCInfo.hash;
@@ -114,11 +116,13 @@ export const getTransactionInfo = async (_txHash) => {
         fromEdenProducer,
         bundledTxsRes,
         slotDelegates,
+        [blockInfo],
       ] = await Promise.all([
         getStakerInfo(txRequest.from.toLowerCase(), blockNum),
         isFromEdenProducer(blockNum),
         getBundledTxs(blockNum),
         getSlotDelegates(blockNum - 1),
+        getBlockInfoForBlocks([blockNum]),
       ]);
       transactionInfo.fromEdenProducer = fromEdenProducer;
       transactionInfo.senderStake = parseInt(senderStake, 10) / 1e18;
@@ -129,7 +133,8 @@ export const getTransactionInfo = async (_txHash) => {
         transactionInfo.inBundle =
           bundledTxsRes[1][txRequest.hash] !== undefined;
       }
-      // use tx-receipt object
+      transactionInfo.timestamp = parseInt(blockInfo.result.timestamp, 16);
+      transactionInfo.blockTxCount = blockInfo.result.transactions.length;
       transactionInfo.gasUsed = parseInt(txReceipt.gasUsed, 16);
       transactionInfo.status = parseInt(txReceipt.status, 16);
       transactionInfo.logs = txReceipt.logs;
