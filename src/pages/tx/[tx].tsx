@@ -2,7 +2,7 @@ import TransactionPage from '../../components/TransactionPage';
 import { Meta } from '../../layout/Meta';
 import Shell from '../../layout/Shell';
 import { getTransactionInfo } from '../../modules/tx-info';
-import { validate } from '../../modules/validator/transaction';
+import { validateTxHash } from '../../modules/validators';
 
 export default function Tx({ txInfo }) {
   return (
@@ -29,7 +29,7 @@ export default function Tx({ txInfo }) {
 
 export async function getServerSideProps(context) {
   const txHash = context.query.tx;
-  if (validate(txHash)) {
+  if (validateTxHash(txHash)) {
     const txInfo = await getTransactionInfo(txHash);
     if (txInfo !== null) {
       return { props: { txInfo } };
