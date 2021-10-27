@@ -235,62 +235,76 @@ export default function AccountTxTable({
       </div>
       <NoSSr>
         <ReactToolTip
+          className="tooltip"
           id="EdenLogoTip"
           place="top"
           effect="solid"
           offset={{ left: 2 }}
-          arrowColor="#737373"
+          arrowColor="#171c47"
+          border
         >
           Block was mined by Eden producer
         </ReactToolTip>
         <ReactToolTip
+          className="tooltip"
           id="EthLogoTip"
           place="top"
           offset={{ left: 2 }}
           effect="solid"
-          arrowColor="#737373"
+          arrowColor="#171c47"
+          border
         >
           Block was not mined by Eden producer
         </ReactToolTip>
         <ReactToolTip
+          className="tooltip"
           id="LockOpenTip"
           place="top"
           effect="solid"
-          arrowColor="#737373"
+          arrowColor="#171c47"
+          border
         >
           Transaction was not submitted to Eden RPC
         </ReactToolTip>
         <ReactToolTip
+          className="tooltip"
           id="LockClosedTip"
           place="top"
           effect="solid"
-          arrowColor="#737373"
+          arrowColor="#171c47"
+          border
         >
           Transaction was submitted to Eden RPC
         </ReactToolTip>
         <ReactToolTip
+          className="tooltip"
           id="thBlockType"
           place="top"
           effect="solid"
-          arrowColor="#737373"
+          arrowColor="#171c47"
+          border
         >
           Was block mined by Eden producer
         </ReactToolTip>
         <ReactToolTip
+          className="tooltip"
           id="thTxsAbove"
           place="top"
           effect="solid"
-          arrowColor="#737373"
+          arrowColor="#171c47"
+          border
         >
           Percentage of transactions in the block
           <br />
           with lower transaction index
         </ReactToolTip>
         <ReactToolTip
+          className="tooltip"
           id="thViaEdenRPC"
           place="top"
           effect="solid"
-          arrowColor="#737373"
+          arrowColor="#171c47"
+          border
         >
           Did user submitted transaction through
           <br />
