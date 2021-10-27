@@ -105,8 +105,10 @@ export const getTransactionInfo = async (_txHash) => {
     transactionInfo.hash = txRequest.hash;
     if (txRequest.maxPriorityFeePerGas) {
       transactionInfo.priorityFee = weiToGwei(txRequest.maxPriorityFeePerGas);
-      transactionInfo.baseFee =
-        weiToGwei(txRequest.gasPrice) - transactionInfo.priorityFee;
+      if (transactionInfo.priorityFee !== transactionInfo.gasPrice) {
+        transactionInfo.baseFee =
+          weiToGwei(txRequest.gasPrice) - transactionInfo.priorityFee;
+      }
     }
 
     if (mined) {
@@ -135,6 +137,7 @@ export const getTransactionInfo = async (_txHash) => {
       }
       transactionInfo.timestamp = parseInt(blockInfo.result.timestamp, 16);
       transactionInfo.blockTxCount = blockInfo.result.transactions.length;
+      transactionInfo.baseFee = weiToGwei(blockInfo.result.baseFeePerGas);
       transactionInfo.gasUsed = parseInt(txReceipt.gasUsed, 16);
       transactionInfo.status = parseInt(txReceipt.status, 16);
       transactionInfo.logs = txReceipt.logs;
