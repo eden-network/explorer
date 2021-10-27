@@ -117,12 +117,3 @@ li.react-datepicker__time-list-item:hover {
   color: #fff !important;
   z-index: 100 !important;
 }
-
-.tooltip.place-top::after,
-.tooltip.place-bottom::after {
-  border-color: #171c47 transparent !important;
-}
-.tooltip.place-right::after,
-.tooltip.place-left::after {
-  border-color: transparent #171c47 !important;
-}

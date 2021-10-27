@@ -240,7 +240,6 @@ export default function AccountTxTable({
           place="top"
           effect="solid"
           offset={{ left: 2 }}
-          arrowColor="#171c47"
           border
         >
           Block was mined by Eden producer
@@ -251,7 +250,6 @@ export default function AccountTxTable({
           place="top"
           offset={{ left: 2 }}
           effect="solid"
-          arrowColor="#171c47"
           border
         >
           Block was not mined by Eden producer
@@ -261,7 +259,6 @@ export default function AccountTxTable({
           id="LockOpenTip"
           place="top"
           effect="solid"
-          arrowColor="#171c47"
           border
         >
           Transaction was not submitted to Eden RPC
@@ -271,7 +268,6 @@ export default function AccountTxTable({
           id="LockClosedTip"
           place="top"
           effect="solid"
-          arrowColor="#171c47"
           border
         >
           Transaction was submitted to Eden RPC
@@ -281,7 +277,6 @@ export default function AccountTxTable({
           id="thBlockType"
           place="top"
           effect="solid"
-          arrowColor="#171c47"
           border
         >
           Was block mined by Eden producer
@@ -291,7 +286,6 @@ export default function AccountTxTable({
           id="thTxsAbove"
           place="top"
           effect="solid"
-          arrowColor="#171c47"
           border
         >
           Percentage of transactions in the block
@@ -303,7 +297,6 @@ export default function AccountTxTable({
           id="thViaEdenRPC"
           place="top"
           effect="solid"
-          arrowColor="#171c47"
           border
         >
           Did user submitted transaction through
