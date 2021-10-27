@@ -1,4 +1,3 @@
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import TimeAgo from 'javascript-time-ago';
 import en from 'javascript-time-ago/locale/en';
 import moment from 'moment';
@@ -76,14 +75,11 @@ export default function TransactionPage({ txInfo }: { txInfo: TxInfo }) {
                   <td className="px-2 sm:px-6 py-4 whitespace-nowrap">
                     <a
                       href={`https://etherscan.io/tx/${txInfo.hash}`}
-                      className="text-green"
+                      className="hover:text-green"
                       target="_blank"
                       rel="noreferrer"
                     >
                       {txInfo.hash}
-                      <sup className="px-1">
-                        <FontAwesomeIcon icon="external-link-alt" size="xs" />
-                      </sup>
                     </a>
                   </td>
                 </tr>
@@ -94,16 +90,19 @@ export default function TransactionPage({ txInfo }: { txInfo: TxInfo }) {
                   <td className="px-2 sm:px-6 py-4 whitespace-nowrap">
                     <a
                       href={`/address/${txInfo.from}`}
-                      className="text-green"
+                      className="hover:text-green"
                       target="_blank"
                       rel="noreferrer"
                     >
-                      {txInfo.from} - STAKED{' '}
-                      {Math.round(txInfo.senderStake).toLocaleString()} EDEN{' '}
-                      {txInfo.senderRank ? ` (#${txInfo.senderRank})` : ''}
-                      <sup className="px-1">
-                        <FontAwesomeIcon icon="external-link-alt" size="xs" />
-                      </sup>
+                      {txInfo.from}
+                      <span className="text-green">
+                        {' '}
+                        - STAKED{' '}
+                        {Math.round(
+                          txInfo.senderStake
+                        ).toLocaleString()} EDEN{' '}
+                        {txInfo.senderRank ? ` (#${txInfo.senderRank})` : ''}
+                      </span>
                     </a>
                   </td>
                 </tr>
@@ -114,7 +113,7 @@ export default function TransactionPage({ txInfo }: { txInfo: TxInfo }) {
                   <td className="px-2 sm:px-6 py-4 whitespace-nowrap">
                     <a
                       href={`/address/${txInfo.to}`}
-                      className="text-green"
+                      className="hover:text-green"
                       target="_blank"
                       rel="noreferrer"
                     >
@@ -122,9 +121,6 @@ export default function TransactionPage({ txInfo }: { txInfo: TxInfo }) {
                       {txInfo.toSlot !== null
                         ? ` - SLOT #${txInfo.toSlot}`
                         : ''}
-                      <sup className="px-1">
-                        <FontAwesomeIcon icon="external-link-alt" size="xs" />
-                      </sup>
                     </a>
                   </td>
                 </tr>
@@ -136,14 +132,11 @@ export default function TransactionPage({ txInfo }: { txInfo: TxInfo }) {
                     <td className="px-2 sm:px-6 py-4 whitespace-nowrap inline-flex">
                       <a
                         href={`/block/${txInfo.blockNumber}?tx=${txInfo.hash}`}
-                        className="text-green"
+                        className="hover:text-green"
                         target="_blank"
                         rel="noreferrer"
                       >
                         {txInfo.blockNumber}
-                        <sup className="px-1">
-                          <FontAwesomeIcon icon="external-link-alt" size="xs" />
-                        </sup>
                         <span className="px-1">
                           {txInfo.fromEdenProducer ? EdenLogo : EthLogo}
                         </span>
@@ -206,7 +199,7 @@ export default function TransactionPage({ txInfo }: { txInfo: TxInfo }) {
                   <td className="px-2 sm:px-6 py-4 whitespace-nowrap">
                     {txInfo.index.toLocaleString()} of{' '}
                     {txInfo.blockTxCount.toLocaleString()} (
-                    {100 * Math.round(txInfo.index / txInfo.blockTxCount)}%)
+                    {Math.round((100 * txInfo.index) / txInfo.blockTxCount)}%)
                   </td>
                 </tr>
                 <tr key="Nonce">
