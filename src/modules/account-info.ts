@@ -7,7 +7,7 @@ import {
   getLabelForAddress,
   getTxsForAccount,
   getSlotDelegates,
-  getLatestStake,
+  getStakerInfo,
   getEdenRPCTxs,
 } from './getters';
 import { weiToGwei } from './utils';
@@ -80,7 +80,7 @@ export const getAccountInfo = async (
     slotDelegates,
   ] = await Promise.all([
     getEdenTxsForAccount(_account.toLowerCase(), _txPerPage, _page),
-    getLatestStake(_account.toLowerCase()),
+    getStakerInfo(_account.toLowerCase()),
     getTxCountForAccount(_account),
     getSlotDelegates(),
   ]);

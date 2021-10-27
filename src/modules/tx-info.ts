@@ -3,6 +3,7 @@ import { ethers } from 'ethers';
 import {
   isFromEdenProducer,
   getSlotDelegates,
+  getStakerInfo,
   getEdenRPCTxs,
   getBundledTxs,
   getTxRequest,
@@ -23,6 +24,8 @@ interface TxInfo {
   hash: string;
   to: string;
   fromEdenProducer: boolean | null;
+  senderStake: number | null;
+  senderRank: number | null;
   logs: Array<Object> | null;
   blockNumber: number | null;
   priorityFee: number | null;
@@ -106,13 +109,20 @@ export const getTransactionInfo = async (_txHash) => {
 
     if (mined) {
       const blockNum = parseInt(txRequest.blockNumber, 16);
-      const [fromEdenProducer, bundledTxsRes, slotDelegates] =
-        await Promise.all([
-          isFromEdenProducer(blockNum),
-          getBundledTxs(blockNum),
-          getSlotDelegates(blockNum - 1),
-        ]);
+      const [
+        { staked: senderStake, rank: senderRank },
+        fromEdenProducer,
+        bundledTxsRes,
+        slotDelegates,
+      ] = await Promise.all([
+        getStakerInfo(txRequest.from.toLowerCase(), blockNum),
+        isFromEdenProducer(blockNum),
+        getBundledTxs(blockNum),
+        getSlotDelegates(blockNum - 1),
+      ]);
       transactionInfo.fromEdenProducer = fromEdenProducer;
+      transactionInfo.senderStake = parseInt(senderStake, 10) / 1e18;
+      transactionInfo.senderRank = senderRank;
       transactionInfo.toSlot =
         slotDelegates[txRequest.to.toLowerCase()] ?? null;
       if (bundledTxsRes[0]) {

@@ -336,12 +336,13 @@ export const getLastSupportedBlock = async () => {
   });
 };
 
-export const getLatestStake = async (_staker) => {
+export const getStakerInfo = async (_staker, _blockNum?) => {
   const response = await request(
     graphNetworkEndpoint,
     gql`{
           staker(
             id: "${_staker.toLowerCase()}"
+            ${_blockNum !== undefined ? `block: { number: ${_blockNum} }` : ''}
           ) {
             staked, 
             rank

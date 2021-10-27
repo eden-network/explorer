@@ -97,7 +97,9 @@ export default function TransactionPage({ txInfo }: { txInfo: TxInfo }) {
                       target="_blank"
                       rel="noreferrer"
                     >
-                      {txInfo.from}
+                      {txInfo.from} - STAKED{' '}
+                      {Math.round(txInfo.senderStake).toLocaleString()} EDEN{' '}
+                      {txInfo.senderRank ? ` (#${txInfo.senderRank})` : ''}
                       <sup className="px-1">
                         <FontAwesomeIcon icon="external-link-alt" size="xs" />
                       </sup>
