@@ -1,10 +1,12 @@
 import { readFromBucket, writeToBucket } from './gcloud-cache';
 import {
+  getLabelForAddress,
   isFromEdenProducer,
   checkIfValidCache,
+  withinSlotGasCap,
   getSlotDelegates,
   getStakersStake,
-  getCapForSlots,
+  getEdenRPCTxs,
   isBlockSecure,
   getBundledTxs,
   getBlockInfo,
@@ -24,8 +26,14 @@ export const getBlockInsight = async (_blockNumber) => {
   const uniqueSenders = makeArrayUnique(
     blockInfo.transactions.map((tx) => tx.from)
   );
-  const stakersStake = await getStakersStake(uniqueSenders, _blockNumber - 1);
-  const slotAvlGas = getCapForSlots();
+  const txHashes = blockInfo.transactions.map((tx) => tx.hash);
+  const [stakersStake, edenRPCTxs] = await Promise.all([
+    getStakersStake(uniqueSenders, _blockNumber - 1),
+    getEdenRPCTxs(txHashes),
+  ]);
+  const edenRPCInfoForTx = Object.fromEntries(
+    edenRPCTxs.result.map((tx) => [tx.hash, tx.blocknumber])
+  );
   const labeledTxs = [];
   transactions.forEach((tx) => {
     const toSlotDelegate = slotDelegates[tx.to.toLowerCase()];
@@ -34,7 +42,10 @@ export const getBlockInsight = async (_blockNumber) => {
       toSlot: (toSlotDelegate !== undefined ? toSlotDelegate : false) as any,
       bundleIndex: bundleIndex !== undefined ? bundleIndex : null,
       senderStake: stakersStake[tx.from.toLowerCase()] || 0,
+      viaEdenRPC: edenRPCInfoForTx[tx.hash] !== undefined,
       maxPriorityFee: BNToGwei(tx.maxPriorityFee), // Format for serialization
+      fromLabel: getLabelForAddress(tx.from),
+      toLabel: getLabelForAddress(tx.to),
       position: tx.transactionIndex,
       gasLimit: tx.gasLimit,
       nonce: tx.nonce,
@@ -43,17 +54,31 @@ export const getBlockInsight = async (_blockNumber) => {
       to: tx.to,
       type: '',
     };
-    if (
-      fromEdenProducer &&
-      labeledTx.toSlot !== false &&
-      slotAvlGas[labeledTx.toSlot] > tx.gasLimit
-    ) {
-      slotAvlGas[labeledTx.toSlot] -= tx.gasLimit;
+    const hasSlotPriority = () => {
+      if (
+        fromEdenProducer &&
+        labeledTx.toSlot !== false &&
+        withinSlotGasCap(tx.gasLimit)
+      ) {
+        // Check that there is no lower nonce to non-slot or higher-slot delegate
+        const inferiorSlotTxForAccount = labeledTxs
+          .filter((_tx) => _tx.from === labeledTx.from)
+          .find((_tx) => _tx.toSlot === false || _tx.toSlot > labeledTx.toSlot);
+        if (inferiorSlotTxForAccount === undefined) {
+          return true;
+        }
+      }
+      return false;
+    };
+
+    if (hasSlotPriority()) {
       labeledTx.type = 'slot';
     } else if (labeledTx.bundleIndex !== null) {
       labeledTx.type = 'fb-bundle';
     } else if (fromEdenProducer && labeledTx.senderStake >= 100) {
       labeledTx.type = 'stake';
+    } else if (labeledTx.from.toLowerCase() === blockInfo.miner.toLowerCase()) {
+      labeledTx.type = 'local-tx';
     } else {
       labeledTx.type = 'priority-fee';
     }
@@ -75,7 +100,7 @@ export const getBlockInsightAndCache = async (_blockNumber) => {
     const blockInsight = await readFromBucket(blockNumberStr);
     // Check cache validity
     if (!checkIfValidCache(blockInsight)) {
-      console.log('Invalid cache');
+      console.error('Invalid cache');
       throw new Error('Invalid cache');
     }
     // Only responses from successfull calls were cached
@@ -87,7 +112,7 @@ export const getBlockInsightAndCache = async (_blockNumber) => {
     isBlockSecure(_blockNumber).then((isSecure) => {
       if (isSecure) {
         writeToBucket(blockNumberStr, blockInsight).catch((e) => {
-          console.log(`Couldn't write to storage:`, e); // eslint-disable-line no-console
+          console.error(`Couldn't write to storage:`, e); // eslint-disable-line no-console
         });
       }
     });

@@ -40,12 +40,8 @@ export const getTxRequest = (_txHash) => {
   );
 };
 
-export const getTxInfoByEdenRPC = (_txHash) => {
-  return sendRawJsonRPCRequest(
-    'eth_getTransactionByHash',
-    [_txHash],
-    'https://api.edennetwork.io/v1/monitor'
-  );
+export const getLatestBlock = async () => {
+  return provider.getBlockNumber();
 };
 
 export const getTxCountForAccount = async (_address) => {
@@ -58,14 +54,12 @@ export const getAddressForENS = async (_ens: string) => {
   try {
     return await provider.resolveName(_ens);
   } catch (e) {
-    console.log(`Error resolving ENS: ${e}`);
+    console.error(`Error resolving ENS: ${e}`);
     return null;
   }
 };
 
-export const getCapForSlots = () => {
-  return { 0: slotGasCap, 1: slotGasCap, 2: slotGasCap };
-};
+export const withinSlotGasCap = (_gas) => slotGasCap >= _gas;
 
 export const checkIfValidCache = (_cache) => {
   return (
@@ -111,7 +105,7 @@ export const isFromEdenProducer = async (_blockNumber) => {
   return blocksInfo[0].fromActiveProducer;
 };
 
-export const getSlotDelegates = async (_blockNumber) => {
+export const getSlotDelegates = async (_blockNumber?) => {
   const slotsInfo = await edenData.slots({
     block: _blockNumber,
     network: network as Network,
@@ -148,27 +142,65 @@ export const getStakersStake = async (_accounts, _blockNumber) => {
   );
 };
 
+export const getBlocksPaged = async ({
+  fromActiveProducerOnly,
+  beforeTimestamp,
+  start,
+  num,
+}) => {
+  return request(
+    graphNetworkEndpoint,
+    gql`{
+        blocks(
+          where: {
+            ${beforeTimestamp ? `timestamp_lte: ${beforeTimestamp}` : ''}
+            fromActiveProducer: ${fromActiveProducerOnly},
+          }
+          orderDirection: desc
+          orderBy: number, 
+          skip: ${start}, 
+          first: ${num}, 
+        ) {
+          timestamp,
+          author,
+          number,
+        }
+    }`
+  ).then((r) =>
+    r.blocks.map((blockInfo) => {
+      blockInfo.timestamp = parseInt(blockInfo.timestamp, 10);
+      blockInfo.number = parseInt(blockInfo.number, 10);
+      return blockInfo;
+    })
+  );
+};
+
 export const getBundledTxs = async (_blockNumber) => {
   return safeFetch(
     `${flashbotsAPIEndpoint}/v1/blocks?block_number=${_blockNumber}`,
     { method: 'GET', headers: { Auth: proxyAuthToken } },
-    (resJson) => {
-      if (!resJson || !resJson.blocks || !resJson.latest_block_number) {
-        throw new Error(`Invalid response format:\n${JSON.stringify(resJson)}`);
+    ({ success, res }) => {
+      if (!success) {
+        console.error(`request to flashbots api failed: ${res}`);
+        return [false, []];
       }
-      if (resJson.latest_block_number < _blockNumber) {
+      if (!res || !res.blocks || !res.latest_block_number) {
+        throw new Error(`Invalid response format:\n${JSON.stringify(res)}`);
+      }
+      if (res.latest_block_number < _blockNumber) {
         throw new Error(
-          `Querying block ${_blockNumber}, but latest avl block is ${resJson.latest_block_number}`
+          `Querying block ${_blockNumber}, but latest avl block is ${res.latest_block_number}`
         );
       }
-      if (resJson.blocks.length === 0) {
-        return [];
+      if (res.blocks.length === 0) {
+        return [false, []];
       }
-      return Object.fromEntries(
-        resJson.blocks[0].transactions
+      const bundledTxs = Object.fromEntries(
+        res.blocks[0].transactions
           .filter((tx) => tx.bundle_type === 'flashbots') // Exclude rogue
           .map((tx) => [tx.transaction_hash, tx.bundle_index])
       );
+      return [true, bundledTxs];
     }
   );
 };
@@ -208,6 +240,11 @@ export const getMinerAlias = (_minerAddress) => {
   return minerAlias[_minerAddress.toLowerCase()] || null;
 };
 
+export const getLabelForAddress = (_address) => {
+  // Future support for ENS, contract-names, ...
+  return getMinerAlias(_address);
+};
+
 export const checkIfContractlike = async (_address) => {
   // Returns false for empty contracts (eg. 0xd8253352f6044cfe55bcc0748c3fa37b7df81f98)
   const code = await provider.send('eth_getCode', [_address]);
@@ -234,7 +271,7 @@ export const getTxsForAccount = async (_account, _offset = 10, _page = 1) => {
     r.json()
   );
   if (status !== '1') {
-    console.log(`Etherscan request failed: ${message}`);
+    console.error(`Etherscan request failed: ${message}`);
     return [];
   }
   return result;
@@ -248,11 +285,22 @@ export const getEdenRPCTxs = async (_txs) => {
     jsonrpc: '2.0',
     id: Date.now(),
   };
-  return fetch(monitorEndpointEdenRPC, {
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(query),
-    method: 'POST',
-  }).then((r) => r.json());
+  const response = await safeFetch(
+    monitorEndpointEdenRPC,
+    {
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(query),
+      method: 'POST',
+    },
+    ({ success, res }) => {
+      if (!success) {
+        console.error(`request to eden-monitor api failed: ${res}`);
+        return { result: [] };
+      }
+      return res;
+    }
+  );
+  return response;
 };
 
 export const filterForEdenBlocks = async (_blocks) => {
@@ -260,17 +308,32 @@ export const filterForEdenBlocks = async (_blocks) => {
   return request(
     graphNetworkEndpoint,
     gql`{
-          blocks(
-            first: 1000,
-            where : { 
-                fromActiveProducer: true, 
-                number_in: [${_blocks.join()}]
-            }
-          ) {
-            number
-          }
-      }`
+      blocks(
+        first: 1000,
+        where : { 
+          fromActiveProducer: true, 
+          number_in: [${_blocks.join()}]
+        }
+      ) {
+        number
+      }
+    }`
   );
+};
+
+export const getLastSupportedBlock = async () => {
+  return request(
+    graphNetworkEndpoint,
+    gql`
+      {
+        blocks(orderDirection: desc, orderBy: number, first: 1) {
+          number
+        }
+      }
+    `
+  ).then((res) => {
+    return parseInt(res.blocks[0].number, 10);
+  });
 };
 
 export const getLatestStake = async (_staker) => {
@@ -286,7 +349,7 @@ export const getLatestStake = async (_staker) => {
       }`
   ).then((r) => r.staker);
   if (response === null) {
-    return { rank: -1, staked: 0 };
+    return { rank: null, staked: 0 };
   }
   return response;
 };

@@ -4,7 +4,9 @@ import {
   getBlockInfoForBlocks,
   getTxCountForAccount,
   filterForEdenBlocks,
+  getLabelForAddress,
   getTxsForAccount,
+  getSlotDelegates,
   getLatestStake,
   getEdenRPCTxs,
 } from './getters';
@@ -25,6 +27,8 @@ interface TxOverview {
 }
 
 interface AccountOverview {
+  slotDelegate: number | null;
+  label: string | null;
   edenStaked: number;
   stakerRank: number;
   txCount: number;
@@ -73,25 +77,29 @@ export const getAccountInfo = async (
     txsForAccount,
     { staked: edenStaked, rank: stakerRank },
     accountTxCount,
+    slotDelegates,
   ] = await Promise.all([
     getEdenTxsForAccount(_account.toLowerCase(), _txPerPage, _page),
     getLatestStake(_account.toLowerCase()),
     getTxCountForAccount(_account),
+    getSlotDelegates(),
   ]);
   const accountOverview: AccountOverview = {
+    slotDelegate: slotDelegates[_account.toLowerCase()] ?? null,
+    stakerRank: stakerRank && parseInt(stakerRank, 10),
     edenStaked: parseInt(edenStaked, 10) / 1e18,
+    label: getLabelForAddress(_account) || null,
     address: ethers.utils.getAddress(_account),
-    stakerRank: parseInt(stakerRank, 10),
     txCount: accountTxCount,
   };
   const formatTx = (_tx) => ({
     to: ethers.utils.getAddress(_tx.to || ethers.constants.AddressZero),
     priorityFee: weiToGwei(_tx.gasPrice) - weiToGwei(_tx.baseFee),
     status: _tx.isError === '0' ? 'success' : 'fail',
-    blockTxCount: parseInt(_tx.blockTxCount, 16),
     index: parseInt(_tx.transactionIndex, 10),
     block: parseInt(_tx.blockNumber, 10),
     nonce: parseInt(_tx.nonce, 10),
+    blockTxCount: _tx.blockTxCount,
     isEden: _tx.fromEdenProducer,
     viaEdenRPC: _tx.viaEdenRPC,
     timestamp: _tx.timeStamp,

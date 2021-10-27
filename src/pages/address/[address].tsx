@@ -19,20 +19,18 @@ const PAGE_SIZE = 10;
 
 export default function Address({ accountOverview, transactions, error }) {
   const router = useRouter();
-  const pageNum = router.query.page ? Number(router.query.page) : 1;
+  const pageNum = router.query.p ? Number(router.query.p) : 1;
 
-  const { next, prev, currentPage } = usePagination(
+  const { next, prev, currentPage, resetCurrentPage } = usePagination(
     999999999,
     PAGE_SIZE,
     pageNum
   );
   useEffect(() => {
-    if (currentPage !== Number(router.query.page)) {
-      router.push(
-        `/address/${router.query.address}?page=${currentPage}`,
-        null,
-        { scroll: false }
-      );
+    if (currentPage !== Number(router.query.p)) {
+      router.push(`/address/${router.query.address}?p=${currentPage}`, null, {
+        scroll: false,
+      });
     }
   }, [currentPage, router]);
 
@@ -56,7 +54,7 @@ export default function Address({ accountOverview, transactions, error }) {
     <Shell
       meta={
         <Meta
-          title={`Address | ${router.query.address}`}
+          title={`Address ${router.query.address}`}
           description="Eden Network Explorer Address Page"
         />
       }
@@ -65,7 +63,7 @@ export default function Address({ accountOverview, transactions, error }) {
         <div className="max-w-4xl mx-auto text-center">
           <h2 className="text-2xl font-extrabold sm:text-4xl hover:text-green break-all">
             <EtherscanLink
-              text={accountOverview.ens || accountOverview.address}
+              text={accountOverview.label || accountOverview.address}
               path={`address/${accountOverview.ens || accountOverview.address}`}
             />
           </h2>
@@ -79,10 +77,16 @@ export default function Address({ accountOverview, transactions, error }) {
               <AccountTxTable
                 transactions={transactions}
                 accountAddress={accountOverview.address}
-                accountENS={accountOverview.ens}
+                accountLabel={accountOverview.label}
               />
             </div>
-            <EndlessPagination nextClick={next} prevClick={prev} />
+            <EndlessPagination
+              end={transactions.length < PAGE_SIZE}
+              currentPage={currentPage}
+              reset={resetCurrentPage}
+              nextClick={next}
+              prevClick={prev}
+            />
           </div>
         </div>
       </div>
@@ -92,7 +96,7 @@ export default function Address({ accountOverview, transactions, error }) {
 
 export async function getServerSideProps(context) {
   try {
-    const pageNum = context.query.page || 1;
+    const pageNum = context.query.p || 1;
     // Find address if ENS
     let { address } = context.query;
     if (ensValidator(address)) {
@@ -109,6 +113,7 @@ export async function getServerSideProps(context) {
     // Change address to ENS if available
     if (context.query.address.toLowerCase() !== address.toLowerCase()) {
       accountInfo.accountOverview.ens = context.query.address.toLowerCase();
+      accountInfo.accountOverview.label = context.query.address.toLowerCase();
     }
     // Contracts have tx-count of one
     if (contractLike) {

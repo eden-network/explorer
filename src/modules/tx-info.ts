@@ -1,7 +1,7 @@
 import { ethers } from 'ethers';
 
 import {
-  getTxInfoByEdenRPC,
+  getEdenRPCTxs,
   getBundledTxs,
   getTxRequest,
   getTxReceipt,
@@ -33,12 +33,12 @@ export type { TxInfo };
 
 export const getTransactionInfo = async (_txHash) => {
   // Get general transaction info
-  const [txRequest, txReceipt, edenRPCInfo] = await Promise.all([
+  const [txRequest, txReceipt, edenRPCInfoRes] = await Promise.all([
     getTxRequest(_txHash),
     getTxReceipt(_txHash),
-    getTxInfoByEdenRPC(_txHash),
+    getEdenRPCTxs([_txHash]),
   ]);
-
+  const edenRPCInfo = edenRPCInfoRes.result[0];
   const mined = txReceipt !== null;
   const viaEdenRPC = edenRPCInfo !== undefined;
   const pendingInEdenMempool = viaEdenRPC && edenRPCInfo.blockNumber === null;
