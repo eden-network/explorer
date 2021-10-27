@@ -1,10 +1,53 @@
+import { useCallback } from 'react';
+
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { useRouter } from 'next/router';
+
+import ErrorMsg from '../../components/ErrorMsg';
 import TransactionPage from '../../components/TransactionPage';
 import { Meta } from '../../layout/Meta';
 import Shell from '../../layout/Shell';
+import { EtherscanLogo } from '../../modules/icons';
 import { getTransactionInfo } from '../../modules/tx-info';
 import { validateTxHash } from '../../modules/validators';
 
-export default function Tx({ txInfo }) {
+export default function Tx({ txInfo, error }) {
+  const router = useRouter();
+  const handleClickRefresh = useCallback(() => {
+    router.push(`/tx/${router.query.tx}`);
+  }, [router]);
+  if (error) {
+    return (
+      <ErrorMsg errorMsg={`Couldn't fetch data for the tx: ${router.query.tx}`}>
+        <div className="text-center pb-2">
+          <div className="w-full flex items-center flex-wrap py-3">
+            <div className="flex text-center my-1 sm:my-0 flex-grow justify-center pr-2">
+              <button
+                type="button"
+                onClick={handleClickRefresh}
+                className="mx-1 relative inline-flex items-center px-3 py-3 bg-blue-light text-sm font-medium rounded-md betterhover:hover:bg-green betterhover:hover:text-blue cursor-pointer select-none"
+              >
+                Refresh
+                <span className="px-1">
+                  <FontAwesomeIcon icon="sync" />
+                </span>
+              </button>
+              <a
+                className="button mx-1 relative inline-flex items-center px-3 py-3 bg-blue-light text-sm font-medium rounded-md betterhover:hover:bg-green betterhover:hover:text-blue cursor-pointer select-none"
+                href={`https://etherscan.io/tx/${router.query.tx}`}
+                target="_blank"
+                role="button"
+                rel="noreferrer"
+              >
+                See on Etherscan
+                <span className="px-1">{EtherscanLogo}</span>
+              </a>
+            </div>
+          </div>
+        </div>
+      </ErrorMsg>
+    );
+  }
   return (
     <Shell
       meta={
@@ -30,16 +73,14 @@ export default function Tx({ txInfo }) {
 export async function getServerSideProps(context) {
   const txHash = context.query.tx;
   if (validateTxHash(txHash)) {
-    const txInfo = await getTransactionInfo(txHash);
-    if (txInfo !== null) {
-      return { props: { txInfo } };
+    try {
+      const txInfo = await getTransactionInfo(txHash);
+      if (txInfo !== null) {
+        return { props: { txInfo, error: false } };
+      }
+    } catch (e) {
+      console.error(e);
     }
   }
-  return {
-    props: {},
-    redirect: {
-      destination: `https://etherscan.io/tx/${context.query.tx}`,
-      permanent: false,
-    },
-  };
+  return { props: { txInfo: {}, error: true } };
 }
