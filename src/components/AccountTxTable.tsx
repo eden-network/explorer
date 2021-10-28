@@ -299,9 +299,7 @@ export default function AccountTxTable({
           effect="solid"
           border
         >
-          Did user submitted transaction through
-          <br />
-          Eden RPC (past submissions not supported)
+          Whether the user submitted transaction through Eden RPC
         </ReactToolTip>
       </NoSSr>
     </div>
