@@ -116,7 +116,7 @@ export default function TransactionPage({ txInfo }: { txInfo: TxInfo }) {
                       target="_blank"
                       rel="noreferrer"
                     >
-                      {txInfo.toSlot
+                      {txInfo.toSlot !== null
                         ? `SLOT #${txInfo.toSlot} DELEGATE`
                         : txInfo.to}
                       <sup className="px-1">
