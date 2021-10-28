@@ -1,4 +1,4 @@
-import { useCallback } from 'react';
+import { useCallback, useEffect } from 'react';
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useRouter } from 'next/router';
@@ -15,6 +15,16 @@ export default function Tx({ txInfo, error }) {
   const router = useRouter();
   const handleClickRefresh = useCallback(() => {
     router.push(`/tx/${router.query.tx}`);
+  }, [router]);
+  useEffect(() => {
+    if (txInfo.pending) {
+      // TODO: RPC provider to frontend to track tx
+      // Refresh page every Xs
+      new Promise((resolve) => setTimeout(resolve, 7e3)).then(() =>
+        handleClickRefresh()
+      );
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [router]);
   if (error) {
     return (
