@@ -281,16 +281,6 @@ export default function TransactionPage({ txInfo }: { txInfo: TxInfo }) {
                 ) : (
                   ''
                 )}
-                {txInfo.input.length > 2 ? (
-                  <tr key="Input">
-                    <td className="px-2 sm:px-6 py-4 break-words">Input:</td>
-                    <td className="px-2 sm:px-6 py-4 ">
-                      {makeInputBox(txInfo.input)}
-                    </td>
-                  </tr>
-                ) : (
-                  ''
-                )}
                 {!txInfo.pending ? (
                   <tr key="Miner reward">
                     <td className="px-2 sm:px-6 py-4 whitespace-nowrap">
@@ -300,6 +290,16 @@ export default function TransactionPage({ txInfo }: { txInfo: TxInfo }) {
                       {(txInfo.minerTip + txInfo.gasCost).toPrecision(2)} ETH
                       (GasCost: {txInfo.gasCost} ETH + MinerTip:{' '}
                       {txInfo.minerTip} ETH)
+                    </td>
+                  </tr>
+                ) : (
+                  ''
+                )}
+                {txInfo.input.length > 2 ? (
+                  <tr key="Input">
+                    <td className="px-2 sm:px-6 py-4 break-words">Input:</td>
+                    <td className="px-2 sm:px-6 py-4 ">
+                      {makeInputBox(txInfo.input)}
                     </td>
                   </tr>
                 ) : (
