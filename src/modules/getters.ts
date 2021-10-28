@@ -391,3 +391,10 @@ export const fetchContractInfo = async (_address) => {
     abi: JSON.parse(res0.ABI),
   };
 };
+
+export const fetchMethodSig = async (_methodSigHex) => {
+  const endpoint = 'https://www.4byte.directory/api/v1/signatures/';
+  const url = `${endpoint}?hex_signature=${_methodSigHex}`;
+  const res = await fetch(url).then((r) => r.json());
+  return res;
+};

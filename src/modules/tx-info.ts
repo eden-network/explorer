@@ -44,16 +44,17 @@ interface TxInfo {
 }
 
 const formatDecodedTxCalldata = (_decoded) => {
-  const argsMsg = _decoded.args
-    .map((arg) => {
-      return `\t* ${arg.key}[${arg.type}]: ${arg.val}`;
-    })
-    .join('\n');
-  const msgFull = `
-  Function: ${_decoded.signature}
-  Args:
-  ${argsMsg}
+  let msgFull = `
+  TextSig: ${_decoded.textSig}
   `;
+  if (_decoded.args.length > 0) {
+    const argsMsg = _decoded.args
+      .map((arg) => {
+        return `\t* ${arg.key} [${arg.type}]: ${arg.val}`;
+      })
+      .join('\n');
+    msgFull += `Args:\n${argsMsg}`;
+  }
   return msgFull;
 };
 
@@ -150,7 +151,7 @@ export const getTransactionInfo = async (txHash) => {
         getBundledTxs(blockNum),
         getSlotDelegates(blockNum - 1),
         getBlockInfoForBlocks([blockNum]),
-        decodeTx({ to: txRequest.to, data: txRequest.input }),
+        decodeTx(txRequest.to, txRequest.input),
       ]);
       if (decodedTx.parsedCalldata) {
         transactionInfo.input = formatDecodedTxCalldata(
