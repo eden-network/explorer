@@ -1,3 +1,4 @@
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import TimeAgo from 'javascript-time-ago';
 import en from 'javascript-time-ago/locale/en';
 import moment from 'moment';
@@ -80,6 +81,9 @@ export default function TransactionPage({ txInfo }: { txInfo: TxInfo }) {
                       rel="noreferrer"
                     >
                       {txInfo.hash}
+                      <sup className="px-1">
+                        <FontAwesomeIcon icon="external-link-alt" />
+                      </sup>
                     </a>
                   </td>
                 </tr>
@@ -95,14 +99,9 @@ export default function TransactionPage({ txInfo }: { txInfo: TxInfo }) {
                       rel="noreferrer"
                     >
                       {txInfo.from}
-                      <span className="text-green">
-                        {' '}
-                        - STAKED{' '}
-                        {Math.round(
-                          txInfo.senderStake
-                        ).toLocaleString()} EDEN{' '}
-                        {txInfo.senderRank ? ` (#${txInfo.senderRank})` : ''}
-                      </span>
+                      <sup className="px-1">
+                        <FontAwesomeIcon icon="external-link-alt" />
+                      </sup>
                     </a>
                   </td>
                 </tr>
@@ -117,13 +116,12 @@ export default function TransactionPage({ txInfo }: { txInfo: TxInfo }) {
                       target="_blank"
                       rel="noreferrer"
                     >
-                      {txInfo.to}
-                      <span className="text-green">
-                        {' '}
-                        {txInfo.toSlot !== null
-                          ? ` - SLOT #${txInfo.toSlot}`
-                          : ''}
-                      </span>
+                      {txInfo.toSlot
+                        ? `SLOT #${txInfo.toSlot} DELEGATE`
+                        : txInfo.to}
+                      <sup className="px-1">
+                        <FontAwesomeIcon icon="external-link-alt" />
+                      </sup>
                     </a>
                   </td>
                 </tr>
@@ -132,17 +130,20 @@ export default function TransactionPage({ txInfo }: { txInfo: TxInfo }) {
                     <td className="px-2 sm:px-6 py-4 whitespace-nowrap">
                       Block Number:
                     </td>
-                    <td className="px-2 sm:px-6 py-4 whitespace-nowrap inline-flex">
+                    <td className="px-2 sm:px-6 py-4 whitespace-nowrap inline-flex items-center">
                       <a
                         href={`/block/${txInfo.blockNumber}?tx=${txInfo.hash}`}
-                        className="hover:text-green"
+                        className="hover:text-green inline-flex"
                         target="_blank"
                         rel="noreferrer"
                       >
-                        {txInfo.blockNumber}
-                        <span className="px-1">
+                        <sup className="px-1">
                           {txInfo.fromEdenProducer ? EdenLogo : EthLogo}
-                        </span>
+                        </sup>
+                        {txInfo.blockNumber}
+                        <sup className="px-1">
+                          <FontAwesomeIcon icon="external-link-alt" />
+                        </sup>
                       </a>
                     </td>
                   </tr>
@@ -187,6 +188,19 @@ export default function TransactionPage({ txInfo }: { txInfo: TxInfo }) {
                       : statusBoxes.fail}
                   </td>
                 </tr>
+                {txInfo.senderStake !== null && txInfo.senderStake > 0 ? (
+                  <tr key="Sender stake">
+                    <td className="px-2 sm:px-6 py-4 whitespace-nowrap">
+                      Sender stake:
+                    </td>
+                    <td className="px-2 sm:px-6 py-4 whitespace-nowrap">
+                      {Math.round(txInfo.senderStake).toLocaleString()} EDEN{' '}
+                      {txInfo.senderRank ? ` (Rank #${txInfo.senderRank})` : ''}
+                    </td>
+                  </tr>
+                ) : (
+                  ''
+                )}
                 {!txInfo.pending ? (
                   <tr key="In Bundle">
                     <td className="px-2 sm:px-6 py-4 whitespace-nowrap">
@@ -297,8 +311,8 @@ export default function TransactionPage({ txInfo }: { txInfo: TxInfo }) {
                 )}
                 {txInfo.input.length > 2 ? (
                   <tr key="Input">
-                    <td className="px-2 sm:px-6 py-4 break-words">Input:</td>
-                    <td className="px-2 sm:px-6 py-4 ">
+                    <td className="px-2 sm:px-6 py-4">Input:</td>
+                    <td className="px-2 sm:px-6 py-4">
                       {makeInputBox(txInfo.input)}
                     </td>
                   </tr>
