@@ -168,7 +168,7 @@ export default function TransactionPage({ txInfo }: { txInfo: TxInfo }) {
                   <td className="px-2 sm:px-6 py-4 whitespace-nowrap">
                     {txInfo.viaEdenRPC
                       ? submissionBoxes.eden
-                      : txInfo.inBundle !== null
+                      : txInfo.bundleIndex !== null
                       ? submissionBoxes.flashbots
                       : submissionBoxes.unknown}
                   </td>
@@ -187,24 +187,20 @@ export default function TransactionPage({ txInfo }: { txInfo: TxInfo }) {
                       : statusBoxes.fail}
                   </td>
                 </tr>
-                <tr key="In Bundle">
-                  <td className="px-2 sm:px-6 py-4 whitespace-nowrap">
-                    In Bundle:
-                  </td>
-                  <td className="px-2 sm:px-6 py-4 whitespace-nowrap">
-                    {txInfo.inBundle !== null ? 'True' : 'False'}
-                  </td>
-                </tr>
-                <tr key="Transaction index">
-                  <td className="px-2 sm:px-6 py-4 whitespace-nowrap">
-                    Transaction Index:
-                  </td>
-                  <td className="px-2 sm:px-6 py-4 whitespace-nowrap">
-                    {txInfo.index.toLocaleString()} of{' '}
-                    {txInfo.blockTxCount.toLocaleString()} (
-                    {Math.round((100 * txInfo.index) / txInfo.blockTxCount)}%)
-                  </td>
-                </tr>
+                {!txInfo.pending ? (
+                  <tr key="In Bundle">
+                    <td className="px-2 sm:px-6 py-4 whitespace-nowrap">
+                      In Bundle:
+                    </td>
+                    <td className="px-2 sm:px-6 py-4 whitespace-nowrap">
+                      {txInfo.bundleIndex !== null
+                        ? `True (Bundle #${txInfo.bundleIndex})`
+                        : 'False'}
+                    </td>
+                  </tr>
+                ) : (
+                  ''
+                )}
                 <tr key="Nonce">
                   <td className="px-2 sm:px-6 py-4 whitespace-nowrap">
                     Nonce:
@@ -213,6 +209,21 @@ export default function TransactionPage({ txInfo }: { txInfo: TxInfo }) {
                     {txInfo.nonce.toLocaleString()}
                   </td>
                 </tr>
+                {!txInfo.pending ? (
+                  <tr key="Transaction index">
+                    <td className="px-2 sm:px-6 py-4 whitespace-nowrap">
+                      Transaction index:
+                    </td>
+                    <td className="px-2 sm:px-6 py-4 whitespace-nowrap">
+                      {txInfo.index.toLocaleString()} of{' '}
+                      {txInfo.blockTxCount.toLocaleString()} (
+                      {Math.round((100 * txInfo.index) / txInfo.blockTxCount)}%
+                      of txs in the block above this one)
+                    </td>
+                  </tr>
+                ) : (
+                  ''
+                )}
                 {txInfo.priorityFee !== null ? (
                   <tr key="Priority fee">
                     <td className="px-2 sm:px-6 py-4 whitespace-nowrap">
@@ -244,16 +255,20 @@ export default function TransactionPage({ txInfo }: { txInfo: TxInfo }) {
                 ) : (
                   ''
                 )}
-                <tr key="Gas used">
-                  <td className="px-2 sm:px-6 py-4 whitespace-nowrap">
-                    Gas used:
-                  </td>
-                  <td className="px-2 sm:px-6 py-4 whitespace-nowrap">
-                    {txInfo.gasUsed.toLocaleString()} of{' '}
-                    {txInfo.gasLimit.toLocaleString()} (
-                    {Math.round((100 * txInfo.gasUsed) / txInfo.gasLimit)}%)
-                  </td>
-                </tr>
+                {!txInfo.pending ? (
+                  <tr key="Gas used">
+                    <td className="px-2 sm:px-6 py-4 whitespace-nowrap">
+                      Gas used:
+                    </td>
+                    <td className="px-2 sm:px-6 py-4 whitespace-nowrap">
+                      {txInfo.gasUsed.toLocaleString()} of{' '}
+                      {txInfo.gasLimit.toLocaleString()} (
+                      {Math.round((100 * txInfo.gasUsed) / txInfo.gasLimit)}%)
+                    </td>
+                  </tr>
+                ) : (
+                  ''
+                )}
                 {txInfo.value > 0 ? (
                   <tr key="Value">
                     <td className="px-2 sm:px-6 py-4 whitespace-nowrap">
@@ -276,7 +291,7 @@ export default function TransactionPage({ txInfo }: { txInfo: TxInfo }) {
                 ) : (
                   ''
                 )}
-                {txInfo.gasCost !== null ? (
+                {!txInfo.pending ? (
                   <tr key="Miner reward">
                     <td className="px-2 sm:px-6 py-4 whitespace-nowrap">
                       Miner reward:

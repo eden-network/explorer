@@ -14,7 +14,6 @@ import { getChecksumAddress, weiToGwei, weiToETH, gweiToETH } from './utils';
 
 interface TxInfo {
   viaEdenRPC: boolean;
-  inBundle: boolean;
   pending: boolean;
   gasPrice: number;
   gasLimit: number;
@@ -24,6 +23,7 @@ interface TxInfo {
   from: string;
   hash: string;
   to: string;
+  bundleIndex: number | null;
   fromEdenProducer: boolean | null;
   blockTxCount: number | null;
   senderStake: number | null;
@@ -70,7 +70,7 @@ export const getTransactionInfo = async (txHash) => {
     blockNumber: null,
     priorityFee: null,
     timestamp: null,
-    inBundle: false,
+    bundleIndex: null,
     pending: !mined, // Exclude case of tx not existing with above check
     gasUsed: null,
     gasCost: null,
@@ -142,7 +142,7 @@ export const getTransactionInfo = async (txHash) => {
         slotDelegates[txRequest.to.toLowerCase()] ?? null;
       if (bundledTxsRes[0] && txHash in bundledTxsRes[1]) {
         const { minerTip, bundleIndex } = bundledTxsRes[1][txHash];
-        transactionInfo.inBundle = bundleIndex ?? null;
+        transactionInfo.bundleIndex = bundleIndex ?? null;
         transactionInfo.minerTip = (minerTip && weiToETH(minerTip)) ?? 0;
       }
       transactionInfo.timestamp = parseInt(blockInfo.result.timestamp, 16);
@@ -154,6 +154,7 @@ export const getTransactionInfo = async (txHash) => {
       transactionInfo.gasCost = gweiToETH(
         transactionInfo.gasUsed * transactionInfo.gasPrice
       );
+      console.log(transactionInfo);
     }
   }
   return transactionInfo;
