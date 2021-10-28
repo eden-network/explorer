@@ -70,14 +70,14 @@ function decryptTxCalldata(_abi, _txRequest) {
 export const decodeTx = async (_txRequest) => {
   // Check if contract-like
   const contractLike = await checkIfContractlike(_txRequest.to);
-  if (!contractLike) {
-    return null;
-  }
-  // Try to obtain contract info
-  const { abi, contractName } = await getContractInfo(_txRequest.to);
-  const response = { contractName: contractName ?? null, parsedCalldata: null };
-  if (abi) {
-    response.parsedCalldata = decryptTxCalldata(abi, _txRequest);
+  const response = { contractName: null, parsedCalldata: null };
+  if (contractLike) {
+    // Try to obtain contract info
+    const { abi, contractName } = await getContractInfo(_txRequest.to);
+    response.contractName = contractName;
+    if (abi) {
+      response.parsedCalldata = decryptTxCalldata(abi, _txRequest);
+    }
   }
   return response;
 };
