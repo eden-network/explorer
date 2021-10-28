@@ -74,7 +74,9 @@ export const decodeTx = async (_txRequest) => {
   if (contractLike) {
     // Try to obtain contract info
     const { abi, contractName } = await getContractInfo(_txRequest.to);
-    response.contractName = contractName;
+    if (contractName) {
+      response.contractName = contractName;
+    }
     if (abi) {
       response.parsedCalldata = decryptTxCalldata(abi, _txRequest);
     }
