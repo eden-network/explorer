@@ -361,3 +361,33 @@ export const getStakerInfo = async (_staker, _blockNum?) => {
   }
   return response;
 };
+
+export const fetchContractInfo = async (_address) => {
+  const endpoint = 'https://api.etherscan.io/api';
+  const query = {
+    apikey: process.env.ETHERSCAN_API_TOKEN,
+    action: 'getsourcecode',
+    module: 'contract',
+    address: _address,
+  };
+  const queryString = new URLSearchParams(query);
+  const url: any = new URL(endpoint);
+  url.search = queryString;
+  const { status, message, result } = await fetch(url.href).then((r) =>
+    r.json()
+  );
+  if (status !== '1') {
+    console.error(`Etherscan request failed: ${message}`);
+    return null;
+  }
+  const [res0] = result;
+  if (res0.ABI === 'Contract source code not verified') {
+    return null;
+  }
+  return {
+    implementation: res0.Implementation,
+    contractName: res0.ContractName,
+    isProxy: res0.Proxy === '1',
+    abi: JSON.parse(res0.ABI),
+  };
+};

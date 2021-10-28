@@ -1,5 +1,6 @@
 import { ethers } from 'ethers';
 
+import { decodeTx } from './contract-info';
 import {
   getBlockInfoForBlocks,
   isFromEdenProducer,
@@ -23,6 +24,7 @@ interface TxInfo {
   from: string;
   hash: string;
   to: string;
+  contractName: string | null;
   bundleIndex: number | null;
   fromEdenProducer: boolean | null;
   blockTxCount: number | null;
@@ -41,7 +43,19 @@ interface TxInfo {
   index: number | null;
 }
 
-export type { TxInfo };
+const formatDecodedTxCalldata = (_decoded) => {
+  const argsMsg = _decoded.args
+    .map((arg) => {
+      return `\t* ${arg.key}[${arg.type}]: ${arg.val}`;
+    })
+    .join('\n');
+  const msgFull = `
+  Function: ${_decoded.signature}
+  Args:
+  ${argsMsg}
+  `;
+  return msgFull;
+};
 
 export const getTransactionInfo = async (txHash) => {
   // Get general transaction info
@@ -65,6 +79,7 @@ export const getTransactionInfo = async (txHash) => {
   const transactionInfo = {
     viaEdenRPC,
     fromEdenProducer: null,
+    contractName: null,
     blockTxCount: null,
     senderStake: null,
     blockNumber: null,
@@ -128,13 +143,21 @@ export const getTransactionInfo = async (txHash) => {
         bundledTxsRes,
         slotDelegates,
         [blockInfo],
+        decodedTx,
       ] = await Promise.all([
         getStakerInfo(txRequest.from.toLowerCase(), blockNum),
         isFromEdenProducer(blockNum),
         getBundledTxs(blockNum),
         getSlotDelegates(blockNum - 1),
         getBlockInfoForBlocks([blockNum]),
+        decodeTx({ to: txRequest.to, data: txRequest.input }),
       ]);
+      if (decodedTx.parsedCalldata) {
+        transactionInfo.input = formatDecodedTxCalldata(
+          decodedTx.parsedCalldata
+        );
+      }
+      transactionInfo.contractName = decodedTx.contractName;
       transactionInfo.fromEdenProducer = fromEdenProducer;
       transactionInfo.senderStake = parseInt(senderStake, 10) / 1e18;
       transactionInfo.senderRank = senderRank;
@@ -154,8 +177,9 @@ export const getTransactionInfo = async (txHash) => {
       transactionInfo.gasCost = gweiToETH(
         transactionInfo.gasUsed * transactionInfo.gasPrice
       );
-      console.log(transactionInfo);
     }
   }
   return transactionInfo;
 };
+
+export type { TxInfo };

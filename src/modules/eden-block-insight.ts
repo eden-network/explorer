@@ -1,4 +1,4 @@
-import { readFromBucket, writeToBucket } from './gcloud-cache';
+import { safeReadFromBucket, writeToBucket } from './gcloud-cache';
 import {
   getLabelForAddress,
   isFromEdenProducer,
@@ -96,22 +96,22 @@ export const getBlockInsight = async (_blockNumber) => {
 
 export const getBlockInsightAndCache = async (_blockNumber) => {
   const blockNumberStr = _blockNumber.toString();
-  try {
-    const blockInsight = await readFromBucket(blockNumberStr);
+  const { error, result } = await safeReadFromBucket('blocks', blockNumberStr);
+  if (error) {
+    console.error(`Couldn't read from storage`);
+  } else if (!checkIfValidCache(result)) {
     // Check cache validity
-    if (!checkIfValidCache(blockInsight)) {
-      console.error('Invalid cache');
-      throw new Error('Invalid cache');
-    }
-    // Only responses from successfull calls were cached
-    blockInsight.bundledTxsCallSuccess = true;
-    return blockInsight;
-  } catch (_) {} // eslint-disable-line no-empty
+    console.error('Invalid cache');
+  } else {
+    result.bundledTxsCallSuccess = true;
+    return result;
+  }
+  // Only responses from successfull calls were cached
   const blockInsight = await getBlockInsight(_blockNumber);
   if (blockInsight.bundledTxsCallSuccess) {
     isBlockSecure(_blockNumber).then((isSecure) => {
       if (isSecure) {
-        writeToBucket(blockNumberStr, blockInsight).catch((e) => {
+        writeToBucket('blocks', blockNumberStr, blockInsight).catch((e) => {
           console.error(`Couldn't write to storage:`, e); // eslint-disable-line no-console
         });
       }

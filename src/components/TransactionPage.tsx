@@ -15,8 +15,8 @@ import { TxInfo } from '../modules/tx-info';
 TimeAgo.addDefaultLocale(en);
 
 const makeInputBox = (_input) => (
-  <span className="p-3 rounded-3xl py-2 bg-white inline-block text-xs text-bold text-blue-light shadow-sm font-bold text-center">
-    <p className="break-all">{_input}</p>
+  <span className="p-3 rounded-3xl py-2 bg-white inline-block text-xs text-bold text-blue-light shadow-sm font-bold text-left">
+    <pre>{_input}</pre>
   </span>
 );
 
@@ -116,9 +116,10 @@ export default function TransactionPage({ txInfo }: { txInfo: TxInfo }) {
                       target="_blank"
                       rel="noreferrer"
                     >
+                      {txInfo.contractName || txInfo.to}
                       {txInfo.toSlot !== null
-                        ? `SLOT #${txInfo.toSlot} DELEGATE`
-                        : txInfo.to}
+                        ? ` - SLOT #${txInfo.toSlot} DELEGATE`
+                        : ''}
                       <sup className="px-1">
                         <FontAwesomeIcon icon="external-link-alt" />
                       </sup>
