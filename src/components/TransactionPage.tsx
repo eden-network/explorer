@@ -168,7 +168,7 @@ export default function TransactionPage({ txInfo }: { txInfo: TxInfo }) {
                   <td className="px-2 sm:px-6 py-4 whitespace-nowrap">
                     {txInfo.viaEdenRPC
                       ? submissionBoxes.eden
-                      : txInfo.inBundle
+                      : txInfo.inBundle !== null
                       ? submissionBoxes.flashbots
                       : submissionBoxes.unknown}
                   </td>
@@ -192,7 +192,7 @@ export default function TransactionPage({ txInfo }: { txInfo: TxInfo }) {
                     In Bundle:
                   </td>
                   <td className="px-2 sm:px-6 py-4 whitespace-nowrap">
-                    {txInfo.inBundle ? 'True' : 'False'}
+                    {txInfo.inBundle !== null ? 'True' : 'False'}
                   </td>
                 </tr>
                 <tr key="Transaction index">
@@ -271,6 +271,20 @@ export default function TransactionPage({ txInfo }: { txInfo: TxInfo }) {
                     <td className="px-2 sm:px-6 py-4 break-words">Input:</td>
                     <td className="px-2 sm:px-6 py-4 ">
                       {makeInputBox(txInfo.input)}
+                    </td>
+                  </tr>
+                ) : (
+                  ''
+                )}
+                {txInfo.gasCost !== null ? (
+                  <tr key="Miner reward">
+                    <td className="px-2 sm:px-6 py-4 whitespace-nowrap">
+                      Miner reward:
+                    </td>
+                    <td className="px-2 sm:px-6 py-4 whitespace-nowrap">
+                      {(txInfo.minerTip + txInfo.gasCost).toPrecision(2)} ETH
+                      (GasCost: {txInfo.gasCost} ETH + MinerTip:{' '}
+                      {txInfo.minerTip} ETH)
                     </td>
                   </tr>
                 ) : (

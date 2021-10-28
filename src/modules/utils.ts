@@ -1,31 +1,30 @@
 import { ethers } from 'ethers';
 
-const toFixedDecimals = (_numStr, _maxDec) => {
-  const maxDex = _maxDec || 2;
-  return (
-    Math.round(parseFloat(_numStr) * 10 ** maxDex) /
-    10 ** maxDex
-  ).toFixed(_maxDec);
-};
-
 export const getChecksumAddress = (_address) => {
   return ethers.utils.getAddress(_address);
 };
 
 export const makeArrayUnique = (a) => a.filter((e, p) => a.indexOf(e) === p);
 
-export const BNToGwei = (_bn) => {
-  return toFixedDecimals(ethers.utils.formatUnits(_bn, 'gwei'), 2);
+export const BNToGwei = (_bn, _pre = 2) => {
+  return parseFloat(
+    parseFloat(ethers.utils.formatUnits(_bn, 'gwei')).toPrecision(_pre)
+  );
 };
 
-export const weiToGwei = (_wei) => {
+export const weiToGwei = (_wei, _pre = 2) => {
   const base = _wei.toString().startsWith('0x') ? 16 : 10;
-  return Math.round(parseInt(_wei, base) / 1e9);
+  return parseFloat((parseInt(_wei, base) / 1e9).toPrecision(_pre));
 };
 
-export const weiToETH = (_wei) => {
+export const weiToETH = (_wei, _pre = 2) => {
   const base = _wei.toString().startsWith('0x') ? 16 : 10;
-  return Math.round(parseInt(_wei, base) / 1e18);
+  return parseFloat((parseInt(_wei, base) / 1e18).toPrecision(_pre));
+};
+
+export const gweiToETH = (_wei, _pre = 2) => {
+  const base = _wei.toString().startsWith('0x') ? 16 : 10;
+  return parseFloat((parseInt(_wei, base) / 1e9).toPrecision(_pre));
 };
 
 export const safeParseResponse = async (_resObj) => {

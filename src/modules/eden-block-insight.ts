@@ -37,10 +37,10 @@ export const getBlockInsight = async (_blockNumber) => {
   const labeledTxs = [];
   transactions.forEach((tx) => {
     const toSlotDelegate = slotDelegates[tx.to.toLowerCase()];
-    const bundleIndex = bundledTxs[tx.hash.toLowerCase()];
+    const bundledTx = bundledTxs[tx.hash.toLowerCase()];
     const labeledTx = {
       toSlot: (toSlotDelegate !== undefined ? toSlotDelegate : false) as any,
-      bundleIndex: bundleIndex !== undefined ? bundleIndex : null,
+      bundleIndex: bundledTx !== undefined ? bundledTx.bundleIndex : null,
       senderStake: stakersStake[tx.from.toLowerCase()] || 0,
       viaEdenRPC: edenRPCInfoForTx[tx.hash] !== undefined,
       maxPriorityFee: BNToGwei(tx.maxPriorityFee), // Format for serialization

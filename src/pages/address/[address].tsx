@@ -126,7 +126,7 @@ export async function getServerSideProps(context) {
       },
     };
   } catch (e) {
-    console.log(e); // eslint-disable-line no-console
+    console.error(e); // eslint-disable-line no-console
     return {
       props: {
         error: true,

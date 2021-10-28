@@ -182,7 +182,7 @@ export const getBundledTxs = async (_blockNumber) => {
     ({ success, res }) => {
       if (!success) {
         console.error(`request to flashbots api failed: ${res}`);
-        return [false, []];
+        return [false, {}];
       }
       if (!res || !res.blocks || !res.latest_block_number) {
         throw new Error(`Invalid response format:\n${JSON.stringify(res)}`);
@@ -193,12 +193,19 @@ export const getBundledTxs = async (_blockNumber) => {
         );
       }
       if (res.blocks.length === 0) {
-        return [false, []];
+        return [true, {}];
       }
       const bundledTxs = Object.fromEntries(
         res.blocks[0].transactions
           .filter((tx) => tx.bundle_type === 'flashbots') // Exclude rogue
-          .map((tx) => [tx.transaction_hash, tx.bundle_index])
+          .map((tx) => [
+            tx.transaction_hash,
+            {
+              minerTip: parseInt(tx.coinbase_transfer, 10),
+              minerReward: tx.total_miner_reward,
+              bundleIndex: tx.bundle_index,
+            },
+          ])
       );
       return [true, bundledTxs];
     }
