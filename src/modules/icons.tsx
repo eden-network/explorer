@@ -87,5 +87,10 @@ export const clockSVG = (
 export const EthLogo = <Image src={ethLogoSvg} width={20} />;
 export const EdenLogo = <Image src={edenLogoSvg} width={20} />;
 export const EtherscanLogo = (
-  <Image src={etherscanLogoSvg} width={14} height={14} />
+  <Image
+    src={etherscanLogoSvg}
+    width={14}
+    height={14}
+    alt="etherscan logo svg"
+  />
 );
