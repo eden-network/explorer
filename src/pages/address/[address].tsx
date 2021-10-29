@@ -13,7 +13,7 @@ import { Meta } from '../../layout/Meta';
 import Shell from '../../layout/Shell';
 import { getAccountInfo } from '../../modules/account-info';
 import { getAddressForENS, checkIfContractlike } from '../../modules/getters';
-import { validate as ensValidator } from '../../modules/validator/ens';
+import { validateEns } from '../../modules/validators';
 
 const PAGE_SIZE = 10;
 
@@ -99,7 +99,7 @@ export async function getServerSideProps(context) {
     const pageNum = context.query.p || 1;
     // Find address if ENS
     let { address } = context.query;
-    if (ensValidator(address)) {
+    if (validateEns(address)) {
       const addressForENS = await getAddressForENS(address);
       if (addressForENS === null) {
         throw new Error('Invalid ENS');
@@ -126,7 +126,7 @@ export async function getServerSideProps(context) {
       },
     };
   } catch (e) {
-    console.log(e); // eslint-disable-line no-console
+    console.error(e); // eslint-disable-line no-console
     return {
       props: {
         error: true,

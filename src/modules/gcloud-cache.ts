@@ -34,16 +34,40 @@ writeGCloudCred();
 const storage = new Storage();
 const myBucket = storage.bucket(AppConfig.gcloudCacheBucket);
 
-export const writeToBucket = (_destFileName, _data) => {
+export const writeToBucket = (_dir, _destFileName, _data) => {
+  if (AppConfig.cachingEnabled !== '1') {
+    throw new Error('Caching disabled');
+  }
   return myBucket
-    .file(`blocks/${_destFileName}.json`)
+    .file(`${_dir}/${_destFileName}.json`)
     .save(JSON.stringify(_data));
 };
 
-export const readFromBucket = async (_destFileName) => {
+export const readFromBucket = async (_dir, _destFileName) => {
+  if (AppConfig.cachingEnabled !== '1') {
+    throw new Error('Caching disabled');
+  }
   return myBucket
-    .file(`blocks/${_destFileName}.json`)
+    .file(`${_dir}/${_destFileName}.json`)
     .download()
     .then((r) => r.toString())
     .then((r) => JSON.parse(r));
+};
+
+export const safeReadFromBucket = async (_dir, _file) => {
+  try {
+    const blockInsight = await readFromBucket(_dir, _file);
+    return { error: false, result: blockInsight };
+  } catch (e) {
+    return { error: true, msg: e };
+  }
+};
+
+export const safeWriteToBucket = async (_dir, _file, _data) => {
+  try {
+    await writeToBucket(_dir, _file, _data);
+    return { error: false };
+  } catch (e) {
+    return { error: true, msg: e };
+  }
 };

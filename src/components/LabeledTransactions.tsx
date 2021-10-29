@@ -218,7 +218,7 @@ export default function LabeledTransactions({
                             copyText={tx.hash}
                           />
                           <a
-                            href={`https://etherscan.io/tx/${tx.hash}`}
+                            href={`/tx/${tx.hash}`}
                             className=" hover:text-green block w-26"
                             target="_blank"
                             rel="noreferrer"

@@ -3,7 +3,7 @@ import { ethers } from 'ethers';
 import { request, gql } from 'graphql-request';
 
 import { AppConfig } from '../utils/AppConfig';
-import { safeFetch } from './utils';
+import { safeFetch, sendRawJsonRPCRequest } from './utils';
 
 const {
   cacheBlockConfirmations,
@@ -23,6 +23,22 @@ export const provider = new ethers.providers.JsonRpcProvider(
   providerEndpoint,
   network
 );
+
+export const getTxReceipt = (_txHash) => {
+  return sendRawJsonRPCRequest(
+    'eth_getTransactionReceipt',
+    [_txHash],
+    providerEndpoint
+  );
+};
+
+export const getTxRequest = (_txHash) => {
+  return sendRawJsonRPCRequest(
+    'eth_getTransactionByHash',
+    [_txHash],
+    providerEndpoint
+  );
+};
 
 export const getLatestBlock = async () => {
   return provider.getBlockNumber();
@@ -166,7 +182,7 @@ export const getBundledTxs = async (_blockNumber) => {
     ({ success, res }) => {
       if (!success) {
         console.error(`request to flashbots api failed: ${res}`);
-        return [false, []];
+        return [false, {}];
       }
       if (!res || !res.blocks || !res.latest_block_number) {
         throw new Error(`Invalid response format:\n${JSON.stringify(res)}`);
@@ -177,12 +193,19 @@ export const getBundledTxs = async (_blockNumber) => {
         );
       }
       if (res.blocks.length === 0) {
-        return [false, []];
+        return [true, {}];
       }
       const bundledTxs = Object.fromEntries(
         res.blocks[0].transactions
           .filter((tx) => tx.bundle_type === 'flashbots') // Exclude rogue
-          .map((tx) => [tx.transaction_hash, tx.bundle_index])
+          .map((tx) => [
+            tx.transaction_hash,
+            {
+              minerTip: parseInt(tx.coinbase_transfer, 10),
+              minerReward: tx.total_miner_reward,
+              bundleIndex: tx.bundle_index,
+            },
+          ])
       );
       return [true, bundledTxs];
     }
@@ -222,11 +245,6 @@ export const getBlockInfo = async (_blockNumber) => {
 
 export const getMinerAlias = (_minerAddress) => {
   return minerAlias[_minerAddress.toLowerCase()] || null;
-};
-
-export const getLabelForAddress = (_address) => {
-  // Future support for ENS, contract-names, ...
-  return getMinerAlias(_address);
 };
 
 export const checkIfContractlike = async (_address) => {
@@ -320,12 +338,13 @@ export const getLastSupportedBlock = async () => {
   });
 };
 
-export const getLatestStake = async (_staker) => {
+export const getStakerInfo = async (_staker, _blockNum?) => {
   const response = await request(
     graphNetworkEndpoint,
     gql`{
           staker(
             id: "${_staker.toLowerCase()}"
+            ${_blockNum !== undefined ? `block: { number: ${_blockNum} }` : ''}
           ) {
             staked, 
             rank
@@ -336,4 +355,41 @@ export const getLatestStake = async (_staker) => {
     return { rank: null, staked: 0 };
   }
   return response;
+};
+
+export const fetchContractInfo = async (_address) => {
+  const endpoint = 'https://api.etherscan.io/api';
+  const query = {
+    apikey: process.env.ETHERSCAN_API_TOKEN,
+    action: 'getsourcecode',
+    module: 'contract',
+    address: _address,
+  };
+  const queryString = new URLSearchParams(query);
+  const url: any = new URL(endpoint);
+  url.search = queryString;
+  const { status, message, result } = await fetch(url.href).then((r) =>
+    r.json()
+  );
+  if (status !== '1') {
+    console.error(`Etherscan request failed: ${message}`);
+    return null;
+  }
+  const [res0] = result;
+  if (res0.ABI === 'Contract source code not verified') {
+    return null;
+  }
+  return {
+    implementation: res0.Implementation,
+    contractName: res0.ContractName,
+    isProxy: res0.Proxy === '1',
+    abi: JSON.parse(res0.ABI),
+  };
+};
+
+export const fetchMethodSig = async (_methodSigHex) => {
+  const endpoint = 'https://www.4byte.directory/api/v1/signatures/';
+  const url = `${endpoint}?hex_signature=${_methodSigHex}`;
+  const res = await fetch(url).then((r) => r.json());
+  return res;
 };

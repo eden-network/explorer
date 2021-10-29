@@ -1,14 +1,15 @@
 import { ethers } from 'ethers';
 
+import { getContractInfo } from './contract-info';
 import {
   getBlockInfoForBlocks,
   getTxCountForAccount,
   filterForEdenBlocks,
-  getLabelForAddress,
   getTxsForAccount,
   getSlotDelegates,
-  getLatestStake,
+  getStakerInfo,
   getEdenRPCTxs,
+  getMinerAlias,
 } from './getters';
 import { weiToGwei } from './utils';
 
@@ -77,18 +78,24 @@ export const getAccountInfo = async (
     txsForAccount,
     { staked: edenStaked, rank: stakerRank },
     accountTxCount,
+    contractInfo,
     slotDelegates,
   ] = await Promise.all([
     getEdenTxsForAccount(_account.toLowerCase(), _txPerPage, _page),
-    getLatestStake(_account.toLowerCase()),
+    getStakerInfo(_account.toLowerCase()),
     getTxCountForAccount(_account),
+    getContractInfo(_account),
     getSlotDelegates(),
   ]);
+  const contractLabel = contractInfo.contractName
+    ? `Contract: ${contractInfo.contractName}`
+    : null;
+  const minerAlias = getMinerAlias(_account);
   const accountOverview: AccountOverview = {
     slotDelegate: slotDelegates[_account.toLowerCase()] ?? null,
     stakerRank: stakerRank && parseInt(stakerRank, 10),
     edenStaked: parseInt(edenStaked, 10) / 1e18,
-    label: getLabelForAddress(_account) || null,
+    label: minerAlias || contractLabel || null,
     address: ethers.utils.getAddress(_account),
     txCount: accountTxCount,
   };

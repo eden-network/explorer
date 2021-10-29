@@ -13,6 +13,7 @@ export const AppConfig = {
   flashbotsAPIEndpoint: process.env.FLASHBOTS_API,
   etherscanAPIKey: process.env.ETHERSCAN_API_TOKEN,
   proxyAuthToken: process.env.PROXY_AUTH_TOKEN,
+  cachingEnabled: process.env.CACHING_ENABLED,
   network: process.env.NETWORK || 'mainnet',
   blockInsightRowColorByPriority: {
     'priority-fee': 'gray-300',
