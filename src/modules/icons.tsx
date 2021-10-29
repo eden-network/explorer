@@ -36,8 +36,17 @@ export const LockOpen = (
     />
   </svg>
 );
-export const EthLogo = <Image src={ethLogoSvg} width={20} />;
-export const EdenLogo = <Image src={edenLogoSvg} width={20} />;
+export const EthLogo = (
+  <Image src={ethLogoSvg} width={20} alt="ether logo svg" />
+);
+export const EdenLogo = (
+  <Image src={edenLogoSvg} width={20} alt="eden logo svg" />
+);
 export const EtherscanLogo = (
-  <Image src={etherscanLogoSvg} width={14} height={14} />
+  <Image
+    src={etherscanLogoSvg}
+    width={14}
+    height={14}
+    alt="etherscan logo svg"
+  />
 );

@@ -1,8 +1,11 @@
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import moment from 'moment';
+import ReactToolTip from 'react-tooltip';
 
 import { formatAddress, formatTxHash } from '../modules/formatter';
 import { EthLogo, EdenLogo, LockClosed, LockOpen } from '../modules/icons';
 import ClipboardButton from './ClipboardButton';
+import NoSSr from './NoSsr';
 
 export default function AccountTxTable({
   transactions,
@@ -27,7 +30,9 @@ export default function AccountTxTable({
                     scope="col"
                     className="px-2 sm:px-0 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider"
                   >
-                    Block-Type
+                    <span data-tip data-for="thBlockType">
+                      <FontAwesomeIcon icon="question-circle" /> Block-Type
+                    </span>
                   </th>
                   <th
                     scope="col"
@@ -63,7 +68,9 @@ export default function AccountTxTable({
                     scope="col"
                     className="px-2 sm:px-0 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider"
                   >
-                    % Txs Above
+                    <span data-tip data-for="thTxsAbove">
+                      <FontAwesomeIcon icon="question-circle" /> % Txs Above
+                    </span>
                   </th>
                   <th
                     scope="col"
@@ -75,7 +82,9 @@ export default function AccountTxTable({
                     scope="col"
                     className="px-2 sm:px- py-3 text-xs font-medium text-gray-500 uppercase tracking-wider"
                   >
-                    Via Eden RPC
+                    <span data-tip data-for="thViaEdenRPC">
+                      <FontAwesomeIcon icon="question-circle" /> Via Eden RPC
+                    </span>
                   </th>
                 </tr>
               </thead>
@@ -99,11 +108,16 @@ export default function AccountTxTable({
                       </span>
                     </td>
                     <td
-                      className={`px-2 sm:px-1 py-4 whitespace-nowrap capitalize ${
+                      className={`px-2 sm:px-1 pt-1 whitespace-nowrap capitalize ${
                         tx.isEden ? 'text-green' : 'text-white'
                       }`}
                     >
-                      {tx.isEden ? EdenLogo : EthLogo}
+                      <span
+                        data-tip
+                        data-for={tx.isEden ? 'EdenLogoTip' : 'EthLogoTip'}
+                      >
+                        {tx.isEden ? EdenLogo : EthLogo}
+                      </span>
                     </td>
                     <td className="px-2 sm:px-1 py-4 whitespace-nowrap">
                       <span className="flex items-center justify-center">
@@ -203,7 +217,14 @@ export default function AccountTxTable({
                         tx.viaEdenRPC ? ' text-green' : ''
                       }`}
                     >
-                      {tx.viaEdenRPC ? LockClosed : LockOpen}
+                      <span
+                        data-tip
+                        data-for={
+                          tx.viaEdenRPC ? 'LockClosedTip' : 'LockOpenTip'
+                        }
+                      >
+                        {tx.viaEdenRPC ? LockClosed : LockOpen}
+                      </span>
                     </td>
                   </tr>
                 ))}
@@ -212,6 +233,75 @@ export default function AccountTxTable({
           </div>
         </div>
       </div>
+      <NoSSr>
+        <ReactToolTip
+          className="tooltip"
+          id="EdenLogoTip"
+          place="top"
+          effect="solid"
+          offset={{ left: 2 }}
+          border
+        >
+          Block was mined by Eden producer
+        </ReactToolTip>
+        <ReactToolTip
+          className="tooltip"
+          id="EthLogoTip"
+          place="top"
+          offset={{ left: 2 }}
+          effect="solid"
+          border
+        >
+          Block was not mined by Eden producer
+        </ReactToolTip>
+        <ReactToolTip
+          className="tooltip"
+          id="LockOpenTip"
+          place="top"
+          effect="solid"
+          border
+        >
+          Transaction was not submitted to Eden RPC
+        </ReactToolTip>
+        <ReactToolTip
+          className="tooltip"
+          id="LockClosedTip"
+          place="top"
+          effect="solid"
+          border
+        >
+          Transaction was submitted to Eden RPC
+        </ReactToolTip>
+        <ReactToolTip
+          className="tooltip"
+          id="thBlockType"
+          place="top"
+          effect="solid"
+          border
+        >
+          Was block mined by Eden producer
+        </ReactToolTip>
+        <ReactToolTip
+          className="tooltip"
+          id="thTxsAbove"
+          place="top"
+          effect="solid"
+          border
+        >
+          Percentage of transactions in the block
+          <br />
+          with lower transaction index
+        </ReactToolTip>
+        <ReactToolTip
+          className="tooltip"
+          id="thViaEdenRPC"
+          place="top"
+          effect="solid"
+          border
+        >
+          Whether the user submitted transaction through Eden RPC
+        </ReactToolTip>
+      </NoSSr>
     </div>
   );
 }

@@ -1,7 +1,9 @@
 import { useRef, useEffect, useState, useCallback } from 'react';
 
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import cx from 'classnames';
 import { useRouter } from 'next/router';
+import ReactToolTip from 'react-tooltip';
 
 import useWindowSize from '../hooks/useWindowSize.hook';
 import { formatAddress, formatTxHash } from '../modules/formatter';
@@ -162,11 +164,13 @@ export default function LabeledTransactions({
                     className="px-0 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider"
                   >
                     <TableSortLabel
-                      active={orderBy === 'parsedMaxPriorityFee'}
+                      active={orderBy === 'viaEdenRPC'}
                       direction={order}
-                      onClick={() => handleRequestSort('parsedMaxPriorityFee')}
+                      onClick={() => handleRequestSort('viaEdenRPC')}
                     >
-                      Via Eden RPC
+                      <span data-tip data-for="thViaEdenRPC">
+                        <FontAwesomeIcon icon="question-circle" /> Via Eden RPC
+                      </span>
                     </TableSortLabel>
                   </th>
                   <th
@@ -272,7 +276,13 @@ export default function LabeledTransactions({
                           tx.viaEdenRPC ? ' text-green' : ''
                         }`}
                       >
-                        <span className="flex justify-center">
+                        <span
+                          className="flex justify-center"
+                          data-tip
+                          data-for={
+                            tx.viaEdenRPC ? 'LockClosedTip' : 'LockOpenTip'
+                          }
+                        >
                           {tx.viaEdenRPC ? LockClosed : LockOpen}
                         </span>
                       </td>
@@ -322,6 +332,33 @@ export default function LabeledTransactions({
           </div>
         </div>
       </div>
+      <ReactToolTip
+        className="tooltip"
+        id="LockOpenTip"
+        place="top"
+        effect="solid"
+        border
+      >
+        Transaction was not submitted to Eden RPC
+      </ReactToolTip>
+      <ReactToolTip
+        className="tooltip"
+        id="LockClosedTip"
+        place="top"
+        effect="solid"
+        border
+      >
+        Transaction was submitted to Eden RPC
+      </ReactToolTip>
+      <ReactToolTip
+        className="tooltip"
+        id="thViaEdenRPC"
+        place="top"
+        effect="solid"
+        border
+      >
+        Whether the user submitted transaction through Eden RPC
+      </ReactToolTip>
     </div>
   );
 }
