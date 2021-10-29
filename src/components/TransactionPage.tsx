@@ -1,4 +1,5 @@
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import cx from 'classnames';
 import TimeAgo from 'javascript-time-ago';
 import en from 'javascript-time-ago/locale/en';
 import moment from 'moment';
@@ -16,7 +17,12 @@ TimeAgo.addDefaultLocale(en);
 
 const makeInputBox = (_input) => (
   <span className="pt-0 px-3 rounded-3xl pb-4 bg-white inline-block text-xs text-bold text-blue-light shadow-sm font-bold text-left">
-    <pre className="w-screen max-w-xs w-xs md:max-w-md	md:w-md lg:max-w-xl overflow-x-auto">
+    <pre
+      className={cx(
+        'w-screen max-w-xs w-xs md:max-w-md	md:w-md lg:max-w-xl overflow-x-auto',
+        { 'p-4': _input.indexOf(' ') < 0 }
+      )}
+    >
       {_input}
     </pre>
   </span>
