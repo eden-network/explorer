@@ -1,4 +1,4 @@
-import { safeReadFromBucket, writeToBucket } from './gcloud-cache';
+import { safeReadFromBucket, safeWriteToBucket } from './gcloud-cache';
 import {
   getMinerAlias,
   isFromEdenProducer,
@@ -42,8 +42,8 @@ export const getBlockInsight = async (_blockNumber) => {
       toSlot: (toSlotDelegate !== undefined ? toSlotDelegate : false) as any,
       bundleIndex: bundledTx !== undefined ? bundledTx.bundleIndex : null,
       senderStake: stakersStake[tx.from.toLowerCase()] || 0,
+      maxPriorityFee: BNToGwei(tx.maxPriorityFee).toString(), // Format for serialization
       viaEdenRPC: edenRPCInfoForTx[tx.hash] !== undefined,
-      maxPriorityFee: BNToGwei(tx.maxPriorityFee), // Format for serialization
       fromLabel: getMinerAlias(tx.from),
       toLabel: getMinerAlias(tx.to),
       position: tx.transactionIndex,
@@ -86,7 +86,7 @@ export const getBlockInsight = async (_blockNumber) => {
   });
   return {
     ...blockInfo,
-    baseFeePerGas: BNToGwei(blockInfo.baseFeePerGas), // Format for serialization
+    baseFeePerGas: BNToGwei(blockInfo.baseFeePerGas).toString(), // Format for serialization
     bundledTxsCallSuccess: bundledTxsWrapped[0],
     transactions: labeledTxs,
     number: _blockNumber,
@@ -96,24 +96,28 @@ export const getBlockInsight = async (_blockNumber) => {
 
 export const getBlockInsightAndCache = async (_blockNumber) => {
   const blockNumberStr = _blockNumber.toString();
-  const { error, result } = await safeReadFromBucket('blocks', blockNumberStr);
-  if (error) {
+  const cachedResult = await safeReadFromBucket('blocks', blockNumberStr);
+  if (cachedResult.error) {
     console.error(`Couldn't read from storage`);
-  } else if (!checkIfValidCache(result)) {
+  } else if (!checkIfValidCache(cachedResult.result)) {
     // Check cache validity
     console.error('Invalid cache');
   } else {
-    result.bundledTxsCallSuccess = true;
-    return result;
+    cachedResult.result.bundledTxsCallSuccess = true;
+    return cachedResult.result;
   }
   // Only responses from successfull calls were cached
   const blockInsight = await getBlockInsight(_blockNumber);
   if (blockInsight.bundledTxsCallSuccess) {
     isBlockSecure(_blockNumber).then((isSecure) => {
       if (isSecure) {
-        writeToBucket('blocks', blockNumberStr, blockInsight).catch((e) => {
-          console.error(`Couldn't write to storage:`, e); // eslint-disable-line no-console
-        });
+        safeWriteToBucket('blocks', blockNumberStr, blockInsight).then(
+          ({ error, msg }) => {
+            if (error) {
+              console.error(`Couldn't write to storage: ${msg}`); // eslint-disable-line no-console
+            }
+          }
+        );
       }
     });
   }

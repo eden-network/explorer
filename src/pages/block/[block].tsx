@@ -13,7 +13,7 @@ import useLocalStorage from '../../hooks/useLocalStorage.hook';
 import usePagination from '../../hooks/usePagination.hook';
 import { Meta } from '../../layout/Meta';
 import Shell from '../../layout/Shell';
-import { getBlockInsight } from '../../modules/eden-block-insight';
+import { getBlockInsightAndCache } from '../../modules/eden-block-insight';
 import { getLastSupportedBlock } from '../../modules/getters';
 import { EtherscanLogo } from '../../modules/icons';
 import { stableSort, getSorting } from '../../modules/table/sort';
@@ -283,7 +283,7 @@ export async function getServerSideProps(context) {
   }
   const blockNum = Number.parseInt(context.query.block, 10);
   try {
-    const blockInsight = await getBlockInsight(blockNum);
+    const blockInsight = await getBlockInsightAndCache(blockNum);
     return {
       props: {
         bundledTxsCallSuccess: blockInsight.bundledTxsCallSuccess,

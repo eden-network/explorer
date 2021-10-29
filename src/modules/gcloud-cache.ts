@@ -35,12 +35,18 @@ const storage = new Storage();
 const myBucket = storage.bucket(AppConfig.gcloudCacheBucket);
 
 export const writeToBucket = (_dir, _destFileName, _data) => {
+  if (AppConfig.cachingEnabled !== '1') {
+    throw new Error('Caching disabled');
+  }
   return myBucket
     .file(`${_dir}/${_destFileName}.json`)
     .save(JSON.stringify(_data));
 };
 
 export const readFromBucket = async (_dir, _destFileName) => {
+  if (AppConfig.cachingEnabled !== '1') {
+    throw new Error('Caching disabled');
+  }
   return myBucket
     .file(`${_dir}/${_destFileName}.json`)
     .download()
