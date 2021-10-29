@@ -68,7 +68,7 @@ export const getTransactionInfo = async (txHash) => {
   const edenRPCInfo = edenRPCInfoRes.result[0];
   const mined = txReceipt !== null;
   const viaEdenRPC = edenRPCInfo !== undefined;
-  const pendingInEdenMempool = viaEdenRPC && edenRPCInfo.blockNumber === null;
+  const pendingInEdenMempool = viaEdenRPC && edenRPCInfo.blocknumber === null;
   const pendingInPublicMempool = !mined && txRequest !== null;
 
   if (!(pendingInPublicMempool || pendingInEdenMempool || mined)) {
@@ -103,16 +103,18 @@ export const getTransactionInfo = async (txHash) => {
     transactionInfo.to = getChecksumAddress(
       edenRPCInfo.to || ethers.constants.AddressZero
     );
-    transactionInfo.gasPrice = weiToGwei(edenRPCInfo.gasPrice);
     transactionInfo.from = getChecksumAddress(edenRPCInfo.from);
     transactionInfo.gasLimit = parseInt(edenRPCInfo.gas, 16);
     transactionInfo.nonce = parseInt(edenRPCInfo.nonce, 10);
+    transactionInfo.value = weiToETH(edenRPCInfo.value);
     transactionInfo.input = edenRPCInfo.input;
     transactionInfo.hash = edenRPCInfo.hash;
-    if (txRequest.maxpriorityfeepergas) {
+    if (edenRPCInfo.maxpriorityfeepergas) {
       transactionInfo.priorityFee = weiToGwei(edenRPCInfo.maxpriorityfeepergas);
-      transactionInfo.baseFee =
-        weiToGwei(edenRPCInfo.gasPrice) - transactionInfo.priorityFee;
+      // transactionInfo.baseFee =
+      //   weiToGwei(edenRPCInfo.gasPrice) - transactionInfo.priorityFee;
+    } else {
+      transactionInfo.gasPrice = weiToGwei(edenRPCInfo.gasprice);
     }
   } else if (txRequest !== null) {
     // use tx-request object
