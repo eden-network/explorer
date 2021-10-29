@@ -16,7 +16,7 @@ TimeAgo.addDefaultLocale(en);
 
 const makeInputBox = (_input) => (
   <span className="p-3 rounded-3xl py-2 bg-white inline-block text-xs text-bold text-blue-light shadow-sm font-bold text-left">
-    <pre>{_input}</pre>
+    <pre className="whitespace-pre-wrap break-all">{_input}</pre>
   </span>
 );
 
