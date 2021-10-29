@@ -133,20 +133,22 @@ export default function TransactionPage({ txInfo }: { txInfo: TxInfo }) {
                     <td className="px-2 sm:px-6 py-4 whitespace-nowrap">
                       Block Number:
                     </td>
-                    <td className="px-2 sm:px-6 py-4 whitespace-nowrap inline-flex items-center">
+                    <td className="px-2 sm:px-6 py-2 whitespace-nowrap inline-flex items-center">
                       <a
                         href={`/block/${txInfo.blockNumber}?tx=${txInfo.hash}`}
                         className="hover:text-green inline-flex"
                         target="_blank"
                         rel="noreferrer"
                       >
-                        <sup className="px-1">
-                          {txInfo.fromEdenProducer ? EdenLogo : EthLogo}
-                        </sup>
-                        {txInfo.blockNumber}
-                        <sup className="px-1">
-                          <FontAwesomeIcon icon="external-link-alt" />
-                        </sup>
+                        <span className="flex items-center">
+                          <span className="block">
+                            {txInfo.fromEdenProducer ? EdenLogo : EthLogo}
+                          </span>
+                          {txInfo.blockNumber}
+                          <sup className="px-1">
+                            <FontAwesomeIcon icon="external-link-alt" />
+                          </sup>
+                        </span>
                       </a>
                     </td>
                   </tr>
