@@ -161,7 +161,9 @@ export default function TransactionPage({ txInfo }: { txInfo: TxInfo }) {
                       Timestamp:
                     </td>
                     <td className="px-2 sm:px-6 py-4 whitespace-nowrap inline-flex">
-                      {moment(txInfo.timestamp * 1e3).format('D MMM YYYY H:mm')}
+                      {moment(txInfo.timestamp * 1e3).format(
+                        'D MMM YYYY H:mm:ss'
+                      )}
                     </td>
                   </tr>
                 ) : (
