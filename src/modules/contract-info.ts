@@ -92,12 +92,23 @@ async function decodeCalldataRaw(_calldata) {
           type: paramTypes[i],
           key: i,
         }));
-      const formattedTx = {
-        textSig: res.text_signature,
-        hexSig: methodSigHex,
-        args,
-      };
-      return formattedTx;
+      // Check if the decoding is correct - with method collision it is possible only subset of calldata was used
+      const reconstructedCalldata =
+        methodSigHex +
+        ethers.utils.defaultAbiCoder
+          .encode(
+            args.map((arg) => arg.type),
+            args.map((arg) => arg.val)
+          )
+          .slice(2);
+      if (reconstructedCalldata === _calldata) {
+        const formattedTx = {
+          textSig: res.text_signature,
+          hexSig: methodSigHex,
+          args,
+        };
+        return formattedTx;
+      }
     } catch (_) {} // eslint-disable-line no-empty
   }
   return null;
