@@ -20,7 +20,7 @@ const makeInputBox = (_input) => (
     <pre
       className={cx(
         'w-screen max-w-xs w-xs md:max-w-md	md:w-md lg:max-w-xl overflow-x-auto',
-        { 'p-4': _input.indexOf(' ') < 0 }
+        { 'p-4 pb-0': _input.indexOf(' ') < 0 }
       )}
     >
       {_input}
