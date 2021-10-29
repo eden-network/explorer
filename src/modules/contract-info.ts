@@ -7,7 +7,11 @@ import {
   fetchMethodSig,
 } from './getters';
 
-const getContractInfo = async (_address) => {
+export const getContractInfo = async (_address) => {
+  const contractLike = await checkIfContractlike(_address);
+  if (!contractLike) {
+    return {};
+  }
   // Look into cache
   const { error, result } = await safeReadFromBucket(
     'contracts',
@@ -115,20 +119,16 @@ async function decodeCalldataRaw(_calldata) {
 }
 
 export const decodeTx = async (_to, _data) => {
-  // Check if contract-like
-  const contractLike = await checkIfContractlike(_to);
   const response = { contractName: null, parsedCalldata: null };
-  if (contractLike) {
-    // Try to obtain contract info
-    const { abi, contractName } = await getContractInfo(_to);
-    if (contractName) {
-      response.contractName = contractName;
-    }
-    if (abi) {
-      response.parsedCalldata = decodeCalldataABI(abi, _data);
-    } else {
-      response.parsedCalldata = await decodeCalldataRaw(_data);
-    }
+  // Try to obtain contract info
+  const { abi, contractName } = await getContractInfo(_to);
+  if (contractName) {
+    response.contractName = contractName;
+  }
+  if (abi) {
+    response.parsedCalldata = decodeCalldataABI(abi, _data);
+  } else if (contractName) {
+    response.parsedCalldata = await decodeCalldataRaw(_data);
   }
   return response;
 };

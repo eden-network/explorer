@@ -247,11 +247,6 @@ export const getMinerAlias = (_minerAddress) => {
   return minerAlias[_minerAddress.toLowerCase()] || null;
 };
 
-export const getLabelForAddress = (_address) => {
-  // Future support for ENS, contract-names, ...
-  return getMinerAlias(_address);
-};
-
 export const checkIfContractlike = async (_address) => {
   // Returns false for empty contracts (eg. 0xd8253352f6044cfe55bcc0748c3fa37b7df81f98)
   const code = await provider.send('eth_getCode', [_address]);

@@ -124,7 +124,9 @@ export default function TransactionPage({ txInfo }: { txInfo: TxInfo }) {
                       target="_blank"
                       rel="noreferrer"
                     >
-                      {txInfo.contractName || txInfo.to}
+                      {txInfo.contractName
+                        ? `Contract: ${txInfo.contractName}`
+                        : txInfo.to}
                       {txInfo.toSlot !== null
                         ? ` - SLOT #${txInfo.toSlot} DELEGATE`
                         : ''}

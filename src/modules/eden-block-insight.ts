@@ -1,6 +1,6 @@
 import { safeReadFromBucket, writeToBucket } from './gcloud-cache';
 import {
-  getLabelForAddress,
+  getMinerAlias,
   isFromEdenProducer,
   checkIfValidCache,
   withinSlotGasCap,
@@ -44,8 +44,8 @@ export const getBlockInsight = async (_blockNumber) => {
       senderStake: stakersStake[tx.from.toLowerCase()] || 0,
       viaEdenRPC: edenRPCInfoForTx[tx.hash] !== undefined,
       maxPriorityFee: BNToGwei(tx.maxPriorityFee), // Format for serialization
-      fromLabel: getLabelForAddress(tx.from),
-      toLabel: getLabelForAddress(tx.to),
+      fromLabel: getMinerAlias(tx.from),
+      toLabel: getMinerAlias(tx.to),
       position: tx.transactionIndex,
       gasLimit: tx.gasLimit,
       nonce: tx.nonce,
