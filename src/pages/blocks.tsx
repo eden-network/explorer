@@ -6,14 +6,20 @@ import moment from 'moment';
 import { useRouter } from 'next/router';
 import DatePicker from 'react-datepicker';
 
+import AutoCompleteInput from '../components/AutocompleteInput';
 import Blocks from '../components/Blocks';
 import EndlessPagination from '../components/EndlessPagination';
 import { Meta } from '../layout/Meta';
 import Shell from '../layout/Shell';
 import { getBlockInsightAndCache } from '../modules/eden-block-insight';
 import { getBlocksPaged } from '../modules/getters';
+import { AppConfig } from '../utils/AppConfig';
+
+const { minerAlias } = AppConfig;
 
 const PER_PAGE = 10;
+
+const miners = Object.values(minerAlias);
 
 export default function BlocksPage({ blocks }) {
   const router = useRouter();
@@ -89,6 +95,14 @@ export default function BlocksPage({ blocks }) {
     setbeforeEpoch(new Date().getTime() / 1e3);
   }, [router]);
 
+  const getSelectedVal = (value) => {
+    console.log(value);
+  };
+
+  const getChanges = (value) => {
+    console.log(value);
+  };
+
   return (
     <Shell
       meta={
@@ -101,10 +115,25 @@ export default function BlocksPage({ blocks }) {
       <div className="max-w-4xl mx-auto grid gap-5">
         <div className="flex flex-col rounded-lg shadow-lg overflow-hidden bg-blue">
           <div className="p-3 flex-1 sm:p-6 flex flex-col justify-between">
-            <div className="w-100">
-              <div className="flex items-center sm:float-right">
+            <div className="w-100 grid sm:grid-cols-2 gap-2 px-2">
+              <div className="flex items-center">
+                <AutoCompleteInput
+                  label="Miners"
+                  pholder="Search..."
+                  data={miners}
+                  onSelected={getSelectedVal}
+                  onChange={getChanges}
+                />
+                <button
+                  onClick={handleResetBeforeEpoch}
+                  className="ml-1 px-2 py-1 text-sm font-medium rounded-md betterhover:hover:bg-green betterhover:hover:text-blue cursor-pointer select-none betterhover:disabled:opacity-50 betterhover:disabled:bg-blue-light betterhover:disabled:text-white"
+                >
+                  All
+                </button>
+              </div>
+              <div className="flex items-center">
                 <p className="text-gray-500 w-28 text-sm mr-2">
-                  Filter By End Date:
+                  Last TimeStamp:
                 </p>
                 <DatePicker
                   selected={selectedTime}
