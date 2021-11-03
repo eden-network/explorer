@@ -118,7 +118,7 @@ export default function BlocksPage({ blocks }) {
             <div className="w-100 grid sm:grid-cols-2 gap-2 px-2">
               <div className="flex items-center">
                 <AutoCompleteInput
-                  label="Miners"
+                  label="Miner"
                   pholder="Search..."
                   data={miners}
                   onSelected={getSelectedVal}
