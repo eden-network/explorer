@@ -9,6 +9,7 @@ export default function AutoCompleteInput({
   pholder,
   data,
   onSelected,
+  className,
   onChange,
 }) {
   const [suggestions, setSugesstions] = useState([]);
@@ -17,12 +18,14 @@ export default function AutoCompleteInput({
   const wrapperRef = useRef<HTMLDivElement>(null);
 
   const handler = (e) => {
+    let search = e.target.value;
+    if (!search) {
+      setSugesstions(data);
+      return;
+    }
+    search = search.toLowerCase();
     setSugesstions(
       data.filter((i) => {
-        let search = e.target.value;
-        if (search) {
-          search = search.toLowerCase();
-        }
         return i.toLowerCase().startsWith(search);
       })
     );
@@ -48,6 +51,8 @@ export default function AutoCompleteInput({
       !wrapperRef.current.contains(event.target)
     ) {
       setIsHideSuggs(true);
+    } else {
+      setIsHideSuggs(false);
     }
   };
 
@@ -59,7 +64,7 @@ export default function AutoCompleteInput({
   }, []);
 
   return (
-    <div ref={wrapperRef}>
+    <div ref={wrapperRef} className={className}>
       <div className="flex items-center">
         <label
           htmlFor="tag-input"

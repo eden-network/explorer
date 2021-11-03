@@ -8,7 +8,9 @@ import DatePicker from 'react-datepicker';
 
 import AutoCompleteInput from '../components/AutocompleteInput';
 import Blocks from '../components/Blocks';
+import Chip from '../components/Chip';
 import EndlessPagination from '../components/EndlessPagination';
+import useLocalStorage from '../hooks/useLocalStorage.hook';
 import { Meta } from '../layout/Meta';
 import Shell from '../layout/Shell';
 import { getBlockInsightAndCache } from '../modules/eden-block-insight';
@@ -19,13 +21,17 @@ const { minerAlias } = AppConfig;
 
 const PER_PAGE = 10;
 
-const miners = Object.values(minerAlias);
+const MINERS = Object.values(minerAlias);
+
+const LocalStorageKey = 'block-list-miner-filters';
 
 export default function BlocksPage({ blocks }) {
   const router = useRouter();
   const [beforeEpoch, setbeforeEpoch] = useState(() => {
     return router.query.beforeEpoch ?? new Date().getTime() / 1e3;
   });
+
+  const [miners, setMiners] = useLocalStorage(LocalStorageKey, []);
 
   const reset = () => {
     router.push(
@@ -95,12 +101,27 @@ export default function BlocksPage({ blocks }) {
     setbeforeEpoch(new Date().getTime() / 1e3);
   }, [router]);
 
+  const addItemToFilteredMiners = (value) => {
+    if (!miners.includes(value)) {
+      setMiners([...miners, value]);
+    }
+  };
+
   const getSelectedVal = (value) => {
-    console.log(value);
+    addItemToFilteredMiners(value);
   };
 
   const getChanges = (value) => {
     console.log(value);
+  };
+
+  const handleRemoveFilteredMiner = (value) => {
+    const res = miners.filter((v) => v !== value);
+    setMiners(res);
+  };
+
+  const handleResetMiners = () => {
+    setMiners([]);
   };
 
   return (
@@ -115,26 +136,25 @@ export default function BlocksPage({ blocks }) {
       <div className="max-w-4xl mx-auto grid gap-5">
         <div className="flex flex-col rounded-lg shadow-lg overflow-hidden bg-blue">
           <div className="p-3 flex-1 sm:p-6 flex flex-col justify-between">
-            <div className="w-100 grid sm:grid-cols-2 gap-2 px-2">
+            <div className="w-100 grid sm:grid-cols-2 gap-4 px-2">
               <div className="flex items-center">
                 <AutoCompleteInput
                   label="Miner"
-                  pholder="Search..."
-                  data={miners}
+                  className="flex-1"
+                  pholder="Search by miner label or address..."
+                  data={MINERS}
                   onSelected={getSelectedVal}
                   onChange={getChanges}
                 />
                 <button
-                  onClick={handleResetBeforeEpoch}
+                  onClick={handleResetMiners}
                   className="ml-1 px-2 py-1 text-sm font-medium rounded-md betterhover:hover:bg-green betterhover:hover:text-blue cursor-pointer select-none betterhover:disabled:opacity-50 betterhover:disabled:bg-blue-light betterhover:disabled:text-white"
                 >
-                  All
+                  <FontAwesomeIcon icon="sync" />
                 </button>
               </div>
-              <div className="flex items-center">
-                <p className="text-gray-500 w-28 text-sm mr-2">
-                  Last TimeStamp:
-                </p>
+              <div className="flex items-center md:ml-auto">
+                <p className="text-gray-500 text-sm mr-3">Before:</p>
                 <DatePicker
                   selected={selectedTime}
                   onChange={handleChangeDate}
@@ -148,6 +168,16 @@ export default function BlocksPage({ blocks }) {
                 >
                   <FontAwesomeIcon icon="sync" />
                 </button>
+              </div>
+              <div className="-ml-1.5">
+                {miners.map((label) => (
+                  <Chip
+                    key={label}
+                    label={label}
+                    className="mr-2"
+                    handleClose={handleRemoveFilteredMiner}
+                  />
+                ))}
               </div>
             </div>
             <div className="flex-1 mt-4">
