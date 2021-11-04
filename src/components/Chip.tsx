@@ -5,21 +5,22 @@ import React from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import cx from 'classnames';
 
-export default function Chip({ label, handleClose, className }) {
+export default function Chip({
+  label,
+  handleClick,
+  className = '',
+  closeIcon = true,
+}) {
   return (
     <span
       className={cx(
-        'rounded-2xl bg-blue-light text-white text-sm px-4 py-1.5 leading-3 cursor-pointer',
+        'rounded-2xl bg-blue-light text-white text-sm px-4 py-1.5 leading-3 cursor-pointer hover:bg-green-mid hover:text-black',
         className
       )}
-      onClick={() => handleClose(label)}
+      onClick={() => handleClick(label)}
     >
       {label}
-      <FontAwesomeIcon
-        icon="times"
-        size="sm"
-        className="ml-1 hover:text-green"
-      />
+      {closeIcon && <FontAwesomeIcon icon="times" size="sm" className="ml-1" />}
     </span>
   );
 }

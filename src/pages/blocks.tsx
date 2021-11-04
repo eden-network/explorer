@@ -1,5 +1,5 @@
 /* eslint-disable react/button-has-type */
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import moment from 'moment';
@@ -32,52 +32,75 @@ export default function BlocksPage({ blocks }) {
   });
 
   const [miners, setMiners] = useLocalStorage(LocalStorageKey, []);
+  const [inputValue, setInputValue] = useState('');
+
+  const getMinerQueryString = () => {
+    let res = '';
+    miners.forEach((miner) => {
+      let v = miner;
+      Object.keys(MINERS).forEach((key) => {
+        if (MINERS[key] === miner) {
+          v = key;
+        }
+      });
+      console.log('oh yes', res);
+      res += `&miner=${v}`;
+    });
+    return res;
+  };
+
+  const updateQuery = ({
+    epoch = router.query.beforeEpoch,
+    pageNum = null,
+  }: {
+    epoch?: string | string[] | undefined | number | null;
+    pageNum?: number | undefined | null;
+  }) => {
+    let url = `/blocks`;
+    let firstSignedOff = false;
+    if (epoch) {
+      url = url.concat(`?beforeEpoch=${epoch}`);
+      firstSignedOff = true;
+    }
+    if (pageNum) {
+      if (!firstSignedOff) {
+        firstSignedOff = true;
+        url = url.concat(`?p=${pageNum}`);
+      } else {
+        url = url.concat(`&p=${pageNum}`);
+      }
+    }
+    if (miners.length > 0 && !firstSignedOff) url = url.concat('?');
+    url = url.concat(getMinerQueryString());
+    console.log({ url });
+
+    router.push(url, null, { scroll: false });
+  };
+
+  useEffect(() => {
+    updateQuery({});
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [miners]);
 
   const reset = () => {
-    router.push(
-      `/blocks${
-        router.query.beforeEpoch
-          ? `?beforeEpoch=${router.query.beforeEpoch}`
-          : ''
-      }`,
-      null,
-      { scroll: false }
-    );
+    updateQuery({});
   };
 
   const nextClick = () => {
-    router.push(
-      `/blocks?p=${
-        router.query.p === undefined ? 2 : Number(router.query.p) + 1
-      }${
-        router.query.beforeEpoch
-          ? `&beforeEpoch=${router.query.beforeEpoch}`
-          : ''
-      }`,
-      null,
-      { scroll: false }
-    );
+    updateQuery({
+      pageNum: router.query.p === undefined ? 2 : Number(router.query.p) + 1,
+    });
   };
 
   const prevClick = () => {
-    router.push(
-      `/blocks?p=${
-        router.query.p === undefined ? 1 : Number(router.query.p) - 1
-      }${
-        router.query.beforeEpoch
-          ? `&beforeEpoch=${router.query.beforeEpoch}`
-          : ''
-      }`,
-      null,
-      { scroll: false }
-    );
+    updateQuery({
+      pageNum: router.query.p === undefined ? 1 : Number(router.query.p) - 1,
+    });
   };
 
   const handleChangeDate = (date) => {
     const epoch = Math.ceil(date.getTime() / 1e3);
-    router.push(`/blocks?beforeEpoch=${epoch}`, null, {
-      scroll: false,
-    });
+    updateQuery({ epoch });
     setbeforeEpoch(epoch);
   };
 
@@ -95,33 +118,38 @@ export default function BlocksPage({ blocks }) {
   );
 
   const handleResetBeforeEpoch = useCallback(() => {
-    router.push(`/blocks`, null, {
-      scroll: false,
-    });
+    updateQuery({});
     setbeforeEpoch(new Date().getTime() / 1e3);
   }, [router]);
 
-  const addItemToFilteredMiners = (value) => {
-    if (!miners.includes(value)) {
-      setMiners([...miners, value]);
+  const addMiner = (value) => {
+    if (value && value.trim().length > 0) {
+      if (!miners.includes(value)) {
+        setMiners([...miners, value]);
+      }
     }
   };
 
   const getSelectedVal = (value) => {
-    addItemToFilteredMiners(value);
+    setInputValue(value);
+    addMiner(value);
   };
 
   const getChanges = (value) => {
-    console.log(value);
+    setInputValue(value);
   };
 
-  const handleRemoveFilteredMiner = (value) => {
+  const removeMiner = (value) => {
     const res = miners.filter((v) => v !== value);
     setMiners(res);
   };
 
   const handleResetMiners = () => {
     setMiners([]);
+  };
+
+  const handleClickSearch = () => {
+    addMiner(inputValue);
   };
 
   return (
@@ -147,10 +175,10 @@ export default function BlocksPage({ blocks }) {
                   onChange={getChanges}
                 />
                 <button
-                  onClick={handleResetMiners}
+                  onClick={handleClickSearch}
                   className="ml-1 px-2 py-1 text-sm font-medium rounded-md betterhover:hover:bg-green betterhover:hover:text-blue cursor-pointer select-none betterhover:disabled:opacity-50 betterhover:disabled:bg-blue-light betterhover:disabled:text-white"
                 >
-                  <FontAwesomeIcon icon="sync" />
+                  <FontAwesomeIcon icon="search" />
                 </button>
               </div>
               <div className="flex items-center md:ml-auto">
@@ -169,16 +197,20 @@ export default function BlocksPage({ blocks }) {
                   <FontAwesomeIcon icon="sync" />
                 </button>
               </div>
-              <div className="-ml-1.5">
-                {miners.map((label) => (
-                  <Chip
-                    key={label}
-                    label={label}
-                    className="mr-2"
-                    handleClose={handleRemoveFilteredMiner}
-                  />
-                ))}
-              </div>
+            </div>
+            <div className="mt-4">
+              {miners.map((label) => (
+                <Chip
+                  key={label}
+                  label={label}
+                  className="mr-2 mt-2"
+                  closeIcon
+                  handleClick={removeMiner}
+                />
+              ))}
+              {miners.length > 0 && (
+                <Chip label="Clear All" handleClick={handleResetMiners} />
+              )}
             </div>
             <div className="flex-1 mt-4">
               <Blocks blocks={blocks} />
