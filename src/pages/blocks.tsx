@@ -37,14 +37,20 @@ export default function BlocksPage({ blocks }) {
   const getMinerQueryString = () => {
     let res = '';
     miners.forEach((miner) => {
-      let v = miner;
-      Object.keys(MINERS).forEach((key) => {
-        if (MINERS[key] === miner) {
-          v = key;
+      const v = miner;
+      const addressArray = [];
+      Object.keys(minerAlias).forEach((key) => {
+        if (minerAlias[key] === miner) {
+          addressArray.push(key);
         }
       });
-      console.log('oh yes', res);
-      res += `&miner=${v}`;
+      if (addressArray.length === 0) {
+        res += `&miner=${v}`;
+      } else {
+        addressArray.forEach((addr) => {
+          res += `&miner=${addr}`;
+        });
+      }
     });
     return res;
   };
@@ -72,7 +78,6 @@ export default function BlocksPage({ blocks }) {
     }
     if (miners.length > 0 && !firstSignedOff) url = url.concat('?');
     url = url.concat(getMinerQueryString());
-    console.log({ url });
 
     router.push(url, null, { scroll: false });
   };
@@ -173,6 +178,9 @@ export default function BlocksPage({ blocks }) {
                   data={MINERS}
                   onSelected={getSelectedVal}
                   onChange={getChanges}
+                  handleEnterKeyDown={() => {
+                    addMiner(inputValue);
+                  }}
                 />
                 <button
                   onClick={handleClickSearch}

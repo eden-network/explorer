@@ -11,15 +11,20 @@ export default function Chip({
   className = '',
   closeIcon = true,
 }) {
+  const { length } = label;
+  const formatedLabel =
+    label.length > 40
+      ? `${label.slice(0, 6)}...${label.slice(length - 4, length)}`
+      : label;
   return (
     <span
       className={cx(
-        'rounded-2xl bg-blue-light text-white text-sm px-4 py-1.5 leading-3 cursor-pointer hover:bg-green-mid hover:text-black',
+        'rounded-2xl bg-blue-light text-white text-sm inline-block px-4 py-2.5 mb-1.5 leading-3 cursor-pointer hover:bg-green-mid hover:text-black',
         className
       )}
       onClick={() => handleClick(label)}
     >
-      {label}
+      {formatedLabel}
       {closeIcon && <FontAwesomeIcon icon="times" size="sm" className="ml-1" />}
     </span>
   );

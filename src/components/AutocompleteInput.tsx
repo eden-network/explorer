@@ -11,6 +11,7 @@ export default function AutoCompleteInput({
   onSelected,
   className,
   onChange,
+  handleEnterKeyDown,
 }) {
   const [suggestions, setSugesstions] = useState([]);
   const [isHideSuggs, setIsHideSuggs] = useState(false);
@@ -29,6 +30,12 @@ export default function AutoCompleteInput({
         return i.toLowerCase().startsWith(search);
       })
     );
+  };
+
+  const handleKeyDown = (e) => {
+    if (e.key === 'Enter') {
+      handleEnterKeyDown();
+    }
   };
 
   const handleChange = (e) => {
@@ -81,6 +88,7 @@ export default function AutoCompleteInput({
             value={selectedVal}
             onChange={handleChange}
             onKeyUp={handler}
+            onKeyDown={handleKeyDown}
           />
           <div
             className={cx(
