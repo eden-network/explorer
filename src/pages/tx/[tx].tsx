@@ -10,6 +10,7 @@ import Shell from '../../layout/Shell';
 import { EtherscanLogo } from '../../modules/icons';
 import { getTransactionInfo } from '../../modules/tx-info';
 import { validateTxHash } from '../../modules/validators';
+import { AppConfig } from '../../utils/AppConfig';
 
 export default function Tx({ txInfo, error }) {
   const router = useRouter();
@@ -44,7 +45,7 @@ export default function Tx({ txInfo, error }) {
               </button>
               <a
                 className="button mx-1 relative inline-flex items-center px-3 py-3 bg-blue-light text-sm font-medium rounded-md betterhover:hover:bg-green betterhover:hover:text-blue cursor-pointer select-none"
-                href={`https://etherscan.io/tx/${router.query.tx}`}
+                href={`${AppConfig.etherscanEndpoint}/tx/${router.query.tx}`}
                 target="_blank"
                 role="button"
                 rel="noreferrer"

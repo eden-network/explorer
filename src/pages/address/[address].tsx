@@ -14,6 +14,7 @@ import Shell from '../../layout/Shell';
 import { getAccountInfo } from '../../modules/account-info';
 import { getAddressForENS, checkIfContractlike } from '../../modules/getters';
 import { validateEns } from '../../modules/validators';
+import { AppConfig } from '../../utils/AppConfig';
 
 const PAGE_SIZE = 10;
 
@@ -39,7 +40,7 @@ export default function Address({ accountOverview, transactions, error }) {
       <ErrorMsg errorMsg={`Couldn't fetch data for the account:`}>
         <div className="text-center pb-2">
           <a
-            href={`https://etherscan.io/address/${router.query.address}`}
+            href={`${AppConfig.etherscanEndpoint}/address/${router.query.address}`}
             target="_blank"
             className="hover:text-green"
             rel="noreferrer"
