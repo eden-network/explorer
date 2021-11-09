@@ -1,4 +1,7 @@
+import Link from 'next/link';
+
 import useWindowSize from '../hooks/useWindowSize.hook';
+import { getMinerAlias } from '../modules/getters';
 import { AppConfig } from '../utils/AppConfig';
 import ClipboardButton from './ClipboardButton';
 
@@ -36,6 +39,12 @@ export default function Stakers({
                   >
                     Address
                   </th>
+                  <th
+                    scope="col"
+                    className="px-2 sm:px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  >
+                    #
+                  </th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-blue-light border-b border-blue-light">
@@ -61,14 +70,22 @@ export default function Stakers({
                           target="_blank"
                           rel="noreferrer"
                         >
-                          {isMobileView
-                            ? `${staker.id.slice(0, 16)}...${staker.id.slice(
-                                36,
-                                40
-                              )}`
-                            : staker.id}
+                          {getMinerAlias(staker.id) ||
+                            (isMobileView
+                              ? `${staker.id.slice(0, 16)}...${staker.id.slice(
+                                  36,
+                                  40
+                                )}`
+                              : staker.id)}
                         </a>
                       </span>
+                    </td>
+                    <td>
+                      {getMinerAlias(staker.id) && (
+                        <Link href={`/blocks/?miner=${staker.id}`}>
+                          <a className="text-green">See miners blocks</a>
+                        </Link>
+                      )}
                     </td>
                   </tr>
                 ))}
