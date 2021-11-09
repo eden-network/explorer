@@ -1,3 +1,5 @@
+import { AppConfig } from '../utils/AppConfig';
+
 export default function EtherscanLink({
   path,
   text = 'View on Etherscan',
@@ -7,7 +9,7 @@ export default function EtherscanLink({
 }) {
   return (
     <a
-      href={`https://etherscan.io/${path}`}
+      href={`${AppConfig.etherscanEndpoint}/${path}`}
       className="inline-flex items-center"
       target="_blank"
       rel="noreferrer"

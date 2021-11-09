@@ -106,12 +106,29 @@ export const isFromEdenProducer = async (_blockNumber) => {
 };
 
 export const getSlotDelegates = async (_blockNumber?) => {
-  const slotsInfo = await edenData.slots({
-    block: _blockNumber,
-    network: network as Network,
-  });
+  const slotProperties = [
+    'expirationTime',
+    'taxRatePerDay',
+    'winningBid',
+    'delegate',
+    'startTime',
+    'oldBid',
+    'owner',
+    'id',
+  ];
+  const [slotsInfo] = await request(
+    graphNetworkEndpoint,
+    gql`{
+        networks {
+            slot0 { ${slotProperties.toString()} },
+            slot1 { ${slotProperties.toString()} },
+            slot2 { ${slotProperties.toString()} }
+        }
+    }`
+  ).then((r) => r.networks);
+  const slotsInfoVals = Object.values(slotsInfo) as any;
   return Object.fromEntries(
-    slotsInfo.map((slotInfo, slotNum) => [slotInfo.delegate, slotNum])
+    slotsInfoVals.map((slotInfo, slotNum) => [slotInfo.delegate, slotNum])
   );
 };
 
@@ -265,7 +282,6 @@ export const checkIfContractlike = async (_address) => {
 };
 
 export const getTxsForAccount = async (_account, _offset = 10, _page = 1) => {
-  const endpoint = 'https://api.etherscan.io/api';
   const query: any = {
     apikey: etherscanAPIKey,
     endblock: 99999999,
@@ -278,7 +294,7 @@ export const getTxsForAccount = async (_account, _offset = 10, _page = 1) => {
     page: _page,
   };
   const queryString = new URLSearchParams(query);
-  const url: any = new URL(endpoint);
+  const url: any = new URL(AppConfig.etherscanAPIEndpoint);
   url.search = queryString;
   const { status, message, result } = await fetch(url.href).then((r) =>
     r.json()
@@ -369,7 +385,6 @@ export const getStakerInfo = async (_staker, _blockNum?) => {
 };
 
 export const fetchContractInfo = async (_address) => {
-  const endpoint = 'https://api.etherscan.io/api';
   const query = {
     apikey: process.env.ETHERSCAN_API_TOKEN,
     action: 'getsourcecode',
@@ -377,7 +392,7 @@ export const fetchContractInfo = async (_address) => {
     address: _address,
   };
   const queryString = new URLSearchParams(query);
-  const url: any = new URL(endpoint);
+  const url: any = new URL(AppConfig.etherscanAPIEndpoint);
   url.search = queryString;
   const { status, message, result } = await fetch(url.href).then((r) =>
     r.json()

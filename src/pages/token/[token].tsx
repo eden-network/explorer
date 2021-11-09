@@ -1,5 +1,6 @@
 import { Meta } from '../../layout/Meta';
 import Shell from '../../layout/Shell';
+import { AppConfig } from '../../utils/AppConfig';
 
 export default function Token() {
   return (
@@ -15,7 +16,7 @@ export async function getServerSideProps(context) {
   return {
     props: {},
     redirect: {
-      destination: `https://etherscan.io/token/${context.query.token}`,
+      destination: `${AppConfig.etherscanEndpoint}/token/${context.query.token}`,
       permanent: false,
     },
   };

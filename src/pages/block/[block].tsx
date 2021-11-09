@@ -17,6 +17,7 @@ import { getBlockInsightAndCache } from '../../modules/eden-block-insight';
 import { getLastSupportedBlock } from '../../modules/getters';
 import { EtherscanLogo } from '../../modules/icons';
 import { stableSort, getSorting } from '../../modules/table/sort';
+import { AppConfig } from '../../utils/AppConfig';
 import { NormalizedBlockType } from '../../utils/type';
 
 interface BlockProps {
@@ -147,7 +148,7 @@ export default function Block({
               </button>
               <a
                 className="button mx-1 relative inline-flex items-center px-3 py-3 bg-blue-light text-sm font-medium rounded-md betterhover:hover:bg-green betterhover:hover:text-blue cursor-pointer select-none"
-                href={`https://etherscan.io/block/${
+                href={`${AppConfig.etherscanEndpoint}/block/${
                   block.number || router.query.block
                 }`}
                 target="_blank"
@@ -223,7 +224,7 @@ export default function Block({
                 <a
                   role="button"
                   title="See block on Etherscan"
-                  href={`https://etherscan.io/block/${block.number}`}
+                  href={`${AppConfig.etherscanEndpoint}/block/${block.number}`}
                   target="_blank"
                   rel="noreferrer"
                   onKeyDown={null}
