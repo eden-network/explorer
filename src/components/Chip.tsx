@@ -5,17 +5,16 @@ import React from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import cx from 'classnames';
 
+import { formatAddress } from '../modules/formatter';
+import { validateAddress } from '../modules/validators';
+
 export default function Chip({
   label,
   handleClick,
   className = '',
   closeIcon = true,
 }) {
-  const { length } = label;
-  const formatedLabel =
-    label.length > 40
-      ? `${label.slice(0, 6)}...${label.slice(length - 4, length)}`
-      : label;
+  const formattedLabel = validateAddress(label) ? formatAddress(label) : label;
   return (
     <span
       className={cx(
@@ -24,7 +23,7 @@ export default function Chip({
       )}
       onClick={() => handleClick(label)}
     >
-      {formatedLabel}
+      {formattedLabel}
       {closeIcon && <FontAwesomeIcon icon="times" size="sm" className="ml-1" />}
     </span>
   );

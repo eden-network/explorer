@@ -59,7 +59,8 @@ export default function BlocksPage({ blocks }) {
   const getMinerQueryString = () => {
     let res = '';
     getMinerArry().forEach((v) => {
-      res += `&miner=${v}`;
+      res += res ? '&' : '';
+      res += `miner=${v}`;
     });
     return res;
   };
@@ -253,7 +254,11 @@ export default function BlocksPage({ blocks }) {
 
 export async function getServerSideProps(context) {
   const page = context.query.p ?? 1;
-  const minersWhitelist = context.query.miner ?? null;
+  const minersWhitelist = context.query.miner
+    ? Array.isArray(context.query.miner)
+      ? context.query.miner
+      : [context.query.miner]
+    : null;
   const beforeEpoch = context.query.beforeEpoch || null;
   try {
     const skip = (page - 1) * PER_PAGE;
