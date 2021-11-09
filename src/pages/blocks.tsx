@@ -15,6 +15,7 @@ import { Meta } from '../layout/Meta';
 import Shell from '../layout/Shell';
 import { getBlockInsightAndCache } from '../modules/eden-block-insight';
 import { getBlocksPaged } from '../modules/getters';
+import { makeArrayUnique } from '../modules/utils';
 import { AppConfig } from '../utils/AppConfig';
 
 const { minerAlias } = AppConfig;
@@ -190,7 +191,7 @@ export default function BlocksPage({ blocks }) {
                   selectedVal={selectedVal}
                   className="flex-1"
                   pholder="Search by miner label or address..."
-                  data={MINERS}
+                  data={makeArrayUnique(MINERS)}
                   onSelected={getSelectedVal}
                   onChange={getChanges}
                   handleEnterKeyDown={() => {
