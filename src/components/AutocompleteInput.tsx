@@ -13,7 +13,7 @@ export default function AutoCompleteInput({
   onChange,
   handleEnterKeyDown,
   selectedVal,
-  handleChangeSelectedVal
+  handleChangeSelectedVal,
 }) {
   const [suggestions, setSugesstions] = useState([]);
   const [isHideSuggs, setIsHideSuggs] = useState(false);

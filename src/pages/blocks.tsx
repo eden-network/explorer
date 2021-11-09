@@ -37,7 +37,7 @@ export default function BlocksPage({ blocks }) {
 
   const handleChangeSelectedVal = (v) => {
     setSelectedVal(v);
-  }
+  };
 
   const getMinerArry = () => {
     const addressArray = new Set<string>();
