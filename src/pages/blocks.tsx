@@ -37,7 +37,7 @@ export default function BlocksPage({ blocks }) {
 
   const handleChangeSelectedVal = (v) => {
     setSelectedVal(v);
-  }
+  };
 
   const getMinerArry = () => {
     const addressArray = new Set<string>();
@@ -253,12 +253,14 @@ export default function BlocksPage({ blocks }) {
 
 export async function getServerSideProps(context) {
   const page = context.query.p ?? 1;
+  const minersWhitelist = context.query.miner ?? null;
   const beforeEpoch = context.query.beforeEpoch || null;
   try {
     const skip = (page - 1) * PER_PAGE;
     const blocks = await getBlocksPaged({
       fromActiveProducerOnly: true,
       beforeTimestamp: beforeEpoch,
+      miners: minersWhitelist,
       num: PER_PAGE,
       start: skip,
     });
