@@ -178,7 +178,9 @@ export const getBlocksPaged = async ({
             }
             ${
               miners
-                ? `author_in: [${miners.map((m) => `"${m}"`).join(', ')}],`
+                ? `author_in: [${miners
+                    .map((m) => `"${m.toLowerCase()}"`)
+                    .join(', ')}],`
                 : ``
             }
             ${beforeTimestamp ? `timestamp_lte: ${beforeTimestamp},` : ''}
