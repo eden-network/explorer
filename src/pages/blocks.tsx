@@ -33,24 +33,33 @@ export default function BlocksPage({ blocks }) {
 
   const [miners, setMiners] = useLocalStorage(LocalStorageKey, []);
   const [inputValue, setInputValue] = useState('');
+  const [selectedVal, setSelectedVal] = useState('');
+
+  const handleChangeSelectedVal = (v) => {
+    setSelectedVal(v);
+  }
+
+  const getMinerArry = () => {
+    const addressArray = new Set<string>();
+    miners.forEach((miner) => {
+      let isAddrInList = false;
+      Object.keys(minerAlias).forEach((key) => {
+        if (minerAlias[key] === miner) {
+          addressArray.add(key);
+          isAddrInList = true;
+        }
+      });
+      if (!isAddrInList) {
+        addressArray.add(miner);
+      }
+    });
+    return Array.from(addressArray);
+  };
 
   const getMinerQueryString = () => {
     let res = '';
-    miners.forEach((miner) => {
-      const v = miner;
-      const addressArray = [];
-      Object.keys(minerAlias).forEach((key) => {
-        if (minerAlias[key] === miner) {
-          addressArray.push(key);
-        }
-      });
-      if (addressArray.length === 0) {
-        res += `&miner=${v}`;
-      } else {
-        addressArray.forEach((addr) => {
-          res += `&miner=${addr}`;
-        });
-      }
+    getMinerArry().forEach((v) => {
+      res += `&miner=${v}`;
     });
     return res;
   };
@@ -128,8 +137,11 @@ export default function BlocksPage({ blocks }) {
   }, [router]);
 
   const addMiner = (value) => {
+    setSelectedVal('');
+    setInputValue('');
+    const minerAddresses = getMinerArry();
     if (value && value.trim().length > 0) {
-      if (!miners.includes(value)) {
+      if (!miners.includes(value) && !minerAddresses.includes(value)) {
         setMiners([...miners, value]);
       }
     }
@@ -173,6 +185,8 @@ export default function BlocksPage({ blocks }) {
               <div className="flex items-center">
                 <AutoCompleteInput
                   label="Miner"
+                  handleChangeSelectedVal={handleChangeSelectedVal}
+                  selectedVal={selectedVal}
                   className="flex-1"
                   pholder="Search by miner label or address..."
                   data={MINERS}

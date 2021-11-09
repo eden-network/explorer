@@ -12,10 +12,11 @@ export default function AutoCompleteInput({
   className,
   onChange,
   handleEnterKeyDown,
+  selectedVal,
+  handleChangeSelectedVal
 }) {
   const [suggestions, setSugesstions] = useState([]);
   const [isHideSuggs, setIsHideSuggs] = useState(false);
-  const [selectedVal, setSelectedVal] = useState('');
   const wrapperRef = useRef<HTMLDivElement>(null);
 
   const handler = (e) => {
@@ -41,13 +42,13 @@ export default function AutoCompleteInput({
   const handleChange = (e) => {
     const input = e.target.value;
     setIsHideSuggs(false);
-    setSelectedVal(input);
+    handleChangeSelectedVal(input);
     onChange(input);
   };
 
   const hideSuggs = (value) => {
+    handleChangeSelectedVal(value);
     onSelected(value);
-    setSelectedVal(value);
     setIsHideSuggs(true);
   };
 
