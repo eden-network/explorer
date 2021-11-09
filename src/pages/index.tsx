@@ -16,6 +16,7 @@ import StakedDistribution from '../components/StakedDistribution';
 import StakedDistributionSummary from '../components/StakedDistributionSummary';
 import { Meta } from '../layout/Meta';
 import Shell from '../layout/Shell';
+import { getTimestampsForBlocks } from '../modules/getters';
 import { AppConfig } from '../utils/AppConfig';
 
 const WEI = BigInt('1000000000000000000');
@@ -124,10 +125,11 @@ export default function Home({
 
 export async function getServerSideProps() {
   const now = Math.floor(Date.now() / 1000);
-  const hour = 60 * 60;
-  const lastSevenDays = [...Array(24 * 7).keys()]
-    .reverse()
-    .map((x) => now - hour * x);
+  const sevenDaysAgo = now - 24 * 7 * 60 * 60;
+  const blocksHourlyLastSevenDays = await getTimestampsForBlocks(
+    sevenDaysAgo,
+    now
+  );
   const [rewards, stake, blocks, leaderboard, historicalStake] =
     await Promise.all([
       rewardSchedule({ network: AppConfig.network as any }),
@@ -148,7 +150,7 @@ export async function getServerSideProps() {
       }),
       timeseries(
         {
-          timestamps: lastSevenDays,
+          blocks: blocksHourlyLastSevenDays,
           network: AppConfig.network as any,
           target: stakeStats,
         },

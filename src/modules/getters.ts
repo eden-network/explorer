@@ -408,3 +408,47 @@ export const fetchMethodSig = async (_methodSigHex) => {
   const res = await fetch(url).then((r) => r.json());
   return res;
 };
+
+export const getTimestampsForBlocks = async (_minTimestamp, _maxTimestamp) => {
+  const [minTimestamp, maxTimestamp] = [_minTimestamp, _maxTimestamp].map((t) =>
+    String(t).length > 10 ? Math.floor(t / 1e3) : t
+  );
+
+  const result = await request(
+    graphNetworkEndpoint,
+    gql`{
+        minBlock: blocks(
+          orderDirection: asc,
+          orderBy: timestamp, 
+          first: 1,
+          where: { 
+            timestamp_gte: ${minTimestamp}
+          }
+        ) {
+            number
+        }
+        maxBlock: blocks(
+          orderDirection: desc,
+          orderBy: timestamp, 
+          first: 1,
+          where: { 
+            timestamp_lte: ${maxTimestamp}
+          }
+        ) {
+            number
+        }
+      }`
+  );
+  const [minBlock, maxBlock] = [
+    Number(result.minBlock[0].number),
+    Number(result.maxBlock[0].number),
+  ];
+  const blocksPerHour = Math.floor(
+    (maxBlock - minBlock) / ((maxTimestamp - minTimestamp) / 3600)
+  );
+  const blocksRes = [];
+  for (let i = minBlock; i <= maxBlock; i += blocksPerHour) {
+    blocksRes.push(i);
+  }
+  return blocksRes;
+};
