@@ -121,7 +121,6 @@ export const getTransactionInfo = async (txHash) => {
     transactionInfo.to = getChecksumAddress(
       txRequest.to || ethers.constants.AddressZero
     );
-    transactionInfo.blockNumber = parseInt(txRequest.blockNumber, 16);
     transactionInfo.index = parseInt(txRequest.transactionIndex, 16);
     transactionInfo.gasPrice = weiToGwei(txRequest.gasPrice);
     transactionInfo.from = getChecksumAddress(txRequest.from);
@@ -160,6 +159,7 @@ export const getTransactionInfo = async (txHash) => {
             decodedTx.parsedCalldata
           );
         }
+        transactionInfo.blockNumber = parseInt(txRequest.blockNumber, 16);
         transactionInfo.contractName = decodedTx.contractName;
         transactionInfo.fromEdenProducer = fromEdenProducer;
         transactionInfo.senderStake = parseInt(senderStake, 10) / 1e18;
