@@ -8,6 +8,7 @@ import Stakers from '../components/Stakers';
 import usePagination from '../hooks/usePagination.hook';
 import { Meta } from '../layout/Meta';
 import Shell from '../layout/Shell';
+import { AppConfig } from '../utils/AppConfig';
 
 const WEI = BigInt('1000000000000000000');
 const PER_PAGE = 15;
@@ -73,16 +74,16 @@ export default function StakersPage({ leaderboard, stats }: StakerPageProps) {
 export async function getServerSideProps(context) {
   const pageNum = context.query.page ?? 1;
   const [statsRaw, leaderboardRaw] = await Promise.all([
-    stakeStats(),
+    stakeStats({ network: AppConfig.network as any, includePercentiles: true }),
     stakerLeaderboard({
-      network: 'mainnet',
-      num: PER_PAGE,
+      network: AppConfig.network as any,
       start: (pageNum - 1) * PER_PAGE,
+      num: PER_PAGE,
     }),
   ]);
   const stats = {
-    numStakers: statsRaw.numStakers,
-    totalStaked: Number(statsRaw.totalStaked / WEI),
+    numStakers: statsRaw ? statsRaw.numStakers : 0,
+    totalStaked: statsRaw ? Number(statsRaw.totalStaked / WEI) : 0,
   };
   const leaderboard = leaderboardRaw
     .filter((staker) => staker.rank != null)

@@ -16,6 +16,8 @@ import StakedDistribution from '../components/StakedDistribution';
 import StakedDistributionSummary from '../components/StakedDistributionSummary';
 import { Meta } from '../layout/Meta';
 import Shell from '../layout/Shell';
+import { getTimestampsForBlocks } from '../modules/getters';
+import { AppConfig } from '../utils/AppConfig';
 
 const WEI = BigInt('1000000000000000000');
 
@@ -123,36 +125,50 @@ export default function Home({
 
 export async function getServerSideProps() {
   const now = Math.floor(Date.now() / 1000);
-  const hour = 60 * 60;
-  const lastSevenDays = [...Array(24 * 7).keys()]
-    .reverse()
-    .map((x) => now - hour * x);
+  const sevenDaysAgo = now - 24 * 7 * 60 * 60;
+  const blocksHourlyLastSevenDays = await getTimestampsForBlocks(
+    sevenDaysAgo,
+    now
+  );
   const [rewards, stake, blocks, leaderboard, historicalStake] =
     await Promise.all([
-      rewardSchedule(),
-      stakeStats(),
+      rewardSchedule({ network: AppConfig.network as any }),
+      stakeStats({
+        network: AppConfig.network as any,
+        includePercentiles: true,
+      }),
       blocksPaged({
+        network: AppConfig.network as any,
+        fromActiveProducerOnly: true,
         start: 0,
         num: 6,
-        fromActiveProducerOnly: true,
-        network: 'mainnet',
       }),
-      stakerLeaderboard({ start: 0, num: 1, network: 'mainnet' }),
+      stakerLeaderboard({
+        start: 0,
+        num: 1,
+        network: AppConfig.network as any,
+      }),
       timeseries(
-        { timestamps: lastSevenDays, network: 'mainnet', target: stakeStats },
+        {
+          blocks: blocksHourlyLastSevenDays,
+          network: AppConfig.network as any,
+          target: stakeStats,
+        },
         { includePercentiles: false }
       ),
     ]);
   const hashRate = (rewards?.pendingEpoch?.producerBlocksRatio ?? 0) * 100;
   const stakers = stake?.numStakers ?? 0;
   const staked = Number((stake?.totalStaked ?? BigInt(0)) / WEI);
-  const stakeDistribution = stake.stakedPercentiles
-    .map((x) => Number(x / WEI))
-    .reverse();
+  const stakeDistribution = stake
+    ? stake.stakedPercentiles.map((x) => Number(x / WEI)).reverse()
+    : [];
   const topStakedAmount = Number(leaderboard[0].staked / WEI);
   const historicalStakeStats = {
-    totalStaked: historicalStake.map((x) => Number(x.data.totalStaked / WEI)),
-    stakers: historicalStake.map((x) => x.data.numStakers),
+    totalStaked: historicalStake.map((x) =>
+      x.data ? Number(x.data.totalStaked / WEI) : 0
+    ),
+    stakers: historicalStake.map((x) => (x.data ? x.data.numStakers : 0)),
   };
   return {
     props: {

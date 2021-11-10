@@ -12,6 +12,7 @@ import {
   EthLogo,
 } from '../modules/icons';
 import { TxInfo } from '../modules/tx-info';
+import { AppConfig } from '../utils/AppConfig';
 
 TimeAgo.addDefaultLocale(en);
 
@@ -83,7 +84,7 @@ export default function TransactionPage({ txInfo }: { txInfo: TxInfo }) {
                   </td>
                   <td className="px-2 sm:px-6 py-4 whitespace-nowrap">
                     <a
-                      href={`https://etherscan.io/tx/${txInfo.hash}`}
+                      href={`${AppConfig.etherscanEndpoint}/tx/${txInfo.hash}`}
                       className="hover:text-green"
                       target="_blank"
                       rel="noreferrer"

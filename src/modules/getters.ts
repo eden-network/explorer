@@ -105,13 +105,36 @@ export const isFromEdenProducer = async (_blockNumber) => {
   return blocksInfo[0].fromActiveProducer;
 };
 
-export const getSlotDelegates = async (_blockNumber?) => {
-  const slotsInfo = await edenData.slots({
-    block: _blockNumber,
-    network: network as Network,
-  });
+export const getSlotDelegates = async (_blockNumber) => {
+  const slotProperties = [
+    'expirationTime',
+    'taxRatePerDay',
+    'winningBid',
+    'delegate',
+    'startTime',
+    'oldBid',
+    'owner',
+    'id',
+  ];
+  const [slotsInfo] = await request(
+    graphNetworkEndpoint,
+    gql`{
+        networks
+          ${
+            _blockNumber === 'latest'
+              ? ''
+              : `(block: { number: ${_blockNumber} })`
+          }
+         {
+            slot0 { ${slotProperties.toString()} },
+            slot1 { ${slotProperties.toString()} },
+            slot2 { ${slotProperties.toString()} }
+        }
+    }`
+  ).then((r) => r.networks);
+  const slotsInfoVals = Object.values(slotsInfo) as any;
   return Object.fromEntries(
-    slotsInfo.map((slotInfo, slotNum) => [slotInfo.delegate, slotNum])
+    slotsInfoVals.map((slotInfo, slotNum) => [slotInfo.delegate, slotNum])
   );
 };
 
@@ -145,6 +168,7 @@ export const getStakersStake = async (_accounts, _blockNumber) => {
 export const getBlocksPaged = async ({
   fromActiveProducerOnly,
   beforeTimestamp,
+  miners,
   start,
   num,
 }) => {
@@ -153,7 +177,19 @@ export const getBlocksPaged = async ({
     gql`{
         blocks(
           where: {
-            ${beforeTimestamp ? `timestamp_lte: ${beforeTimestamp}` : ''}
+            ${
+              fromActiveProducerOnly
+                ? `fromActiveProducer: ${fromActiveProducerOnly},`
+                : ``
+            }
+            ${
+              miners
+                ? `author_in: [${miners
+                    .map((m) => `"${m.toLowerCase()}"`)
+                    .join(', ')}],`
+                : ``
+            }
+            ${beforeTimestamp ? `timestamp_lte: ${beforeTimestamp},` : ''}
             fromActiveProducer: ${fromActiveProducerOnly},
           }
           orderDirection: desc
@@ -254,7 +290,6 @@ export const checkIfContractlike = async (_address) => {
 };
 
 export const getTxsForAccount = async (_account, _offset = 10, _page = 1) => {
-  const endpoint = 'https://api.etherscan.io/api';
   const query: any = {
     apikey: etherscanAPIKey,
     endblock: 99999999,
@@ -267,7 +302,7 @@ export const getTxsForAccount = async (_account, _offset = 10, _page = 1) => {
     page: _page,
   };
   const queryString = new URLSearchParams(query);
-  const url: any = new URL(endpoint);
+  const url: any = new URL(AppConfig.etherscanAPIEndpoint);
   url.search = queryString;
   const { status, message, result } = await fetch(url.href).then((r) =>
     r.json()
@@ -358,7 +393,6 @@ export const getStakerInfo = async (_staker, _blockNum?) => {
 };
 
 export const fetchContractInfo = async (_address) => {
-  const endpoint = 'https://api.etherscan.io/api';
   const query = {
     apikey: process.env.ETHERSCAN_API_TOKEN,
     action: 'getsourcecode',
@@ -366,7 +400,7 @@ export const fetchContractInfo = async (_address) => {
     address: _address,
   };
   const queryString = new URLSearchParams(query);
-  const url: any = new URL(endpoint);
+  const url: any = new URL(AppConfig.etherscanAPIEndpoint);
   url.search = queryString;
   const { status, message, result } = await fetch(url.href).then((r) =>
     r.json()
@@ -392,4 +426,48 @@ export const fetchMethodSig = async (_methodSigHex) => {
   const url = `${endpoint}?hex_signature=${_methodSigHex}`;
   const res = await fetch(url).then((r) => r.json());
   return res;
+};
+
+export const getTimestampsForBlocks = async (_minTimestamp, _maxTimestamp) => {
+  const [minTimestamp, maxTimestamp] = [_minTimestamp, _maxTimestamp].map((t) =>
+    String(t).length > 10 ? Math.floor(t / 1e3) : t
+  );
+
+  const result = await request(
+    graphNetworkEndpoint,
+    gql`{
+        minBlock: blocks(
+          orderDirection: asc,
+          orderBy: timestamp, 
+          first: 1,
+          where: { 
+            timestamp_gte: ${minTimestamp}
+          }
+        ) {
+            number
+        }
+        maxBlock: blocks(
+          orderDirection: desc,
+          orderBy: timestamp, 
+          first: 1,
+          where: { 
+            timestamp_lte: ${maxTimestamp}
+          }
+        ) {
+            number
+        }
+      }`
+  );
+  const [minBlock, maxBlock] = [
+    Number(result.minBlock[0].number),
+    Number(result.maxBlock[0].number),
+  ];
+  const blocksPerHour = Math.floor(
+    (maxBlock - minBlock) / ((maxTimestamp - minTimestamp) / 3600)
+  );
+  const blocksRes = [];
+  for (let i = minBlock; i <= maxBlock; i += blocksPerHour) {
+    blocksRes.push(i);
+  }
+  return blocksRes;
 };

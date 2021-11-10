@@ -1,20 +1,54 @@
+function getGraphNetworkEndpoint() {
+  if (process.env.NETWORK === 'ropsten') {
+    // eden-data reads mainnet env var for network
+    process.env.GRAPH_MAINNET_NETWORK = process.env.GRAPH_ROPSTEN_NETWORK;
+    return process.env.GRAPH_ROPSTEN_NETWORK;
+  }
+  if (process.env.GRAPH_MAINNET_NETWORK === undefined) {
+    return 'https://api.thegraph.com/subgraphs/name/eden-network/eden-network';
+  }
+  return process.env.GRAPH_MAINNET_NETWORK;
+}
+
+function getCachingEnabled() {
+  if (process.env.NETWORK === 'ropsten') return false;
+  return Boolean(process.env.CACHING_ENABLED);
+}
+
+function getProviderEndpoint() {
+  if (process.env.NETWORK === 'ropsten') return process.env.RPC_HTTP_ROPSTEN;
+  return process.env.RPC_HTTP_MAINNET;
+}
+
+function getEtherscanEndpoint() {
+  if (process.env.NETWORK === 'ropsten') return 'https://ropsten.etherscan.io';
+  return 'https://etherscan.io';
+}
+
+function getEtherscanAPIEndpoint() {
+  if (process.env.NETWORK === 'ropsten')
+    return 'https://api-ropsten.etherscan.io/api';
+  return 'https://api.etherscan.io/api';
+}
+
 export const AppConfig = {
-  firstEdenBlock: 12965000,
-  site_name: 'Eden Network Explorer',
-  title: 'Home',
-  description: 'Eden Network block and stacking view',
-  locale: 'en',
-  graphNetworkEndpoint:
-    process.env.GRAPH_MAINNET_NETWORK ||
-    'https://api.thegraph.com/subgraphs/name/eden-network/eden-network',
   gcloudCacheBucket: process.env.GSTORAGE_CACHE_BUCKET || 'eden_block_insight',
   cacheBlockConfirmations: process.env.CACHE_BLOCK_CONFIRMATIONS || '10',
-  providerEndpoint: process.env.RPC_HTTP_MAINNET,
-  flashbotsAPIEndpoint: process.env.FLASHBOTS_API,
   etherscanAPIKey: process.env.ETHERSCAN_API_TOKEN,
+  flashbotsAPIEndpoint: process.env.FLASHBOTS_API,
   proxyAuthToken: process.env.PROXY_AUTH_TOKEN,
-  cachingEnabled: process.env.CACHING_ENABLED,
   network: process.env.NETWORK || 'mainnet',
+  graphNetworkEndpoint: getGraphNetworkEndpoint(),
+  etherscanAPIEndpoint: getEtherscanAPIEndpoint(),
+  etherscanEndpoint: getEtherscanEndpoint(),
+  providerEndpoint: getProviderEndpoint(),
+  cachingEnabled: getCachingEnabled(),
+  description: 'Eden Network block and stacking view',
+  site_name: 'Eden Network Explorer',
+  firstEdenBlock: 12965000,
+  slotGasCap: 1.5e6,
+  title: 'Home',
+  locale: 'en',
   blockInsightRowColorByPriority: {
     'priority-fee': 'gray-300',
     'bundle-0': 'purple',
@@ -23,7 +57,6 @@ export const AppConfig = {
     stake: 'indigo',
     slot: 'green',
   },
-  slotGasCap: 1.5e6,
   labelsToUI: {
     'fb-bundle': 'BUNDLE (FB)',
     'priority-fee': 'PRIORITY FEE',
