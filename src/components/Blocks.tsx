@@ -20,6 +20,7 @@ export default function Blocks({
     slotTxs: number;
     bundledTxs: number;
     stakerTxs: number;
+    fromActiveProducer: boolean;
     bundledTxsCallSuccess: boolean;
   }[];
   edenProducerOnly: boolean;
@@ -31,6 +32,7 @@ export default function Blocks({
       blocks.map((block) => {
         return {
           number: block.number,
+          fromActiveProducer: block.fromActiveProducer,
           author: getMinerAlias(block.author) || block.author,
           timestamp: timeAgo.format(block.timestamp * 1000),
           bundledTxsCallSuccess: block.bundledTxsCallSuccess,
@@ -112,7 +114,7 @@ export default function Blocks({
                     {!edenProducerOnly && (
                       <td className="px-0 sm:px-0 pt-2 w-6 whitespace-nowrap text-center">
                         <span className="w-3 h-3">
-                          {block.author ? EdenLogo : EthLogo}
+                          {block.fromActiveProducer ? EdenLogo : EthLogo}
                         </span>
                       </td>
                     )}

@@ -322,6 +322,7 @@ export async function getServerSideProps(context) {
               (tx) => tx.toSlot !== false
             ).length,
             bundledTxsCallSuccess: blockInsight.bundledTxsCallSuccess,
+            fromActiveProducer: block.fromActiveProducer,
             timestamp: block.timestamp,
             author: block.author,
             number: block.number,
