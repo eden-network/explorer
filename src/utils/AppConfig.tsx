@@ -1,5 +1,7 @@
 function getGraphNetworkEndpoint() {
   if (process.env.NETWORK === 'ropsten') {
+    // eden-data reads mainnet env var for network
+    process.env.GRAPH_MAINNET_NETWORK = process.env.GRAPH_ROPSTEN_NETWORK;
     return process.env.GRAPH_ROPSTEN_NETWORK;
   }
   if (process.env.GRAPH_MAINNET_NETWORK === undefined) {
