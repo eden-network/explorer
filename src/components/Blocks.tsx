@@ -5,11 +5,13 @@ import en from 'javascript-time-ago/locale/en';
 import Link from 'next/link';
 
 import { getMinerAlias } from '../modules/getters';
+import { EthLogo, EdenLogo } from '../modules/icons';
 
 TimeAgo.addDefaultLocale(en);
 
 export default function Blocks({
   blocks,
+  edenProducerOnly,
 }: {
   blocks: {
     number: number;
@@ -20,6 +22,7 @@ export default function Blocks({
     stakerTxs: number;
     bundledTxsCallSuccess: boolean;
   }[];
+  edenProducerOnly: boolean;
 }) {
   const timeAgo = useMemo(() => new TimeAgo('en-US'), []);
 
@@ -59,6 +62,14 @@ export default function Blocks({
                   >
                     Time
                   </th>
+                  {!edenProducerOnly && (
+                    <th
+                      scope="col"
+                      className="px-2 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                    >
+                      Block Type
+                    </th>
+                  )}
                   <th
                     scope="col"
                     className="px-2 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
@@ -98,6 +109,13 @@ export default function Blocks({
                     <td className="px-2 sm:px-6 py-4 whitespace-nowrap">
                       {block.timestamp}
                     </td>
+                    {!edenProducerOnly && (
+                      <td className="px-0 sm:px-0 pt-2 w-6 whitespace-nowrap text-center">
+                        <span className="w-3 h-3">
+                          {block.author ? EdenLogo : EthLogo}
+                        </span>
+                      </td>
+                    )}
                     <td className="px-2 sm:px-6 py-4 whitespace-nowrap">
                       {block.author}
                     </td>

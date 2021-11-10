@@ -272,7 +272,7 @@ export default function BlocksPage({ blocks }) {
               </label>
             </div>
             <div className="flex-1 mt-4">
-              <Blocks blocks={blocks} />
+              <Blocks blocks={blocks} edenProducerOnly={edenProducerOnly} />
             </div>
             <EndlessPagination
               end={blocks.length < PER_PAGE}
