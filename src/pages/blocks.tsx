@@ -25,6 +25,7 @@ const PER_PAGE = 10;
 const MINERS = Object.values(minerAlias);
 
 const LocalStorageKey = 'block-list-miner-filters';
+const LocalStorageKeyProducerFilter = 'block-list-producer-filter';
 
 export default function BlocksPage({ blocks }) {
   const router = useRouter();
@@ -33,6 +34,10 @@ export default function BlocksPage({ blocks }) {
   });
 
   const [miners, setMiners] = useLocalStorage(LocalStorageKey, []);
+  const [edenProducerOnly, setEdenProducerOnly] = useLocalStorage(
+    LocalStorageKeyProducerFilter,
+    true
+  );
   const [inputValue, setInputValue] = useState('');
   const [selectedVal, setSelectedVal] = useState('');
 
@@ -57,15 +62,6 @@ export default function BlocksPage({ blocks }) {
     return Array.from(addressArray);
   };
 
-  const getMinerQueryString = () => {
-    let res = '';
-    getMinerArry().forEach((v) => {
-      res += res ? '&' : '';
-      res += `miner=${v}`;
-    });
-    return res;
-  };
-
   const updateQuery = ({
     epoch = router.query.beforeEpoch,
     pageNum = null,
@@ -73,22 +69,42 @@ export default function BlocksPage({ blocks }) {
     epoch?: string | string[] | undefined | number | null;
     pageNum?: number | undefined | null;
   }) => {
-    let url = `/blocks`;
-    let firstSignedOff = false;
+    const params = [];
     if (epoch) {
-      url = url.concat(`?beforeEpoch=${epoch}`);
-      firstSignedOff = true;
+      params.push({
+        key: 'beforeEpoch',
+        value: epoch,
+      });
     }
     if (pageNum) {
-      if (!firstSignedOff) {
-        firstSignedOff = true;
-        url = url.concat(`?p=${pageNum}`);
-      } else {
-        url = url.concat(`&p=${pageNum}`);
-      }
+      params.push({
+        key: 'p',
+        value: pageNum,
+      });
     }
-    if (miners.length > 0 && !firstSignedOff) url = url.concat('?');
-    url = url.concat(getMinerQueryString());
+    if (miners.length > 0) {
+      const minerParams = getMinerArry();
+      minerParams.forEach((value) => {
+        params.push({
+          key: 'miner',
+          value,
+        });
+      });
+    }
+    if (!edenProducerOnly) {
+      params.push({
+        key: 'fromAllProducer',
+        value: true,
+      });
+    }
+
+    let url = '/blocks';
+    if (params.length > 0) {
+      const queryString = params
+        .map((param) => `${param.key}=${param.value}`)
+        .join('&');
+      url = `/blocks?${queryString}`;
+    }
 
     router.push(url, null, { scroll: false });
   };
@@ -171,6 +187,10 @@ export default function BlocksPage({ blocks }) {
     addMiner(inputValue);
   };
 
+  const handleChangeProducerFilter = (e) => {
+    setEdenProducerOnly(e.target.checked);
+  };
+
   return (
     <Shell
       meta={
@@ -236,6 +256,21 @@ export default function BlocksPage({ blocks }) {
                 <Chip label="Clear All" handleClick={handleResetMiners} />
               )}
             </div>
+            <div className="ml-auto mr-4">
+              <label
+                htmlFor="edenProducerOnly"
+                className="inline-flex items-center"
+              >
+                <input
+                  type="checkbox"
+                  id="edenProducerOnly"
+                  onChange={handleChangeProducerFilter}
+                  checked={edenProducerOnly}
+                  className="mr-2 form-checkbox rounded-sm w-4 h-4 inline-block text-green border-none"
+                />
+                <span className="inline-block text-sm">Eden Producer Only</span>
+              </label>
+            </div>
             <div className="flex-1 mt-4">
               <Blocks blocks={blocks} />
             </div>
@@ -260,11 +295,13 @@ export async function getServerSideProps(context) {
       ? context.query.miner
       : [context.query.miner]
     : null;
+
+  const fromActiveProducerOnly = !context.query.fromAllProducer;
   const beforeEpoch = context.query.beforeEpoch || null;
   try {
     const skip = (page - 1) * PER_PAGE;
     const blocks = await getBlocksPaged({
-      fromActiveProducerOnly: true,
+      fromActiveProducerOnly,
       beforeTimestamp: beforeEpoch,
       miners: minersWhitelist,
       num: PER_PAGE,
