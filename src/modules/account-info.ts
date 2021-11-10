@@ -85,7 +85,7 @@ export const getAccountInfo = async (
     getStakerInfo(_account.toLowerCase()),
     getTxCountForAccount(_account),
     getContractInfo(_account),
-    getSlotDelegates(),
+    getSlotDelegates('latest'),
   ]);
   const contractLabel = contractInfo.contractName
     ? `Contract: ${contractInfo.contractName}`

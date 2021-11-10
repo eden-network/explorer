@@ -105,7 +105,7 @@ export const isFromEdenProducer = async (_blockNumber) => {
   return blocksInfo[0].fromActiveProducer;
 };
 
-export const getSlotDelegates = async (_blockNumber?) => {
+export const getSlotDelegates = async (_blockNumber) => {
   const slotProperties = [
     'expirationTime',
     'taxRatePerDay',
@@ -119,7 +119,13 @@ export const getSlotDelegates = async (_blockNumber?) => {
   const [slotsInfo] = await request(
     graphNetworkEndpoint,
     gql`{
-        networks {
+        networks
+          ${
+            _blockNumber === 'latest'
+              ? ''
+              : `(block: { number: ${_blockNumber} })`
+          }
+         {
             slot0 { ${slotProperties.toString()} },
             slot1 { ${slotProperties.toString()} },
             slot2 { ${slotProperties.toString()} }
