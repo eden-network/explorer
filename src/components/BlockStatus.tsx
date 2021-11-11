@@ -3,6 +3,7 @@ import moment from 'moment';
 
 import { getMinerAlias } from '../modules/getters';
 import { EthLogo, EdenLogo } from '../modules/icons';
+import { weiToGwei } from '../modules/utils';
 import { NormalizedBlockType } from '../utils/type';
 
 const Container = ({ children }) => (
@@ -23,6 +24,7 @@ export default function BlockStatus({
   block: NormalizedBlockType;
   isEdenBlock: any;
 }) {
+  console.log('block base fee', block.baseFeePerGas);
   return (
     <div className="text-small font-medium sm:flex sm:flex-wrap sm:justify-between">
       <Info.Container>
@@ -33,7 +35,9 @@ export default function BlockStatus({
       </Info.Container>
       <Info.Container>
         <Info.Label>Base-fee</Info.Label>
-        <Info.Description>{block.baseFeePerGas} Gwei</Info.Description>
+        <Info.Description>
+          {weiToGwei(block.baseFeePerGas)} Gwei
+        </Info.Description>
       </Info.Container>
       <Info.Container>
         <Info.Label>Gas-used</Info.Label>

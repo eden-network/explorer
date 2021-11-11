@@ -7,6 +7,7 @@ import { safeFetch, sendRawJsonRPCRequest } from './utils';
 
 const {
   cacheBlockConfirmations,
+  providerEndpointGraphQl,
   graphNetworkEndpoint,
   flashbotsAPIEndpoint,
   providerEndpoint,
@@ -18,6 +19,31 @@ const {
   minerAlias,
   network,
 } = AppConfig;
+
+interface TransactionInfo {
+  cumulativeGasUsed?: number;
+  maxPriorityFee: string;
+  minerReward?: string;
+  gasLimit: number;
+  gasUsed?: number;
+  status?: number;
+  txFee?: string;
+  nonce: number;
+  index: number;
+  value: string;
+  from: string;
+  hash: string;
+  to: string;
+}
+interface BlockInfoWithTxs {
+  transactions: TransactionInfo[];
+  baseFeePerGas: string;
+  timestamp: number;
+  gasLimit: number;
+  gasUsed: number;
+  number: number;
+  miner: string;
+}
 
 export const provider = new ethers.providers.JsonRpcProvider(
   providerEndpoint,
@@ -235,35 +261,120 @@ export const getBundledTxs = async (_blockNumber) => {
   );
 };
 
-export const getBlockInfo = async (_blockNumber) => {
-  const blockInfoRaw = await provider.send('eth_getBlockByNumber', [
-    `0x${_blockNumber.toString(16)}`,
-    true,
-  ]);
+export const fetchBlockInfoGraphQl = async (
+  _blockNumber
+): Promise<BlockInfoWithTxs> => {
+  const blockInfoRaw = await request(
+    providerEndpointGraphQl,
+    gql`{
+          block(number: ${_blockNumber}) {
+              miner { address }
+              baseFeePerGas
+              timestamp
+              gasLimit
+              gasUsed
+              number
+              transactions { 
+                cumulativeGasUsed
+                from { address }
+                to { address }
+                gasPrice
+                gasUsed
+                status
+                nonce
+                index
+                value
+                hash
+                gas
+              }
+          }
+      }`
+  ).then((r) => r.block);
+  // Format response
   const baseFeePerGas = ethers.BigNumber.from(blockInfoRaw.baseFeePerGas);
+  const miner = ethers.utils.getAddress(blockInfoRaw.miner.address);
   const timestamp = parseInt(blockInfoRaw.timestamp, 16);
   const gasLimit = parseInt(blockInfoRaw.gasLimit, 16);
   const gasUsed = parseInt(blockInfoRaw.gasUsed, 16);
-  const miner = ethers.utils.getAddress(blockInfoRaw.miner);
-  const transactions = blockInfoRaw.transactions.map((tx) => {
+  const transactions = blockInfoRaw.transactions.map((tx, index) => {
+    const maxPriorityFee = ethers.BigNumber.from(tx.gasPrice).sub(
+      baseFeePerGas
+    );
+    const txFee = maxPriorityFee.mul(tx.gasUsed);
     return {
-      maxPriorityFee: ethers.BigNumber.from(tx.gasPrice).sub(baseFeePerGas),
-      to: ethers.utils.getAddress(tx.to || ethers.constants.AddressZero),
+      to: ethers.utils.getAddress(
+        (tx.to && tx.to.address) || ethers.constants.AddressZero
+      ),
+      cumulativeGasUsed: parseInt(tx.cumulativeGasUsed, 16),
       transactionIndex: parseInt(tx.transactionIndex, 16),
-      from: ethers.utils.getAddress(tx.from),
+      from: ethers.utils.getAddress(tx.from.address),
+      maxPriorityFee: maxPriorityFee.toHexString(),
+      gasUsed: parseInt(tx.gasUsed, 16),
       gasLimit: parseInt(tx.gas, 16),
       nonce: parseInt(tx.nonce, 16),
+      txFee: txFee.toHexString(),
+      status: tx.status,
+      value: tx.value,
       hash: tx.hash,
-    };
+      index,
+    } as TransactionInfo;
   });
   return {
-    baseFeePerGas,
+    baseFeePerGas: blockInfoRaw.baseFeePerGas,
+    number: _blockNumber,
     transactions,
     timestamp,
     gasLimit,
     gasUsed,
     miner,
   };
+};
+
+export const fetchBlockInfoRPC = async (
+  _blockNumber
+): Promise<BlockInfoWithTxs> => {
+  const blockInfoRaw = await provider.send('eth_getBlockByNumber', [
+    `0x${_blockNumber.toString(16)}`,
+    true,
+  ]);
+  // Format response
+  const baseFeePerGas = ethers.BigNumber.from(blockInfoRaw.baseFeePerGas);
+  const miner = ethers.utils.getAddress(blockInfoRaw.miner);
+  const timestamp = parseInt(blockInfoRaw.timestamp, 16);
+  const gasLimit = parseInt(blockInfoRaw.gasLimit, 16);
+  const gasUsed = parseInt(blockInfoRaw.gasUsed, 16);
+  const transactions = blockInfoRaw.transactions.map((tx, index) => {
+    const maxPriorityFee = ethers.BigNumber.from(tx.gasPrice).sub(
+      baseFeePerGas
+    );
+    return {
+      to: ethers.utils.getAddress(tx.to || ethers.constants.AddressZero),
+      transactionIndex: parseInt(tx.transactionIndex, 16),
+      maxPriorityFee: maxPriorityFee.toHexString(),
+      from: ethers.utils.getAddress(tx.from),
+      gasLimit: parseInt(tx.gas, 16),
+      nonce: parseInt(tx.nonce, 16),
+      value: tx.value,
+      hash: tx.hash,
+      index,
+    } as TransactionInfo;
+  });
+  return {
+    baseFeePerGas: blockInfoRaw.baseFeePerGas,
+    number: _blockNumber,
+    transactions,
+    timestamp,
+    gasLimit,
+    gasUsed,
+    miner,
+  };
+};
+
+export const getBlockInfo = async (_blockNumber) => {
+  if (network === 'ropsten') {
+    return fetchBlockInfoRPC(_blockNumber);
+  }
+  return fetchBlockInfoGraphQl(_blockNumber);
 };
 
 export const getMinerAlias = (_minerAddress) => {

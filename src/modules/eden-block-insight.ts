@@ -11,7 +11,7 @@ import {
   getBundledTxs,
   getBlockInfo,
 } from './getters';
-import { BNToGwei, makeArrayUnique } from './utils';
+import { makeArrayUnique } from './utils';
 
 export const getBlockInsight = async (_blockNumber) => {
   const [bundledTxsWrapped, fromEdenProducer, slotDelegates, blockInfo] =
@@ -41,23 +41,23 @@ export const getBlockInsight = async (_blockNumber) => {
     const fromLocalMiner =
       tx.from.toLowerCase() === blockInfo.miner.toLowerCase();
     const toLocalMiner = tx.to.toLowerCase() === blockInfo.miner.toLowerCase();
+    const minerReward = bundledTx
+      ? bundledTx.minerReward
+      : tx.txFee
+      ? tx.txFee
+      : null;
     const labeledTx = {
+      ...tx,
       fromLabel:
         getMinerAlias(tx.from) || (fromLocalMiner ? 'Local Miner' : null),
       toLabel: getMinerAlias(tx.to) || (toLocalMiner ? 'Local Miner' : null),
       toSlot: (toSlotDelegate !== undefined ? toSlotDelegate : false) as any,
       bundleIndex: bundledTx !== undefined ? bundledTx.bundleIndex : null,
       senderStake: stakersStake[tx.from.toLowerCase()] || 0,
-      maxPriorityFee: BNToGwei(tx.maxPriorityFee).toString(), // Format for serialization
       viaEdenRPC: edenRPCInfoForTx[tx.hash] !== undefined,
-      position: tx.transactionIndex,
-      gasLimit: tx.gasLimit,
-      nonce: tx.nonce,
-      hash: tx.hash,
-      from: tx.from,
-      to: tx.to,
       type: '',
     };
+    if (minerReward) labeledTx.minerReward = minerReward;
     const hasSlotPriority = () => {
       if (
         fromEdenProducer &&
@@ -86,12 +86,12 @@ export const getBlockInsight = async (_blockNumber) => {
     } else {
       labeledTx.type = 'priority-fee';
     }
-    labeledTxs[labeledTx.position] = labeledTx;
+    labeledTxs[labeledTx.index] = labeledTx;
   });
   return {
     ...blockInfo,
-    baseFeePerGas: BNToGwei(blockInfo.baseFeePerGas).toString(), // Format for serialization
     bundledTxsCallSuccess: bundledTxsWrapped[0],
+    baseFeePerGas: blockInfo.baseFeePerGas,
     transactions: labeledTxs,
     number: _blockNumber,
     fromEdenProducer,

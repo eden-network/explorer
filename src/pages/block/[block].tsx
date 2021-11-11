@@ -71,7 +71,7 @@ export default function Block({
     pageSize,
   } = usePagination(labeledTxs.length, initialPageSize, 1, setInitialPageSize);
   const [order, setOrder] = useState('asc');
-  const [orderBy, setOrderBy] = useState('position');
+  const [orderBy, setOrderBy] = useState('index');
 
   const handleRequestSort = (property) => {
     let newOrder = 'asc';
