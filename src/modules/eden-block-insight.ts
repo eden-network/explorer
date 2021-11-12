@@ -41,10 +41,10 @@ export const getBlockInsight = async (_blockNumber) => {
     const fromLocalMiner =
       tx.from.toLowerCase() === blockInfo.miner.toLowerCase();
     const toLocalMiner = tx.to.toLowerCase() === blockInfo.miner.toLowerCase();
-    const minerReward = bundledTx
-      ? bundledTx.minerReward
-      : tx.txFee
-      ? tx.txFee
+    const minerReward = tx.txFee
+      ? bundledTx
+        ? bundledTx.minerReward
+        : tx.txFee
       : null;
     const labeledTx = {
       ...tx,

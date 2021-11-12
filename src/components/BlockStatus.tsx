@@ -24,7 +24,6 @@ export default function BlockStatus({
   block: NormalizedBlockType;
   isEdenBlock: any;
 }) {
-  console.log('block base fee', block.baseFeePerGas);
   return (
     <div className="text-small font-medium sm:flex sm:flex-wrap sm:justify-between">
       <Info.Container>

@@ -182,7 +182,7 @@ export default function LabeledTransactions({
                   labeledTxs[0].minerReward !== undefined ? (
                     <th
                       scope="col"
-                      className="px-2 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider"
+                      className="px-2 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider"
                     >
                       <TableSortLabel
                         active={orderBy === 'parsedMaxPriorityFee'}
