@@ -26,7 +26,7 @@ export default function Tx({ txInfo, error }) {
       );
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [router]);
+  }, [txInfo]);
   if (error) {
     return (
       <ErrorMsg errorMsg={`Couldn't fetch data for the tx: ${router.query.tx}`}>

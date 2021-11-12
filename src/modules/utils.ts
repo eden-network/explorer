@@ -75,3 +75,7 @@ export const sendRawJsonRPCRequest = async (_method, _params, _provider) => {
   }
   return result;
 };
+
+export const sleep = async (_ms) => {
+  return new Promise((resolve) => setTimeout(resolve, _ms));
+};
