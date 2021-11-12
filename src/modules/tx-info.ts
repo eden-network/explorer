@@ -68,9 +68,8 @@ export const getTransactionInfo = async (txHash) => {
   const edenRPCInfo = edenRPCInfoRes.result[0];
   const mined = txReceipt !== null;
   const viaEdenRPC = edenRPCInfo !== undefined;
-  const pendingInEdenMempool = viaEdenRPC && edenRPCInfo.blocknumber === null;
+  const pendingInEdenMempool = !mined && viaEdenRPC;
   const pendingInPublicMempool = !mined && txRequest !== null;
-
   if (!(pendingInPublicMempool || pendingInEdenMempool || mined)) {
     console.error(`Can't find any info for transaction ${txHash}`);
     return null;
@@ -111,8 +110,8 @@ export const getTransactionInfo = async (txHash) => {
     transactionInfo.hash = edenRPCInfo.hash;
     if (edenRPCInfo.maxpriorityfeepergas) {
       transactionInfo.priorityFee = weiToGwei(edenRPCInfo.maxpriorityfeepergas);
-      // transactionInfo.baseFee =
-      //   weiToGwei(edenRPCInfo.gasPrice) - transactionInfo.priorityFee;
+      transactionInfo.baseFee =
+        weiToGwei(edenRPCInfo.maxfeepergas) - transactionInfo.priorityFee;
     } else {
       transactionInfo.gasPrice = weiToGwei(edenRPCInfo.gasprice);
     }
