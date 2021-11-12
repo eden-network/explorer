@@ -371,10 +371,10 @@ export const fetchBlockInfoRPC = async (
 };
 
 export const getBlockInfo = async (_blockNumber) => {
-  if (network === 'ropsten') {
-    return fetchBlockInfoRPC(_blockNumber);
+  if (providerEndpointGraphQl && network === 'mainnet') {
+    return fetchBlockInfoGraphQl(_blockNumber);
   }
-  return fetchBlockInfoGraphQl(_blockNumber);
+  return fetchBlockInfoRPC(_blockNumber);
 };
 
 export const getMinerAlias = (_minerAddress) => {
