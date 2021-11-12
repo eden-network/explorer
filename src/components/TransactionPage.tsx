@@ -1,9 +1,13 @@
+import { useEffect, useState } from 'react';
+
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import cx from 'classnames';
+import { ethers } from 'ethers';
 import TimeAgo from 'javascript-time-ago';
 import en from 'javascript-time-ago/locale/en';
 import moment from 'moment';
 
+import { formatAddress } from '../modules/formatter';
 import {
   clockSVG,
   crossSVG,
@@ -71,6 +75,43 @@ const statusBoxes = {
 };
 
 export default function TransactionPage({ txInfo }: { txInfo: TxInfo }) {
+  const [knownTkns, setKnownTkns] = useState({});
+  useEffect(() => {
+    fetch('https://tokens.coingecko.com/uniswap/all.json')
+      .then((res) => res.json())
+      .then((resJson) => {
+        const addToTknInfo = Object.fromEntries(
+          resJson.tokens.map((tkn) => {
+            return [tkn.address, tkn];
+          })
+        );
+        console.log(addToTknInfo);
+        setKnownTkns(addToTknInfo);
+      });
+  }, []);
+
+  const formatERC20Transfers = (_transfers, _knownAddresses) => {
+    return _transfers
+      .map((transfer) => {
+        const tkn = _knownAddresses[transfer.address];
+        const valFormatted = ethers.utils.formatUnits(
+          ethers.BigNumber.from(transfer.args.value),
+          tkn.decimals || 18
+        );
+        const tknAddFormatted =
+          _knownAddresses[transfer.address].symbol ||
+          formatAddress(transfer.address);
+        const fromAddFormatted =
+          _knownAddresses[transfer.args.from.toLowerCase()] ||
+          formatAddress(transfer.args.from);
+        const toAddFormatted =
+          _knownAddresses[transfer.args.to.toLowerCase()] ||
+          formatAddress(transfer.args.to);
+        return `* From: ${fromAddFormatted} -> To: ${toAddFormatted} For ${valFormatted} ${tknAddFormatted}`;
+      })
+      .join('\n');
+  };
+
   return (
     <div className="flex flex-col">
       <div className="-my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
@@ -333,6 +374,24 @@ export default function TransactionPage({ txInfo }: { txInfo: TxInfo }) {
                     <td className="px-2 sm:px-6 py-4">Input:</td>
                     <td className="px-2 sm:px-6 py-4">
                       {makeInputBox(txInfo.input)}
+                    </td>
+                  </tr>
+                ) : (
+                  ''
+                )}
+                {txInfo.erc20Transfers && txInfo.erc20Transfers.length > 0 ? (
+                  <tr key="Transfers">
+                    <td className="px-2 sm:px-6 py-4">Transfers:</td>
+                    <td className="px-2 sm:px-6 py-4">
+                      {makeInputBox(
+                        formatERC20Transfers(txInfo.erc20Transfers, {
+                          ...knownTkns,
+                          ...Object.fromEntries([
+                            [txInfo.from.toLowerCase(), 'Sender'],
+                            [txInfo.to.toLowerCase(), 'Recipient'],
+                          ]),
+                        })
+                      )}
                     </td>
                   </tr>
                 ) : (

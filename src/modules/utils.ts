@@ -94,3 +94,24 @@ export const sendRawJsonRPCRequest = async (_method, _params, _provider) => {
 export const sleep = async (_ms) => {
   return new Promise((resolve) => setTimeout(resolve, _ms));
 };
+export const decodeERC20Transfers = (_logs) => {
+  const erc20TransferTopic =
+    '0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef';
+  const decodeRaw = (_log) => {
+    return {
+      address: _log.address,
+      args: {
+        from: ethers.utils.getAddress(`0x${_log.topics[1].slice(26)}`),
+        to: ethers.utils.getAddress(`0x${_log.topics[2].slice(26)}`),
+        value: ethers.BigNumber.from(_log.data).toHexString(),
+      },
+    };
+  };
+  const transfers = [];
+  _logs.forEach((log) => {
+    if (log.topics[0] === erc20TransferTopic) {
+      transfers.push(decodeRaw(log));
+    }
+  });
+  return transfers;
+};

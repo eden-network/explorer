@@ -17,6 +17,7 @@ import {
   weiToGwei,
   weiToETH,
   gweiToETH,
+  decodeERC20Transfers,
   sleep,
 } from './utils';
 
@@ -32,6 +33,7 @@ interface TxInfo {
   hash: string;
   to: string;
   nextBaseFee: number | null;
+  erc20Transfers: Array<Object> | null;
   contractName: string | null;
   bundleIndex: number | null;
   fromEdenProducer: boolean | null;
@@ -51,6 +53,7 @@ interface TxInfo {
   index: number | null;
 }
 
+// TODO: move to frontend
 const formatDecodedTxCalldata = (_decoded) => {
   let msgFull = `
   TextSig: ${_decoded.textSig}
@@ -182,6 +185,10 @@ export const getTransactionInfo = async (txHash) => {
             const { minerTip, bundleIndex } = bundledTxsRes[1][txHash];
             transactionInfo.bundleIndex = bundleIndex ?? null;
             transactionInfo.minerTip = (minerTip && weiToETH(minerTip)) ?? 0;
+          }
+          const erc20Transfers = decodeERC20Transfers(txReceipt.logs);
+          if (erc20Transfers.length > 0) {
+            transactionInfo.erc20Transfers = erc20Transfers;
           }
           transactionInfo.timestamp = parseInt(blockInfo.result.timestamp, 16);
           transactionInfo.blockTxCount = blockInfo.result.transactions.length;
