@@ -142,18 +142,28 @@ export default function LabeledTransactions({
                       To
                     </TableSortLabel>
                   </th>
-                  <th
-                    scope="col"
-                    className="px-2 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider"
-                  >
-                    <TableSortLabel
-                      active={orderBy === 'gasLimit'}
-                      direction={order}
-                      onClick={() => handleRequestSort('gasLimit')}
+                  {labeledTxs.length > 0 &&
+                  labeledTxs[0].gasUsed !== undefined ? (
+                    <th
+                      scope="col"
+                      className="px-2 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider"
                     >
-                      Gas limit
-                    </TableSortLabel>
-                  </th>
+                      Gas usage
+                    </th>
+                  ) : (
+                    <th
+                      scope="col"
+                      className="px-2 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider"
+                    >
+                      <TableSortLabel
+                        active={orderBy === 'gasLimit'}
+                        direction={order}
+                        onClick={() => handleRequestSort('gasLimit')}
+                      >
+                        Gas limit
+                      </TableSortLabel>
+                    </th>
+                  )}
                   <th
                     scope="col"
                     className="px-2 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider"
@@ -314,9 +324,16 @@ export default function LabeledTransactions({
                           </a>
                         </span>
                       </td>
-                      <td className="px-2 py-4 text-right whitespace-nowrap">
-                        {tx.gasLimit.toLocaleString()}
-                      </td>
+                      {tx.gasUsed ? (
+                        <td className="px-2 py-4 text-right whitespace-nowrap">
+                          {tx.gasUsed.toLocaleString()}
+                          <p>of {tx.gasLimit.toLocaleString()}</p>
+                        </td>
+                      ) : (
+                        <td className="px-2 py-4 text-right whitespace-nowrap">
+                          {tx.gasLimit.toLocaleString()}
+                        </td>
+                      )}
                       <td className="px-2 py-4 text-right whitespace-nowrap">
                         {tx.nonce.toLocaleString()}
                       </td>
