@@ -1,8 +1,10 @@
+import { faLongArrowAltRight } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import cx from 'classnames';
 import TimeAgo from 'javascript-time-ago';
 import en from 'javascript-time-ago/locale/en';
 import moment from 'moment';
+import Image from 'next/image';
 
 import { formatAddress } from '../modules/formatter';
 import {
@@ -72,15 +74,41 @@ const statusBoxes = {
 };
 
 export default function TransactionPage({ txInfo }: { txInfo: TxInfo }) {
+  const makeAddressHyperlink = (_text, _address) => (
+    <a
+      href={`${AppConfig.etherscanEndpoint}/address/${_address}`}
+      className="hover:text-gray-300"
+      target="_blank"
+      rel="noreferrer"
+    >
+      {_text}
+    </a>
+  );
+
+  const makeTknIcon = (_url) => {
+    if (_url) {
+      return <Image src={_url} width={15} height={15} />;
+    }
+    return <FontAwesomeIcon icon="question-circle" />;
+  };
+  const arrowRight = <FontAwesomeIcon icon={faLongArrowAltRight} />;
+
   const formatERC20Transfers = (_transfers) => {
-    return _transfers
-      .map((transfer) => {
-        const fromAddFormatted =
-          transfer.fromLabel || formatAddress(transfer.from);
-        const toAddFormatted = transfer.toLabel || formatAddress(transfer.to);
-        return `* From: ${fromAddFormatted} -> To: ${toAddFormatted} For ${transfer.value} ${transfer.tknSymbol}`;
-      })
-      .join('\n');
+    return _transfers.map((transfer, i) => {
+      const fromAddFormatted =
+        transfer.fromLabel || formatAddress(transfer.from);
+      const toAddFormatted = transfer.toLabel || formatAddress(transfer.to);
+      const transferKey = `Transfer#${i}`;
+      return (
+        <p key={transferKey} className="px-0 sm:px-0 py-2">
+          {makeTknIcon(transfer.tknLogoUrl)} From:{' '}
+          {makeAddressHyperlink(fromAddFormatted, transfer.from)} {arrowRight}{' '}
+          To: {makeAddressHyperlink(toAddFormatted, transfer.to)} For{' '}
+          {transfer.value}{' '}
+          {makeAddressHyperlink(transfer.tknSymbol, transfer.tknAddress)}
+        </p>
+      );
+    });
   };
 
   return (
@@ -340,16 +368,6 @@ export default function TransactionPage({ txInfo }: { txInfo: TxInfo }) {
                 ) : (
                   ''
                 )}
-                {txInfo.input.length > 2 ? (
-                  <tr key="Input">
-                    <td className="px-2 sm:px-6 py-4">Input:</td>
-                    <td className="px-2 sm:px-6 py-4">
-                      {makeInputBox(txInfo.input)}
-                    </td>
-                  </tr>
-                ) : (
-                  ''
-                )}
                 {txInfo.erc20Transfers && txInfo.erc20Transfers.length > 0 ? (
                   <tr key="Transfers">
                     <td className="px-2 sm:px-6 py-4">Transfers:</td>
@@ -357,6 +375,16 @@ export default function TransactionPage({ txInfo }: { txInfo: TxInfo }) {
                       {makeInputBox(
                         formatERC20Transfers(txInfo.erc20Transfers)
                       )}
+                    </td>
+                  </tr>
+                ) : (
+                  ''
+                )}
+                {txInfo.input.length > 2 ? (
+                  <tr key="Input">
+                    <td className="px-2 sm:px-6 py-4">Input:</td>
+                    <td className="px-2 sm:px-6 py-4">
+                      {makeInputBox(txInfo.input)}
                     </td>
                   </tr>
                 ) : (

@@ -4,7 +4,12 @@ import { request, gql } from 'graphql-request';
 
 import { AppConfig } from '../utils/AppConfig';
 import { formatAddress } from './formatter';
-import { safeFetch, sendRawJsonRPCRequest, weiToGwei } from './utils';
+import {
+  safeFetch,
+  sendRawJsonRPCRequest,
+  weiToGwei,
+  safeParseResponse,
+} from './utils';
 
 const {
   cacheBlockConfirmations,
@@ -599,8 +604,8 @@ export const getTimestampsForBlocks = async (_minTimestamp, _maxTimestamp) => {
 };
 
 export const getTknInfoFromCoingecko = async () => {
-  const coingeckoDataRaw = await fetch(coingeckoTokensAPI).then((res) =>
-    res.json()
+  const coingeckoDataRaw = await fetch(coingeckoTokensAPI).then(
+    safeParseResponse
   );
   return Object.fromEntries(
     coingeckoDataRaw.tokens.map((tknInfo) => [

@@ -47,6 +47,11 @@ export const safeParseResponse = async (_resObj) => {
   try {
     return JSON.parse(parsed);
   } catch (e) {
+    if (_resObj.status !== 200) {
+      throw new Error(
+        `REST request failed with status ${_resObj.status}: \n${parsed}`
+      );
+    }
     return parsed;
   }
 };

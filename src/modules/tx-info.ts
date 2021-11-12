@@ -207,7 +207,7 @@ export const getTransactionInfo = async (txHash) => {
                 toLabel: localLabels[transfer.args.to.toLowerCase()] || null,
                 tknAddress: transfer.address,
                 tknSymbol: tknInfo.symbol,
-                tknIcon: tknInfo.logoURL,
+                tknLogoUrl: tknInfo.logoURL,
                 from: transfer.args.from,
                 to: transfer.args.to,
               };
