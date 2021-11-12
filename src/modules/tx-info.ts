@@ -5,6 +5,7 @@ import {
   getBlockInfoForBlocks,
   isFromEdenProducer,
   getSlotDelegates,
+  getNextBaseFee,
   getStakerInfo,
   getEdenRPCTxs,
   getBundledTxs,
@@ -24,6 +25,7 @@ interface TxInfo {
   from: string;
   hash: string;
   to: string;
+  nextBaseFee: number | null;
   contractName: string | null;
   bundleIndex: number | null;
   fromEdenProducer: boolean | null;
@@ -74,6 +76,7 @@ export const getTransactionInfo = async (txHash) => {
     console.error(`Can't find any info for transaction ${txHash}`);
     return null;
   }
+  const nextBaseFee = !mined ? await getNextBaseFee() : null;
 
   // Get tx info
   const transactionInfo = {
@@ -95,6 +98,7 @@ export const getTransactionInfo = async (txHash) => {
     minerTip: 0,
     index: null,
     logs: null,
+    nextBaseFee,
   } as TxInfo;
 
   if (pendingInEdenMempool) {
@@ -172,13 +176,15 @@ export const getTransactionInfo = async (txHash) => {
         }
         transactionInfo.timestamp = parseInt(blockInfo.result.timestamp, 16);
         transactionInfo.blockTxCount = blockInfo.result.transactions.length;
-        transactionInfo.baseFee = weiToGwei(blockInfo.result.baseFeePerGas);
+        transactionInfo.baseFee = weiToGwei(blockInfo.result.baseFeePerGas, 4);
         transactionInfo.gasUsed = parseInt(txReceipt.gasUsed, 16);
         transactionInfo.status = parseInt(txReceipt.status, 16);
         transactionInfo.logs = txReceipt.logs;
         transactionInfo.gasCost = gweiToETH(
           transactionInfo.gasUsed * transactionInfo.gasPrice
         );
+        transactionInfo.priorityFee =
+          weiToGwei(txReceipt.effectiveGasPrice, 4) - transactionInfo.baseFee;
         transactionInfo.pending = false;
       } catch (_) {} // eslint-disable-line no-empty
     }
