@@ -2,6 +2,7 @@ import { ethers } from 'ethers';
 
 import { decodeTx } from './contract-info';
 import {
+  getTknInfoForAddresses,
   getBlockInfoForBlocks,
   isFromEdenProducer,
   getSlotDelegates,
@@ -188,7 +189,30 @@ export const getTransactionInfo = async (txHash) => {
           }
           const erc20Transfers = decodeERC20Transfers(txReceipt.logs);
           if (erc20Transfers.length > 0) {
-            transactionInfo.erc20Transfers = erc20Transfers;
+            const tknAddresses = erc20Transfers.map((t) => t.address);
+            const tknInfos = await getTknInfoForAddresses(tknAddresses);
+            const erc20TransfersEnriched = erc20Transfers.map((transfer) => {
+              const tknInfo = tknInfos[transfer.address.toLowerCase()];
+              const localLabels = Object.fromEntries([
+                [txRequest.from.toLowerCase(), 'TxSender'],
+                [txRequest.to.toLowerCase(), 'TxRecipient'],
+              ]);
+              return {
+                value: ethers.utils.formatUnits(
+                  ethers.BigNumber.from(transfer.args.value),
+                  tknInfo.decimals
+                ),
+                fromLabel:
+                  localLabels[transfer.args.from.toLowerCase()] || null,
+                toLabel: localLabels[transfer.args.to.toLowerCase()] || null,
+                tknAddress: transfer.address,
+                tknSymbol: tknInfo.symbol,
+                tknIcon: tknInfo.logoURL,
+                from: transfer.args.from,
+                to: transfer.args.to,
+              };
+            });
+            transactionInfo.erc20Transfers = erc20TransfersEnriched;
           }
           transactionInfo.timestamp = parseInt(blockInfo.result.timestamp, 16);
           transactionInfo.blockTxCount = blockInfo.result.transactions.length;
