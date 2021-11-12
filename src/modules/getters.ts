@@ -85,7 +85,7 @@ export const getAddressForENS = async (_ens: string) => {
   }
 };
 
-export const withinSlotGasCap = (_gas) => slotGasCap >= _gas;
+export const getSlotGasCap = () => slotGasCap;
 
 export const checkIfValidCache = (_cache) => {
   return (
@@ -314,18 +314,19 @@ export const fetchBlockInfoGraphQl = async (
       baseFeePerGas
     );
     const txFee = maxPriorityFee.mul(tx.gasUsed);
+
     return {
       to: ethers.utils.getAddress(
         (tx.to && tx.to.address) || ethers.constants.AddressZero
       ),
-      cumulativeGasUsed: parseInt(tx.cumulativeGasUsed, 16),
       transactionIndex: parseInt(tx.transactionIndex, 16),
       from: ethers.utils.getAddress(tx.from.address),
       maxPriorityFee: maxPriorityFee.toHexString(),
-      gasUsed: parseInt(tx.gasUsed, 16),
+      cumulativeGasUsed: tx.cumulativeGasUsed,
       gasLimit: parseInt(tx.gas, 16),
       nonce: parseInt(tx.nonce, 16),
       txFee: txFee.toHexString(),
+      gasUsed: tx.gasUsed,
       status: tx.status,
       value: tx.value,
       hash: tx.hash,

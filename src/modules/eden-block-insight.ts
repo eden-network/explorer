@@ -3,9 +3,9 @@ import {
   getMinerAlias,
   isFromEdenProducer,
   checkIfValidCache,
-  withinSlotGasCap,
   getSlotDelegates,
   getStakersStake,
+  getSlotGasCap,
   getEdenRPCTxs,
   isBlockSecure,
   getBundledTxs,
@@ -34,6 +34,8 @@ export const getBlockInsight = async (_blockNumber) => {
   const edenRPCInfoForTx = Object.fromEntries(
     edenRPCTxs.result.map((tx) => [tx.hash, tx.blocknumber])
   );
+  const slotGasCap = getSlotGasCap();
+  const slotAvlGas = Object.fromEntries([0, 1, 2].map((s) => [s, slotGasCap]));
   const labeledTxs = [];
   transactions.forEach((tx) => {
     const toSlotDelegate = slotDelegates[tx.to.toLowerCase()];
@@ -58,17 +60,22 @@ export const getBlockInsight = async (_blockNumber) => {
       type: '',
     };
     if (minerReward) labeledTx.minerReward = minerReward;
+
     const hasSlotPriority = () => {
-      if (
-        fromEdenProducer &&
-        labeledTx.toSlot !== false &&
-        withinSlotGasCap(tx.gasLimit)
-      ) {
+      if (fromEdenProducer && labeledTx.toSlot !== false) {
+        // Check that gas-limit does not exceed slot-avl-gas
+        if (tx.gasLimit > slotAvlGas[labeledTx.toSlot]) {
+          return false;
+        }
         // Check that there is no lower nonce to non-slot or higher-slot delegate
         const inferiorSlotTxForAccount = labeledTxs
           .filter((_tx) => _tx.from === labeledTx.from)
           .find((_tx) => _tx.toSlot === false || _tx.toSlot > labeledTx.toSlot);
         if (inferiorSlotTxForAccount === undefined) {
+          // Decrement used gas by slot tx if data is available
+          if (tx.gasUsed) {
+            slotAvlGas[labeledTx.toSlot] -= tx.gasUsed;
+          }
           return true;
         }
       }
