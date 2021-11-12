@@ -279,7 +279,10 @@ export default function TransactionPage({ txInfo }: { txInfo: TxInfo }) {
                       Base Fee:
                     </td>
                     <td className="px-2 sm:px-6 py-4 whitespace-nowrap">
-                      {txInfo.baseFee} Gwei
+                      {txInfo.baseFee} Gwei{' '}
+                      {txInfo.nextBaseFee
+                        ? ` / Next base-fee: ${txInfo.nextBaseFee.toLocaleString()} Gwei`
+                        : ''}
                     </td>
                   </tr>
                 ) : (
@@ -312,9 +315,9 @@ export default function TransactionPage({ txInfo }: { txInfo: TxInfo }) {
                   ''
                 )}
                 {!txInfo.pending ? (
-                  <tr key="Miner reward">
+                  <tr key="Fee">
                     <td className="px-2 sm:px-6 py-4 whitespace-nowrap">
-                      Miner reward:
+                      Fee:
                     </td>
                     <td className="px-2 sm:px-6 py-4 whitespace-nowrap">
                       {(txInfo.minerTip + txInfo.gasCost).toPrecision(2)} ETH

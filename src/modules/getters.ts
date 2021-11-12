@@ -3,7 +3,7 @@ import { ethers } from 'ethers';
 import { request, gql } from 'graphql-request';
 
 import { AppConfig } from '../utils/AppConfig';
-import { safeFetch, sendRawJsonRPCRequest } from './utils';
+import { safeFetch, sendRawJsonRPCRequest, weiToGwei } from './utils';
 
 const {
   cacheBlockConfirmations,
@@ -49,6 +49,18 @@ export const provider = new ethers.providers.JsonRpcProvider(
   providerEndpoint,
   network
 );
+
+export const getPendingBlock = () => {
+  return sendRawJsonRPCRequest(
+    'eth_getBlockByNumber',
+    ['pending', false],
+    providerEndpoint
+  );
+};
+
+export const getNextBaseFee = async () => {
+  return getPendingBlock().then((block) => weiToGwei(block.baseFeePerGas, 4));
+};
 
 export const getTxReceipt = (_txHash) => {
   return sendRawJsonRPCRequest(
