@@ -4,6 +4,7 @@ import TimeAgo from 'javascript-time-ago';
 import en from 'javascript-time-ago/locale/en';
 import Link from 'next/link';
 
+import { formatAddress } from '../modules/formatter';
 import { getMinerAlias } from '../modules/getters';
 
 TimeAgo.addDefaultLocale(en);
@@ -28,7 +29,7 @@ export default function Blocks({
       blocks.map((block) => {
         return {
           number: block.number,
-          author: getMinerAlias(block.author) || block.author,
+          author: getMinerAlias(block.author) || formatAddress(block.author),
           timestamp: timeAgo.format(block.timestamp * 1000),
           bundledTxsCallSuccess: block.bundledTxsCallSuccess,
           bundledTxs: block.bundledTxs,
