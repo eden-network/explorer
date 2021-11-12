@@ -87,25 +87,6 @@ export default function LabeledTransactions({
                       {isMobile ? '#' : 'TxIndex'}
                     </TableSortLabel>
                   </th>
-                  {labeledTxs.length > 0 &&
-                  labeledTxs[0].status !== undefined ? (
-                    <th
-                      scope="col"
-                      className="px-2 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider"
-                    >
-                      <TableSortLabel
-                        active={orderBy === 'parsedMaxPriorityFee'}
-                        direction={order}
-                        onClick={() =>
-                          handleRequestSort('parsedMaxPriorityFee')
-                        }
-                      >
-                        Status
-                      </TableSortLabel>
-                    </th>
-                  ) : (
-                    ''
-                  )}
                   <th
                     scope="col"
                     className="px-2 sm:px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider"
@@ -259,19 +240,17 @@ export default function LabeledTransactions({
                       })}
                       onClick={() => handleClickRow(tx)}
                     >
-                      <td className="py-4 text-center whitespace-nowrap">
-                        {tx.index}
-                      </td>
-                      {tx.status !== undefined ? (
-                        <td
-                          className={`px-2 py-4 text-center whitespace-nowrap ${
-                            tx.status === 1 ? 'text-green' : 'text-red'
-                          }`}
-                        >
-                          {tx.status === 1 ? 'Success' : 'Fail'}
+                      {tx.status === 0 ? (
+                        <td className="pr-3 py-4 text-right whitespace-nowrap text-red">
+                          <span data-tip data-for="TxFail">
+                            <FontAwesomeIcon icon="exclamation-circle" />{' '}
+                            {tx.index}
+                          </span>
                         </td>
                       ) : (
-                        ''
+                        <td className="pr-3 py-4 text-right whitespace-nowrap">
+                          {tx.index}
+                        </td>
                       )}
                       <td className="px-2 sm:px-4 py-4 text-center whitespace-nowrap">
                         <span className="flex items-center justify-center">
@@ -444,6 +423,15 @@ export default function LabeledTransactions({
       >
         ETH miner recieved from this transaction. Includes non-burned gas fees
         and direct miner payments if transaction is in a bundle.
+      </ReactToolTip>
+      <ReactToolTip
+        className="tooltip"
+        id="TxFail"
+        place="top"
+        effect="solid"
+        border
+      >
+        Transaction reverted
       </ReactToolTip>
     </div>
   );
