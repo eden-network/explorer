@@ -194,6 +194,7 @@ export const getStakersStake = async (_accounts, _blockNumber) => {
 export const getBlocksPaged = async ({
   fromActiveProducerOnly,
   beforeTimestamp,
+  miners,
   start,
   num,
 }) => {
@@ -202,7 +203,19 @@ export const getBlocksPaged = async ({
     gql`{
         blocks(
           where: {
-            ${beforeTimestamp ? `timestamp_lte: ${beforeTimestamp}` : ''}
+            ${
+              fromActiveProducerOnly
+                ? `fromActiveProducer: ${fromActiveProducerOnly},`
+                : ``
+            }
+            ${
+              miners
+                ? `author_in: [${miners
+                    .map((m) => `"${m.toLowerCase()}"`)
+                    .join(', ')}],`
+                : ``
+            }
+            ${beforeTimestamp ? `timestamp_lte: ${beforeTimestamp},` : ''}
             fromActiveProducer: ${fromActiveProducerOnly},
           }
           orderDirection: desc

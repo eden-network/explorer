@@ -12,7 +12,7 @@ function getGraphNetworkEndpoint() {
 
 function getCachingEnabled() {
   if (process.env.NETWORK === 'ropsten') return false;
-  return Boolean(process.env.CACHING_ENABLED);
+  return process.env.CACHING_ENABLED === '1';
 }
 
 function getProviderEndpoint() {
