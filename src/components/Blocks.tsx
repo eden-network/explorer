@@ -4,6 +4,7 @@ import TimeAgo from 'javascript-time-ago';
 import en from 'javascript-time-ago/locale/en';
 import Link from 'next/link';
 
+import { formatAddress } from '../modules/formatter';
 import { getMinerAlias } from '../modules/getters';
 import { EthLogo, EdenLogo } from '../modules/icons';
 
@@ -32,10 +33,10 @@ export default function Blocks({
       blocks.map((block) => {
         return {
           number: block.number,
-          fromActiveProducer: block.fromActiveProducer,
-          author: getMinerAlias(block.author) || block.author,
+          author: getMinerAlias(block.author) || formatAddress(block.author),
           timestamp: timeAgo.format(block.timestamp * 1000),
           bundledTxsCallSuccess: block.bundledTxsCallSuccess,
+          fromActiveProducer: block.fromActiveProducer,
           bundledTxs: block.bundledTxs,
           stakerTxs: block.stakerTxs,
           slotTxs: block.slotTxs,

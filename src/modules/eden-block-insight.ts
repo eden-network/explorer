@@ -38,14 +38,18 @@ export const getBlockInsight = async (_blockNumber) => {
   transactions.forEach((tx) => {
     const toSlotDelegate = slotDelegates[tx.to.toLowerCase()];
     const bundledTx = bundledTxs[tx.hash.toLowerCase()];
+    const fromLocalMiner =
+      tx.from.toLowerCase() === blockInfo.miner.toLowerCase();
+    const toLocalMiner = tx.to.toLowerCase() === blockInfo.miner.toLowerCase();
     const labeledTx = {
+      fromLabel:
+        getMinerAlias(tx.from) || (fromLocalMiner ? 'Local Miner' : null),
+      toLabel: getMinerAlias(tx.to) || (toLocalMiner ? 'Local Miner' : null),
       toSlot: (toSlotDelegate !== undefined ? toSlotDelegate : false) as any,
       bundleIndex: bundledTx !== undefined ? bundledTx.bundleIndex : null,
       senderStake: stakersStake[tx.from.toLowerCase()] || 0,
       maxPriorityFee: BNToGwei(tx.maxPriorityFee).toString(), // Format for serialization
       viaEdenRPC: edenRPCInfoForTx[tx.hash] !== undefined,
-      fromLabel: getMinerAlias(tx.from),
-      toLabel: getMinerAlias(tx.to),
       position: tx.transactionIndex,
       gasLimit: tx.gasLimit,
       nonce: tx.nonce,

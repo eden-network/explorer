@@ -3,7 +3,7 @@ import { ethers } from 'ethers';
 import { request, gql } from 'graphql-request';
 
 import { AppConfig } from '../utils/AppConfig';
-import { safeFetch, sendRawJsonRPCRequest } from './utils';
+import { safeFetch, sendRawJsonRPCRequest, weiToGwei } from './utils';
 
 const {
   cacheBlockConfirmations,
@@ -23,6 +23,18 @@ export const provider = new ethers.providers.JsonRpcProvider(
   providerEndpoint,
   network
 );
+
+export const getPendingBlock = () => {
+  return sendRawJsonRPCRequest(
+    'eth_getBlockByNumber',
+    ['pending', false],
+    providerEndpoint
+  );
+};
+
+export const getNextBaseFee = async () => {
+  return getPendingBlock().then((block) => weiToGwei(block.baseFeePerGas, 4));
+};
 
 export const getTxReceipt = (_txHash) => {
   return sendRawJsonRPCRequest(
@@ -105,7 +117,7 @@ export const isFromEdenProducer = async (_blockNumber) => {
   return blocksInfo[0].fromActiveProducer;
 };
 
-export const getSlotDelegates = async (_blockNumber?) => {
+export const getSlotDelegates = async (_blockNumber) => {
   const slotProperties = [
     'expirationTime',
     'taxRatePerDay',
@@ -119,7 +131,13 @@ export const getSlotDelegates = async (_blockNumber?) => {
   const [slotsInfo] = await request(
     graphNetworkEndpoint,
     gql`{
-        networks {
+        networks
+          ${
+            _blockNumber === 'latest'
+              ? ''
+              : `(block: { number: ${_blockNumber} })`
+          }
+         {
             slot0 { ${slotProperties.toString()} },
             slot1 { ${slotProperties.toString()} },
             slot2 { ${slotProperties.toString()} }
@@ -420,4 +438,48 @@ export const fetchMethodSig = async (_methodSigHex) => {
   const url = `${endpoint}?hex_signature=${_methodSigHex}`;
   const res = await fetch(url).then((r) => r.json());
   return res;
+};
+
+export const getTimestampsForBlocks = async (_minTimestamp, _maxTimestamp) => {
+  const [minTimestamp, maxTimestamp] = [_minTimestamp, _maxTimestamp].map((t) =>
+    String(t).length > 10 ? Math.floor(t / 1e3) : t
+  );
+
+  const result = await request(
+    graphNetworkEndpoint,
+    gql`{
+        minBlock: blocks(
+          orderDirection: asc,
+          orderBy: timestamp, 
+          first: 1,
+          where: { 
+            timestamp_gte: ${minTimestamp}
+          }
+        ) {
+            number
+        }
+        maxBlock: blocks(
+          orderDirection: desc,
+          orderBy: timestamp, 
+          first: 1,
+          where: { 
+            timestamp_lte: ${maxTimestamp}
+          }
+        ) {
+            number
+        }
+      }`
+  );
+  const [minBlock, maxBlock] = [
+    Number(result.minBlock[0].number),
+    Number(result.maxBlock[0].number),
+  ];
+  const blocksPerHour = Math.floor(
+    (maxBlock - minBlock) / ((maxTimestamp - minTimestamp) / 3600)
+  );
+  const blocksRes = [];
+  for (let i = minBlock; i <= maxBlock; i += blocksPerHour) {
+    blocksRes.push(i);
+  }
+  return blocksRes;
 };
