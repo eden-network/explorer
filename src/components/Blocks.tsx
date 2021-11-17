@@ -78,11 +78,9 @@ export default function Blocks({
                     scope="col"
                     className="px-0 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider w-22"
                   >
-                    {!edenProducerOnly && (
-                      <span data-tip data-for="thBlockType">
-                        <FontAwesomeIcon icon="question-circle" /> Block-Type
-                      </span>
-                    )}
+                    <span data-tip data-for="thBlockType">
+                      <FontAwesomeIcon icon="question-circle" /> Block-Type
+                    </span>
                   </th>
                   <th
                     scope="col"
@@ -125,18 +123,16 @@ export default function Blocks({
                     </td>
 
                     <td className="pt-3 pb-0 flex justify-center">
-                      {!edenProducerOnly && (
-                        <span
-                          data-tip
-                          data-for={
-                            block.fromActiveProducer
-                              ? 'EdenLogoTip'
-                              : 'EthLogoTip'
-                          }
-                        >
-                          {block.fromActiveProducer ? EdenLogo : EthLogo}
-                        </span>
-                      )}
+                      <span
+                        data-tip
+                        data-for={
+                          block.fromActiveProducer
+                            ? 'EdenLogoTip'
+                            : 'EthLogoTip'
+                        }
+                      >
+                        {block.fromActiveProducer ? EdenLogo : EthLogo}
+                      </span>
                     </td>
                     <td className="px-2 sm:px-6 py-4 whitespace-nowrap text-left">
                       <span className="flex">
