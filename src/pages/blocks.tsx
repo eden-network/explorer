@@ -24,8 +24,8 @@ const PER_PAGE = 10;
 
 const MINERS = Object.values(minerAlias);
 
-const LocalStorageKey = 'block-list-miner-filters';
-const LocalStorageKeyProducerFilter = 'block-list-producer-filter';
+export const LocalStorageKeyMinerFilter = 'block-list-miner-filters';
+const LocalStorageKeyMinerFilterProducerFilter = 'block-list-producer-filter';
 
 export default function BlocksPage({ blocks }) {
   const router = useRouter();
@@ -33,9 +33,15 @@ export default function BlocksPage({ blocks }) {
     return router.query.beforeEpoch ?? new Date().getTime() / 1e3;
   });
 
-  const [miners, setMiners] = useLocalStorage(LocalStorageKey, []);
+  const [miners, setMiners] = useLocalStorage<string[]>(
+    LocalStorageKeyMinerFilter,
+    () => {
+      if (router.query.miner) return [router.query.miner as string];
+      return [];
+    }
+  );
   const [edenProducerOnly, setEdenProducerOnly] = useLocalStorage(
-    LocalStorageKeyProducerFilter,
+    LocalStorageKeyMinerFilterProducerFilter,
     true
   );
   const [inputValue, setInputValue] = useState('');
