@@ -33,22 +33,20 @@ export default function Blocks({
 
   const shapedBlocks = useMemo(
     () =>
-      blocks
-        .filter((x) => !edenProducerOnly || x.fromActiveProducer)
-        .map((block) => {
-          return {
-            number: block.number,
-            autherHex: block.author,
-            author: getMinerAlias(block.author) || formatAddress(block.author),
-            timestamp: timeAgo.format(block.timestamp * 1000),
-            bundledTxsCallSuccess: block.bundledTxsCallSuccess,
-            fromActiveProducer: block.fromActiveProducer,
-            bundledTxs: block.bundledTxs,
-            stakerTxs: block.stakerTxs,
-            slotTxs: block.slotTxs,
-          };
-        }),
-    [edenProducerOnly, blocks, timeAgo]
+      blocks.map((block) => {
+        return {
+          number: block.number,
+          autherHex: block.author,
+          author: getMinerAlias(block.author) || formatAddress(block.author),
+          timestamp: timeAgo.format(block.timestamp * 1000),
+          bundledTxsCallSuccess: block.bundledTxsCallSuccess,
+          fromActiveProducer: block.fromActiveProducer,
+          bundledTxs: block.bundledTxs,
+          stakerTxs: block.stakerTxs,
+          slotTxs: block.slotTxs,
+        };
+      }),
+    [blocks, timeAgo]
   );
 
   useEffect(() => {

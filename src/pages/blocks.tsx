@@ -119,7 +119,6 @@ export default function BlocksPage({ blocks }) {
   };
 
   const nextClick = () => {
-    console.log('Next Click');
     updateQuery({
       pageNum: router.query.p === undefined ? 2 : Number(router.query.p) + 1,
     });
@@ -260,7 +259,7 @@ export default function BlocksPage({ blocks }) {
             <div className="ml-auto mr-4">
               <label
                 htmlFor="edenProducerOnly"
-                className="inline-flex items-center"
+                className="inline-flex items-center checkbox-no-tick"
               >
                 <input
                   type="checkbox"
