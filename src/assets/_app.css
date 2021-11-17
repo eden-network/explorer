@@ -117,3 +117,7 @@ li.react-datepicker__time-list-item:hover {
   color: #fff !important;
   z-index: 100 !important;
 }
+
+.checkbox-no-tick [type='checkbox']:checked {
+  background-image: none !important;
+}

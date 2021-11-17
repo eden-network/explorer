@@ -1,6 +1,9 @@
+/* eslint-disable jsx-a11y/no-static-element-interactions */
+/* eslint-disable jsx-a11y/click-events-have-key-events */
 /* eslint-disable react/jsx-props-no-spreading */
 import { useEffect } from 'react';
 
+import Link from 'next/link';
 import { useRouter } from 'next/router';
 
 import AccountTxTable from '../../components/AccountTxTable';
@@ -15,6 +18,7 @@ import { getAccountInfo } from '../../modules/account-info';
 import { getAddressForENS, checkIfContractlike } from '../../modules/getters';
 import { validateEns } from '../../modules/validators';
 import { AppConfig } from '../../utils/AppConfig';
+import { LocalStorageKeyMinerFilter } from '../blocks';
 
 const PAGE_SIZE = 10;
 
@@ -51,6 +55,7 @@ export default function Address({ accountOverview, transactions, error }) {
       </ErrorMsg>
     );
   }
+
   return (
     <Shell
       meta={
@@ -68,6 +73,18 @@ export default function Address({ accountOverview, transactions, error }) {
               path={`address/${accountOverview.ens || accountOverview.address}`}
             />
           </h2>
+          {accountOverview.label && (
+            <Link href={`/blocks?miner=${accountOverview.address}`}>
+              <a
+                onClick={() => {
+                  window.localStorage.removeItem(LocalStorageKeyMinerFilter);
+                }}
+                className="px-3 py-1 mt-4 bg-blue-light text-sm font-medium rounded-md betterhover:hover:bg-green betterhover:hover:text-blue cursor-pointer select-none betterhover:disabled:opacity-50 betterhover:disabled:bg-blue-light betterhover:disabled:text-white"
+              >
+                See miner blocks
+              </a>
+            </Link>
+          )}
         </div>
       </div>
       <StakerHeroStats {...accountOverview} />
