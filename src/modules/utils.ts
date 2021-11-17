@@ -108,7 +108,10 @@ export const decodeERC20Transfers = (_logs) => {
       args: {
         from: ethers.utils.getAddress(`0x${_log.topics[1].slice(26)}`),
         to: ethers.utils.getAddress(`0x${_log.topics[2].slice(26)}`),
-        value: ethers.BigNumber.from(_log.data).toHexString(),
+        value:
+          _log.data === '0x'
+            ? '0x'
+            : ethers.BigNumber.from(_log.data).toHexString(),
       },
     };
   };

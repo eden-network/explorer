@@ -198,10 +198,13 @@ export const getTransactionInfo = async (txHash) => {
                 [txRequest.to.toLowerCase(), 'TxRecipient'],
               ]);
               return {
-                value: ethers.utils.formatUnits(
-                  ethers.BigNumber.from(transfer.args.value),
-                  tknInfo.decimals
-                ),
+                value:
+                  transfer.args.value === '0x'
+                    ? 0
+                    : ethers.utils.formatUnits(
+                        ethers.BigNumber.from(transfer.args.value),
+                        tknInfo.decimals
+                      ),
                 fromLabel:
                   localLabels[transfer.args.from.toLowerCase()] || null,
                 toLabel: localLabels[transfer.args.to.toLowerCase()] || null,
