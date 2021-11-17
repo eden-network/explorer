@@ -12,6 +12,21 @@ export const BNToGwei = (_bn, _pre = 2) => {
   );
 };
 
+export const formatWei = (_wei, _pre = 2) => {
+  const base = _wei.toString().startsWith('0x') ? 16 : 10;
+  const intVal = parseInt(_wei, base);
+  if (intVal === 0) {
+    return { value: '0', unit: 'Wei' };
+  }
+  if (intVal >= 1e14) {
+    return { value: (intVal / 1e18).toFixed(_pre), unit: 'Eth' };
+  }
+  if (intVal >= 1e5) {
+    return { value: (intVal / 1e9).toFixed(_pre), unit: 'Gwei' };
+  }
+  return { value: intVal.toFixed(_pre), unit: 'Wei' };
+};
+
 export const weiToGwei = (_wei, _pre = 2) => {
   const base = _wei.toString().startsWith('0x') ? 16 : 10;
   return parseFloat((parseInt(_wei, base) / 1e9).toPrecision(_pre));

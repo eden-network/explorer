@@ -8,6 +8,7 @@ import ReactToolTip from 'react-tooltip';
 import useWindowSize from '../hooks/useWindowSize.hook';
 import { formatAddress, formatTxHash } from '../modules/formatter';
 import { LockClosed, LockOpen } from '../modules/icons';
+import { weiToETH, formatWei } from '../modules/utils';
 import { AppConfig } from '../utils/AppConfig';
 import ClipboardButton from './ClipboardButton';
 import TableSortLabel from './table/TableSortLabel';
@@ -40,7 +41,6 @@ export default function LabeledTransactions({
   const isMobile = width < AppConfig.breakpoints.small;
 
   const selectedTx = router.query.tx ? router.query.tx : null;
-
   const [selectedRow, setSelectedRow] = useState(null);
 
   useEffect(() => {
@@ -77,12 +77,12 @@ export default function LabeledTransactions({
                 <tr>
                   <th
                     scope="col"
-                    className="py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider"
+                    className="px-2 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider"
                   >
                     <TableSortLabel
-                      active={orderBy === 'position'}
+                      active={orderBy === 'index'}
                       direction={order}
-                      onClick={() => handleRequestSort('position')}
+                      onClick={() => handleRequestSort('index')}
                     >
                       {isMobile ? '#' : 'TxIndex'}
                     </TableSortLabel>
@@ -123,18 +123,28 @@ export default function LabeledTransactions({
                       To
                     </TableSortLabel>
                   </th>
-                  <th
-                    scope="col"
-                    className="px-2 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider"
-                  >
-                    <TableSortLabel
-                      active={orderBy === 'gasLimit'}
-                      direction={order}
-                      onClick={() => handleRequestSort('gasLimit')}
+                  {labeledTxs.length > 0 &&
+                  labeledTxs[0].gasUsed !== undefined ? (
+                    <th
+                      scope="col"
+                      className="px-2 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider"
                     >
-                      Gas limit
-                    </TableSortLabel>
-                  </th>
+                      Gas usage
+                    </th>
+                  ) : (
+                    <th
+                      scope="col"
+                      className="px-2 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider"
+                    >
+                      <TableSortLabel
+                        active={orderBy === 'gasLimit'}
+                        direction={order}
+                        onClick={() => handleRequestSort('gasLimit')}
+                      >
+                        Gas limit
+                      </TableSortLabel>
+                    </th>
+                  )}
                   <th
                     scope="col"
                     className="px-2 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider"
@@ -159,9 +169,31 @@ export default function LabeledTransactions({
                       Priority Fee
                     </TableSortLabel>
                   </th>
+                  {labeledTxs.length > 0 &&
+                  labeledTxs[0].minerReward !== undefined ? (
+                    <th
+                      scope="col"
+                      className="px-2 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider"
+                    >
+                      <TableSortLabel
+                        active={orderBy === 'parsedMaxPriorityFee'}
+                        direction={order}
+                        onClick={() =>
+                          handleRequestSort('parsedMaxPriorityFee')
+                        }
+                      >
+                        <span data-tip data-for="MinerReward">
+                          <FontAwesomeIcon icon="question-circle" /> Miner
+                          Reward
+                        </span>
+                      </TableSortLabel>
+                    </th>
+                  ) : (
+                    ''
+                  )}
                   <th
                     scope="col"
-                    className="px-0 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider"
+                    className="px-3 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider"
                   >
                     <TableSortLabel
                       active={orderBy === 'viaEdenRPC'}
@@ -208,9 +240,18 @@ export default function LabeledTransactions({
                       })}
                       onClick={() => handleClickRow(tx)}
                     >
-                      <td className="py-4 text-center whitespace-nowrap">
-                        {tx.position}
-                      </td>
+                      {tx.status === 0 ? (
+                        <td className="pr-3 py-4 text-right whitespace-nowrap text-red">
+                          <span data-tip data-for="TxFail">
+                            <FontAwesomeIcon icon="exclamation-circle" />{' '}
+                            {tx.index}
+                          </span>
+                        </td>
+                      ) : (
+                        <td className="pr-3 py-4 text-right whitespace-nowrap">
+                          {tx.index}
+                        </td>
+                      )}
                       <td className="px-2 sm:px-4 py-4 text-center whitespace-nowrap">
                         <span className="flex items-center justify-center">
                           <ClipboardButton
@@ -262,15 +303,29 @@ export default function LabeledTransactions({
                           </a>
                         </span>
                       </td>
-                      <td className="px-2 py-4 text-right whitespace-nowrap">
-                        {tx.gasLimit.toLocaleString()}
-                      </td>
+                      {tx.gasUsed ? (
+                        <td className="px-2 py-4 text-right whitespace-nowrap">
+                          {tx.gasUsed.toLocaleString()}
+                          <p>of {tx.gasLimit.toLocaleString()}</p>
+                        </td>
+                      ) : (
+                        <td className="px-2 py-4 text-right whitespace-nowrap">
+                          {tx.gasLimit.toLocaleString()}
+                        </td>
+                      )}
                       <td className="px-2 py-4 text-right whitespace-nowrap">
                         {tx.nonce.toLocaleString()}
                       </td>
                       <td className="px-2 py-4 text-right whitespace-nowrap">
-                        {tx.maxPriorityFee.toLocaleString()}
+                        {Object.values(formatWei(tx.maxPriorityFee)).join(' ')}
                       </td>
+                      {tx.minerReward !== undefined ? (
+                        <td className="px-2 py-4 text-right whitespace-nowrap">
+                          {tx.minerReward && weiToETH(tx.minerReward)} Eth
+                        </td>
+                      ) : (
+                        ''
+                      )}
                       <td
                         className={`px-0 py-4 whitespace-nowrap ${
                           tx.viaEdenRPC ? ' text-green' : ''
@@ -358,6 +413,25 @@ export default function LabeledTransactions({
         border
       >
         Whether the user submitted transaction through Eden RPC
+      </ReactToolTip>
+      <ReactToolTip
+        className="tooltip"
+        id="MinerReward"
+        place="top"
+        effect="solid"
+        border
+      >
+        ETH miner recieved from this transaction. Includes non-burned gas fees
+        and direct miner payments if transaction is in a bundle.
+      </ReactToolTip>
+      <ReactToolTip
+        className="tooltip"
+        id="TxFail"
+        place="top"
+        effect="solid"
+        border
+      >
+        Transaction reverted
       </ReactToolTip>
     </div>
   );

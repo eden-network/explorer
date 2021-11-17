@@ -3,15 +3,15 @@ import {
   getMinerAlias,
   isFromEdenProducer,
   checkIfValidCache,
-  withinSlotGasCap,
   getSlotDelegates,
   getStakersStake,
+  getSlotGasCap,
   getEdenRPCTxs,
   isBlockSecure,
   getBundledTxs,
   getBlockInfo,
 } from './getters';
-import { BNToGwei, makeArrayUnique } from './utils';
+import { makeArrayUnique } from './utils';
 
 export const getBlockInsight = async (_blockNumber) => {
   const [bundledTxsWrapped, fromEdenProducer, slotDelegates, blockInfo] =
@@ -34,6 +34,8 @@ export const getBlockInsight = async (_blockNumber) => {
   const edenRPCInfoForTx = Object.fromEntries(
     edenRPCTxs.result.map((tx) => [tx.hash, tx.blocknumber])
   );
+  const slotGasCap = getSlotGasCap();
+  const slotAvlGas = Object.fromEntries([0, 1, 2].map((s) => [s, slotGasCap]));
   const labeledTxs = [];
   transactions.forEach((tx) => {
     const toSlotDelegate = slotDelegates[tx.to.toLowerCase()];
@@ -41,34 +43,39 @@ export const getBlockInsight = async (_blockNumber) => {
     const fromLocalMiner =
       tx.from.toLowerCase() === blockInfo.miner.toLowerCase();
     const toLocalMiner = tx.to.toLowerCase() === blockInfo.miner.toLowerCase();
+    const minerReward = tx.txFee
+      ? bundledTx
+        ? bundledTx.minerReward
+        : tx.txFee
+      : null;
     const labeledTx = {
+      ...tx,
       fromLabel:
         getMinerAlias(tx.from) || (fromLocalMiner ? 'Local Miner' : null),
       toLabel: getMinerAlias(tx.to) || (toLocalMiner ? 'Local Miner' : null),
       toSlot: (toSlotDelegate !== undefined ? toSlotDelegate : false) as any,
       bundleIndex: bundledTx !== undefined ? bundledTx.bundleIndex : null,
       senderStake: stakersStake[tx.from.toLowerCase()] || 0,
-      maxPriorityFee: BNToGwei(tx.maxPriorityFee).toString(), // Format for serialization
       viaEdenRPC: edenRPCInfoForTx[tx.hash] !== undefined,
-      position: tx.transactionIndex,
-      gasLimit: tx.gasLimit,
-      nonce: tx.nonce,
-      hash: tx.hash,
-      from: tx.from,
-      to: tx.to,
       type: '',
     };
+    if (minerReward) labeledTx.minerReward = minerReward;
+
     const hasSlotPriority = () => {
-      if (
-        fromEdenProducer &&
-        labeledTx.toSlot !== false &&
-        withinSlotGasCap(tx.gasLimit)
-      ) {
+      if (fromEdenProducer && labeledTx.toSlot !== false) {
+        // Check that gas-limit does not exceed slot-avl-gas
+        if (tx.gasLimit > slotAvlGas[labeledTx.toSlot]) {
+          return false;
+        }
         // Check that there is no lower nonce to non-slot or higher-slot delegate
         const inferiorSlotTxForAccount = labeledTxs
           .filter((_tx) => _tx.from === labeledTx.from)
           .find((_tx) => _tx.toSlot === false || _tx.toSlot > labeledTx.toSlot);
         if (inferiorSlotTxForAccount === undefined) {
+          // Decrement used gas by slot tx if data is available
+          if (tx.gasUsed) {
+            slotAvlGas[labeledTx.toSlot] -= tx.gasUsed;
+          }
           return true;
         }
       }
@@ -86,12 +93,12 @@ export const getBlockInsight = async (_blockNumber) => {
     } else {
       labeledTx.type = 'priority-fee';
     }
-    labeledTxs[labeledTx.position] = labeledTx;
+    labeledTxs[labeledTx.index] = labeledTx;
   });
   return {
     ...blockInfo,
-    baseFeePerGas: BNToGwei(blockInfo.baseFeePerGas).toString(), // Format for serialization
     bundledTxsCallSuccess: bundledTxsWrapped[0],
+    baseFeePerGas: blockInfo.baseFeePerGas,
     transactions: labeledTxs,
     number: _blockNumber,
     fromEdenProducer,

@@ -34,6 +34,7 @@ function getEtherscanAPIEndpoint() {
 export const AppConfig = {
   gcloudCacheBucket: process.env.GSTORAGE_CACHE_BUCKET || 'eden_block_insight',
   cacheBlockConfirmations: process.env.CACHE_BLOCK_CONFIRMATIONS || '10',
+  providerEndpointGraphQl: process.env.ETH_GRAPHQL_MAINNET,
   etherscanAPIKey: process.env.ETHERSCAN_API_TOKEN,
   flashbotsAPIEndpoint: process.env.FLASHBOTS_API,
   proxyAuthToken: process.env.PROXY_AUTH_TOKEN,
@@ -79,8 +80,11 @@ export const AppConfig = {
   },
   cacheTxParams: {
     maxPriorityFee: 'string',
-    position: 'number',
     gasLimit: 'number',
+    gasUsed: 'number',
+    status: 'number',
+    txFee: 'string',
+    index: 'number',
     nonce: 'number',
     from: 'string',
     hash: 'string',
