@@ -235,13 +235,13 @@ export const getBlocksPaged = async ({
                 : ``
             }
             ${beforeTimestamp ? `timestamp_lte: ${beforeTimestamp},` : ''}
-            fromActiveProducer: ${fromActiveProducerOnly},
           }
           orderDirection: desc
           orderBy: number, 
           skip: ${start}, 
           first: ${num}, 
         ) {
+          fromActiveProducer,
           timestamp,
           author,
           number,

@@ -13,11 +13,21 @@ function parseJSON<T>(value: string | null): T | undefined {
   }
 }
 
-function useLocalStorage<T>(key: string, initialValue: T): [T, SetValue<T>] {
+type FuncGenericReturn<T> = () => T;
+
+function useLocalStorage<T>(
+  key: string,
+  _initialValue: T | FuncGenericReturn<T>
+): [T, SetValue<T>] {
   // Get from local storage then
   // parse stored json or return initialValue
   const readValue = (): T => {
     // Prevent build error "window is undefined" but keep keep working
+
+    const initialValue =
+      typeof _initialValue === 'function'
+        ? (_initialValue as FuncGenericReturn<T>)()
+        : _initialValue;
     if (typeof window === 'undefined') {
       return initialValue;
     }

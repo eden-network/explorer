@@ -24,7 +24,8 @@ const PER_PAGE = 10;
 
 const MINERS = Object.values(minerAlias);
 
-const LocalStorageKey = 'block-list-miner-filters';
+export const LocalStorageKeyMinerFilter = 'block-list-miner-filters';
+const LocalStorageKeyMinerFilterProducerFilter = 'block-list-producer-filter';
 
 export default function BlocksPage({ blocks }) {
   const router = useRouter();
@@ -32,7 +33,17 @@ export default function BlocksPage({ blocks }) {
     return router.query.beforeEpoch ?? new Date().getTime() / 1e3;
   });
 
-  const [miners, setMiners] = useLocalStorage(LocalStorageKey, []);
+  const [miners, setMiners] = useLocalStorage<string[]>(
+    LocalStorageKeyMinerFilter,
+    () => {
+      if (router.query.miner) return [router.query.miner as string];
+      return [];
+    }
+  );
+  const [edenProducerOnly, setEdenProducerOnly] = useLocalStorage(
+    LocalStorageKeyMinerFilterProducerFilter,
+    true
+  );
   const [inputValue, setInputValue] = useState('');
   const [selectedVal, setSelectedVal] = useState('');
 
@@ -57,15 +68,6 @@ export default function BlocksPage({ blocks }) {
     return Array.from(addressArray);
   };
 
-  const getMinerQueryString = () => {
-    let res = '';
-    getMinerArry().forEach((v) => {
-      res += res ? '&' : '';
-      res += `miner=${v}`;
-    });
-    return res;
-  };
-
   const updateQuery = ({
     epoch = router.query.beforeEpoch,
     pageNum = null,
@@ -73,22 +75,42 @@ export default function BlocksPage({ blocks }) {
     epoch?: string | string[] | undefined | number | null;
     pageNum?: number | undefined | null;
   }) => {
-    let url = `/blocks`;
-    let firstSignedOff = false;
+    const params = [];
     if (epoch) {
-      url = url.concat(`?beforeEpoch=${epoch}`);
-      firstSignedOff = true;
+      params.push({
+        key: 'beforeEpoch',
+        value: epoch,
+      });
     }
     if (pageNum) {
-      if (!firstSignedOff) {
-        firstSignedOff = true;
-        url = url.concat(`?p=${pageNum}`);
-      } else {
-        url = url.concat(`&p=${pageNum}`);
-      }
+      params.push({
+        key: 'p',
+        value: pageNum,
+      });
     }
-    if (miners.length > 0 && !firstSignedOff) url = url.concat('?');
-    url = url.concat(getMinerQueryString());
+    if (miners.length > 0) {
+      const minerParams = getMinerArry();
+      minerParams.forEach((value) => {
+        params.push({
+          key: 'miner',
+          value,
+        });
+      });
+    }
+    if (!edenProducerOnly) {
+      params.push({
+        key: 'fromAllProducer',
+        value: true,
+      });
+    }
+
+    let url = '/blocks';
+    if (params.length > 0) {
+      const queryString = params
+        .map((param) => `${param.key}=${param.value}`)
+        .join('&');
+      url = `/blocks?${queryString}`;
+    }
 
     router.push(url, null, { scroll: false });
   };
@@ -171,6 +193,25 @@ export default function BlocksPage({ blocks }) {
     addMiner(inputValue);
   };
 
+  const handleChangeProducerFilter = (e) => {
+    setEdenProducerOnly(e.target.checked);
+  };
+
+  const renderCheckBox = () => (
+    <label
+      htmlFor="edenProducerOnly"
+      className="inline-flex items-center checkbox-no-tick"
+    >
+      <input
+        type="checkbox"
+        id="edenProducerOnly"
+        onChange={handleChangeProducerFilter}
+        checked={edenProducerOnly}
+        className="mr-2 form-checkbox rounded-sm w-4 h-4 inline-block text-green border-none"
+      />
+      <span className="inline-block text-sm">Eden Producer Only</span>
+    </label>
+  );
   return (
     <Shell
       meta={
@@ -183,7 +224,7 @@ export default function BlocksPage({ blocks }) {
       <div className="max-w-4xl mx-auto grid gap-5">
         <div className="flex flex-col rounded-lg shadow-lg overflow-hidden bg-blue">
           <div className="p-3 flex-1 sm:p-6 flex flex-col justify-between">
-            <div className="w-100 grid sm:grid-cols-2 gap-4 px-2">
+            <div className="w-100 grid sm:flex gap-4 sm:justify-between px-2">
               <div className="flex items-center">
                 <AutoCompleteInput
                   label="Miner"
@@ -205,6 +246,9 @@ export default function BlocksPage({ blocks }) {
                   <FontAwesomeIcon icon="search" />
                 </button>
               </div>
+              <div className="hidden md:block" style={{ paddingTop: '8.5px' }}>
+                {renderCheckBox()}
+              </div>
               <div className="flex items-center md:ml-auto">
                 <p className="text-gray-500 text-sm mr-3">Before:</p>
                 <DatePicker
@@ -222,6 +266,9 @@ export default function BlocksPage({ blocks }) {
                 </button>
               </div>
             </div>
+            <div className="block md:hidden mt-3 ml-auto mr-4">
+              {renderCheckBox()}
+            </div>
             <div className="mt-4">
               {miners.map((label) => (
                 <Chip
@@ -237,7 +284,7 @@ export default function BlocksPage({ blocks }) {
               )}
             </div>
             <div className="flex-1 mt-4">
-              <Blocks blocks={blocks} />
+              <Blocks blocks={blocks} edenProducerOnly={edenProducerOnly} />
             </div>
             <EndlessPagination
               end={blocks.length < PER_PAGE}
@@ -260,11 +307,13 @@ export async function getServerSideProps(context) {
       ? context.query.miner
       : [context.query.miner]
     : null;
+
+  const fromActiveProducerOnly = !context.query.fromAllProducer;
   const beforeEpoch = context.query.beforeEpoch || null;
   try {
     const skip = (page - 1) * PER_PAGE;
     const blocks = await getBlocksPaged({
-      fromActiveProducerOnly: true,
+      fromActiveProducerOnly,
       beforeTimestamp: beforeEpoch,
       miners: minersWhitelist,
       num: PER_PAGE,
@@ -285,6 +334,7 @@ export async function getServerSideProps(context) {
               (tx) => tx.toSlot !== false
             ).length,
             bundledTxsCallSuccess: blockInsight.bundledTxsCallSuccess,
+            fromActiveProducer: block.fromActiveProducer,
             timestamp: block.timestamp,
             author: block.author,
             number: block.number,
