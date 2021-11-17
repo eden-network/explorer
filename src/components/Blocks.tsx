@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useEffect, useMemo } from 'react';
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import TimeAgo from 'javascript-time-ago';
@@ -9,6 +9,7 @@ import ReactToolTip from 'react-tooltip';
 import { formatAddress } from '../modules/formatter';
 import { getMinerAlias } from '../modules/getters';
 import { EthLogo, EdenLogo } from '../modules/icons';
+import ClipboardButton from './ClipboardButton';
 
 TimeAgo.addDefaultLocale(en);
 
@@ -32,20 +33,27 @@ export default function Blocks({
 
   const shapedBlocks = useMemo(
     () =>
-      blocks.map((block) => {
-        return {
-          number: block.number,
-          author: getMinerAlias(block.author) || formatAddress(block.author),
-          timestamp: timeAgo.format(block.timestamp * 1000),
-          bundledTxsCallSuccess: block.bundledTxsCallSuccess,
-          fromActiveProducer: block.fromActiveProducer,
-          bundledTxs: block.bundledTxs,
-          stakerTxs: block.stakerTxs,
-          slotTxs: block.slotTxs,
-        };
-      }),
-    [blocks, timeAgo]
+      blocks
+        .filter((x) => !edenProducerOnly || x.fromActiveProducer)
+        .map((block) => {
+          return {
+            number: block.number,
+            autherHex: block.author,
+            author: getMinerAlias(block.author) || formatAddress(block.author),
+            timestamp: timeAgo.format(block.timestamp * 1000),
+            bundledTxsCallSuccess: block.bundledTxsCallSuccess,
+            fromActiveProducer: block.fromActiveProducer,
+            bundledTxs: block.bundledTxs,
+            stakerTxs: block.stakerTxs,
+            slotTxs: block.slotTxs,
+          };
+        }),
+    [edenProducerOnly, blocks, timeAgo]
   );
+
+  useEffect(() => {
+    ReactToolTip.rebuild();
+  }, [edenProducerOnly]);
 
   return (
     <div className="flex flex-col">
@@ -67,16 +75,17 @@ export default function Blocks({
                   >
                     Time
                   </th>
-                  {!edenProducerOnly && (
-                    <th
-                      scope="col"
-                      className="px-0 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider w-24"
-                    >
+
+                  <th
+                    scope="col"
+                    className="px-0 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider w-22"
+                  >
+                    {!edenProducerOnly && (
                       <span data-tip data-for="thBlockType">
                         <FontAwesomeIcon icon="question-circle" /> Block-Type
                       </span>
-                    </th>
-                  )}
+                    )}
+                  </th>
                   <th
                     scope="col"
                     className="px-2 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
@@ -116,8 +125,9 @@ export default function Blocks({
                     <td className="px-2 sm:px-6 py-4 whitespace-nowrap">
                       {block.timestamp}
                     </td>
-                    {!edenProducerOnly && (
-                      <td className="pt-1 whitespace-nowrap capitalize">
+
+                    <td className="pt-3 pb-0 flex justify-center">
+                      {!edenProducerOnly && (
                         <span
                           data-tip
                           data-for={
@@ -128,10 +138,16 @@ export default function Blocks({
                         >
                           {block.fromActiveProducer ? EdenLogo : EthLogo}
                         </span>
-                      </td>
-                    )}
+                      )}
+                    </td>
                     <td className="px-2 sm:px-6 py-4 whitespace-nowrap text-left">
-                      {block.author}
+                      <span className="flex">
+                        <ClipboardButton
+                          className="pr-2 block"
+                          copyText={block.autherHex}
+                        />
+                        {block.author}
+                      </span>
                     </td>
                     <td className="px-2 sm:px-6 py-4 whitespace-nowrap text-center">
                       {block.slotTxs}

@@ -119,6 +119,7 @@ export default function BlocksPage({ blocks }) {
   };
 
   const nextClick = () => {
+    console.log('Next Click');
     updateQuery({
       pageNum: router.query.p === undefined ? 2 : Number(router.query.p) + 1,
     });
