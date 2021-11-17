@@ -1,8 +1,10 @@
 import { useMemo } from 'react';
 
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import TimeAgo from 'javascript-time-ago';
 import en from 'javascript-time-ago/locale/en';
 import Link from 'next/link';
+import ReactToolTip from 'react-tooltip';
 
 import { formatAddress } from '../modules/formatter';
 import { getMinerAlias } from '../modules/getters';
@@ -55,22 +57,24 @@ export default function Blocks({
                 <tr>
                   <th
                     scope="col"
-                    className="px-2 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                    className="px-2 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1"
                   >
                     Number
                   </th>
                   <th
                     scope="col"
-                    className="px-2 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                    className="px-2 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1"
                   >
                     Time
                   </th>
                   {!edenProducerOnly && (
                     <th
                       scope="col"
-                      className="px-2 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                      className="px-0 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider w-24"
                     >
-                      Block Type
+                      <span data-tip data-for="thBlockType">
+                        <FontAwesomeIcon icon="question-circle" /> Block-Type
+                      </span>
                     </th>
                   )}
                   <th
@@ -81,19 +85,19 @@ export default function Blocks({
                   </th>
                   <th
                     scope="col"
-                    className="px-2 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                    className="px-2 sm:px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider w-1"
                   >
                     Slot Txs
                   </th>
                   <th
                     scope="col"
-                    className="px-2 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                    className="px-2 sm:px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider w-1"
                   >
                     Bundled Txs
                   </th>
                   <th
                     scope="col"
-                    className="px-2 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                    className="px-2 sm:px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider w-1"
                   >
                     Staker Txs
                   </th>
@@ -113,13 +117,20 @@ export default function Blocks({
                       {block.timestamp}
                     </td>
                     {!edenProducerOnly && (
-                      <td className="px-0 sm:px-0 pt-2 w-6 whitespace-nowrap text-center">
-                        <span className="w-3 h-3">
+                      <td className="pt-1 whitespace-nowrap capitalize">
+                        <span
+                          data-tip
+                          data-for={
+                            block.fromActiveProducer
+                              ? 'EdenLogoTip'
+                              : 'EthLogoTip'
+                          }
+                        >
                           {block.fromActiveProducer ? EdenLogo : EthLogo}
                         </span>
                       </td>
                     )}
-                    <td className="px-2 sm:px-6 py-4 whitespace-nowrap">
+                    <td className="px-2 sm:px-6 py-4 whitespace-nowrap text-left">
                       {block.author}
                     </td>
                     <td className="px-2 sm:px-6 py-4 whitespace-nowrap text-center">
@@ -140,6 +151,35 @@ export default function Blocks({
           </div>
         </div>
       </div>
+      <ReactToolTip
+        className="tooltip"
+        id="thBlockType"
+        place="top"
+        effect="solid"
+        border
+      >
+        Was block mined by Eden producer
+      </ReactToolTip>
+      <ReactToolTip
+        className="tooltip"
+        id="EdenLogoTip"
+        place="top"
+        effect="solid"
+        offset={{ left: 2 }}
+        border
+      >
+        Block was mined by Eden producer
+      </ReactToolTip>
+      <ReactToolTip
+        className="tooltip"
+        id="EthLogoTip"
+        place="top"
+        offset={{ left: 2 }}
+        effect="solid"
+        border
+      >
+        Block was not mined by Eden producer
+      </ReactToolTip>
     </div>
   );
 }
