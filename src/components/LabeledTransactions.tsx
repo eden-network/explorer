@@ -67,6 +67,10 @@ export default function LabeledTransactions({
     event.stopPropagation();
   }, []);
 
+  useEffect(() => {
+    ReactToolTip.rebuild();
+  }, [labeledTxs]);
+
   return (
     <div className="flex flex-col">
       <div className="overflow-x-auto -my-2 sm:-mx-6 lg:-mx-8">

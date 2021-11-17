@@ -3,13 +3,20 @@ import { ethers } from 'ethers';
 import { request, gql } from 'graphql-request';
 
 import { AppConfig } from '../utils/AppConfig';
-import { safeFetch, sendRawJsonRPCRequest, weiToGwei } from './utils';
+import { formatAddress } from './formatter';
+import {
+  safeFetch,
+  sendRawJsonRPCRequest,
+  weiToGwei,
+  safeParseResponse,
+} from './utils';
 
 const {
   cacheBlockConfirmations,
   providerEndpointGraphQl,
   graphNetworkEndpoint,
   flashbotsAPIEndpoint,
+  coingeckoTokensAPI,
   providerEndpoint,
   cacheBlockParams,
   etherscanAPIKey,
@@ -594,4 +601,82 @@ export const getTimestampsForBlocks = async (_minTimestamp, _maxTimestamp) => {
     blocksRes.push(i);
   }
   return blocksRes;
+};
+
+export const getTknInfoFromCoingecko = async () => {
+  const coingeckoDataRaw = await fetch(coingeckoTokensAPI).then(
+    safeParseResponse
+  );
+  return Object.fromEntries(
+    coingeckoDataRaw.tokens.map((tknInfo) => [
+      tknInfo.address,
+      {
+        decimals: tknInfo.decimals,
+        logoURL: tknInfo.logoURI,
+        symbol: tknInfo.symbol,
+      },
+    ])
+  );
+};
+
+export const getTknInfoFromChain = async (_tokenAddress) => {
+  const callDecimals = {
+    jsonrpc: '2.0',
+    method: 'eth_call',
+    params: [
+      {
+        to: _tokenAddress,
+        data: '0x313ce567', // ERC20.decimals()
+      },
+    ],
+    id: 1,
+  };
+  const callSymbol = {
+    jsonrpc: '2.0',
+    method: 'eth_call',
+    params: [
+      {
+        to: _tokenAddress,
+        data: '0x95d89b41', // ERC20.name()
+      },
+    ],
+    id: 1,
+  };
+  const [decRaw, symbolRaw] = await fetch(providerEndpoint, {
+    method: 'POST',
+    body: JSON.stringify([callDecimals, callSymbol]),
+    headers: { 'Content-Type': 'application/json' },
+  }).then((res) => res.json());
+  const decimals = parseInt(decRaw.result, 16);
+  const symbol = ethers.utils.defaultAbiCoder.decode(
+    ['string'],
+    symbolRaw.result
+  )[0];
+  return { decimals, symbol, logoURL: null };
+};
+
+export const getTknInfoForAddresses = async (_addresses) => {
+  const getDefualtTknInfo = (_address) => ({
+    symbol: formatAddress(_address),
+    decimals: 18,
+    logoURL: null,
+  });
+  // Fetch coingecko data
+  const coingeckoData = await getTknInfoFromCoingecko();
+  const tknInfo = await Promise.all(
+    _addresses.map(async (tknAdd) => {
+      // Fetch token info from coingecko
+      const coingeckoTknInfo = coingeckoData[tknAdd.toLowerCase()];
+      if (coingeckoTknInfo) {
+        return [tknAdd, await coingeckoTknInfo];
+      }
+      // Fetch token info from blockchain
+      try {
+        return [tknAdd, await getTknInfoFromChain(tknAdd)];
+      } catch (_) {
+        return [tknAdd, getDefualtTknInfo(tknAdd)];
+      }
+    })
+  ).then((r: any[]) => Object.fromEntries(r));
+  return tknInfo;
 };

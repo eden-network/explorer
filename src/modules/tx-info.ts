@@ -2,6 +2,7 @@ import { ethers } from 'ethers';
 
 import { decodeTx } from './contract-info';
 import {
+  getTknInfoForAddresses,
   getBlockInfoForBlocks,
   isFromEdenProducer,
   getSlotDelegates,
@@ -17,6 +18,7 @@ import {
   weiToGwei,
   weiToETH,
   gweiToETH,
+  decodeERC20Transfers,
   sleep,
 } from './utils';
 
@@ -32,6 +34,7 @@ interface TxInfo {
   hash: string;
   to: string;
   nextBaseFee: number | null;
+  erc20Transfers: Array<Object> | null;
   contractName: string | null;
   bundleIndex: number | null;
   fromEdenProducer: boolean | null;
@@ -51,6 +54,7 @@ interface TxInfo {
   index: number | null;
 }
 
+// TODO: move to frontend
 const formatDecodedTxCalldata = (_decoded) => {
   let msgFull = `
   TextSig: ${_decoded.textSig}
@@ -182,6 +186,36 @@ export const getTransactionInfo = async (txHash) => {
             const { minerTip, bundleIndex } = bundledTxsRes[1][txHash];
             transactionInfo.bundleIndex = bundleIndex ?? null;
             transactionInfo.minerTip = (minerTip && weiToETH(minerTip)) ?? 0;
+          }
+          const erc20Transfers = decodeERC20Transfers(txReceipt.logs);
+          if (erc20Transfers.length > 0) {
+            const tknAddresses = erc20Transfers.map((t) => t.address);
+            const tknInfos = await getTknInfoForAddresses(tknAddresses);
+            const erc20TransfersEnriched = erc20Transfers.map((transfer) => {
+              const tknInfo = tknInfos[transfer.address.toLowerCase()];
+              const localLabels = Object.fromEntries([
+                [txRequest.from.toLowerCase(), 'TxSender'],
+                [txRequest.to.toLowerCase(), 'TxRecipient'],
+              ]);
+              return {
+                value:
+                  transfer.args.value === '0x'
+                    ? 0
+                    : ethers.utils.formatUnits(
+                        ethers.BigNumber.from(transfer.args.value),
+                        tknInfo.decimals
+                      ),
+                fromLabel:
+                  localLabels[transfer.args.from.toLowerCase()] || null,
+                toLabel: localLabels[transfer.args.to.toLowerCase()] || null,
+                tknAddress: transfer.address,
+                tknSymbol: tknInfo.symbol,
+                tknLogoUrl: tknInfo.logoURL,
+                from: transfer.args.from,
+                to: transfer.args.to,
+              };
+            });
+            transactionInfo.erc20Transfers = erc20TransfersEnriched;
           }
           transactionInfo.timestamp = parseInt(blockInfo.result.timestamp, 16);
           transactionInfo.blockTxCount = blockInfo.result.transactions.length;

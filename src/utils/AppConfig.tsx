@@ -34,6 +34,7 @@ function getEtherscanAPIEndpoint() {
 export const AppConfig = {
   gcloudCacheBucket: process.env.GSTORAGE_CACHE_BUCKET || 'eden_block_insight',
   cacheBlockConfirmations: process.env.CACHE_BLOCK_CONFIRMATIONS || '10',
+  coingeckoTokensAPI: 'https://tokens.coingecko.com/uniswap/all.json',
   providerEndpointGraphQl: process.env.ETH_GRAPHQL_MAINNET,
   etherscanAPIKey: process.env.ETHERSCAN_API_TOKEN,
   flashbotsAPIEndpoint: process.env.FLASHBOTS_API,
