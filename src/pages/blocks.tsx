@@ -191,6 +191,21 @@ export default function BlocksPage({ blocks }) {
     setEdenProducerOnly(e.target.checked);
   };
 
+  const renderCheckBox = () => (
+    <label
+      htmlFor="edenProducerOnly"
+      className="inline-flex items-center checkbox-no-tick"
+    >
+      <input
+        type="checkbox"
+        id="edenProducerOnly"
+        onChange={handleChangeProducerFilter}
+        checked={edenProducerOnly}
+        className="mr-2 form-checkbox rounded-sm w-4 h-4 inline-block text-green border-none"
+      />
+      <span className="inline-block text-sm">Eden Producer Only</span>
+    </label>
+  );
   return (
     <Shell
       meta={
@@ -203,7 +218,7 @@ export default function BlocksPage({ blocks }) {
       <div className="max-w-4xl mx-auto grid gap-5">
         <div className="flex flex-col rounded-lg shadow-lg overflow-hidden bg-blue">
           <div className="p-3 flex-1 sm:p-6 flex flex-col justify-between">
-            <div className="w-100 grid sm:grid-cols-2 gap-4 px-2">
+            <div className="w-100 grid sm:flex gap-4 sm:justify-between px-2">
               <div className="flex items-center">
                 <AutoCompleteInput
                   label="Miner"
@@ -225,6 +240,9 @@ export default function BlocksPage({ blocks }) {
                   <FontAwesomeIcon icon="search" />
                 </button>
               </div>
+              <div className="hidden md:block" style={{ paddingTop: '8.5px' }}>
+                {renderCheckBox()}
+              </div>
               <div className="flex items-center md:ml-auto">
                 <p className="text-gray-500 text-sm mr-3">Before:</p>
                 <DatePicker
@@ -242,6 +260,9 @@ export default function BlocksPage({ blocks }) {
                 </button>
               </div>
             </div>
+            <div className="block md:hidden mt-3 ml-auto mr-4">
+              {renderCheckBox()}
+            </div>
             <div className="mt-4">
               {miners.map((label) => (
                 <Chip
@@ -255,21 +276,6 @@ export default function BlocksPage({ blocks }) {
               {miners.length > 0 && (
                 <Chip label="Clear All" handleClick={handleResetMiners} />
               )}
-            </div>
-            <div className="ml-auto mr-4">
-              <label
-                htmlFor="edenProducerOnly"
-                className="inline-flex items-center checkbox-no-tick"
-              >
-                <input
-                  type="checkbox"
-                  id="edenProducerOnly"
-                  onChange={handleChangeProducerFilter}
-                  checked={edenProducerOnly}
-                  className="mr-2 form-checkbox rounded-sm w-4 h-4 inline-block text-green border-none"
-                />
-                <span className="inline-block text-sm">Eden Producer Only</span>
-              </label>
             </div>
             <div className="flex-1 mt-4">
               <Blocks blocks={blocks} edenProducerOnly={edenProducerOnly} />
