@@ -14,6 +14,12 @@ const abbreviateNumber = (num: number): string => {
     const shortValue = Math.floor(value / 1000 ** suffixNum);
     return `${shortValue}${suffixes[suffixNum]}+`;
   }
+  if (value >= 100) {
+    return `${Math.floor(value / 50) * 50}+`;
+  }
+  if (value >= 10) {
+    return `${Math.floor(value / 10) * 10}+`;
+  }
   return value.toString();
 };
 
