@@ -12,7 +12,6 @@ const abbreviateNumber = (num: number): string => {
     const suffixes = ['', 'k', 'M', 'B', 'T'];
     const suffixNum = Math.floor(value.toString().length / 3);
     const shortValue = Math.floor(value / 1000 ** suffixNum);
-
     return `${shortValue}${suffixes[suffixNum]}+`;
   }
   return value.toString();
@@ -26,11 +25,11 @@ export default function StakedDistributionSummary({
 }) {
   const stats = useMemo(() => {
     return [
-      { name: 'Top', stat: abbreviateNumber(1000582) },
-      { name: 'Average', stat: abbreviateNumber(1864) },
-      { name: '95th %', stat: abbreviateNumber(4309) },
-      { name: '75th %', stat: abbreviateNumber(500) },
-      { name: '50th %', stat: abbreviateNumber(156) },
+      { name: 'Top', stat: abbreviateNumber(topStakedAmount) },
+      { name: 'Average', stat: abbreviateNumber(staked / stakers) },
+      { name: '95th %', stat: abbreviateNumber(data[95]) },
+      { name: '75th %', stat: abbreviateNumber(data[75]) },
+      { name: '50th %', stat: abbreviateNumber(data[50]) },
     ];
   }, [data, staked, stakers, topStakedAmount]);
 
