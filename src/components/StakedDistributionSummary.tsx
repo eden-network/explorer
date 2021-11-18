@@ -6,6 +6,21 @@ import { useMemo } from 'react';
 //   { name: 'Avg. Click Rate', stat: '24.57%' },
 // ];
 
+const abbreviateNumber = (num: number): string => {
+  const value = Math.floor(num);
+  if (value >= 1000) {
+    const suffixes = ['', 'k', 'M', 'B', 'T'];
+    const suffixNum = Math.floor(value.toString().length / 3);
+    const shortValue = Math.floor(value / 1000 ** suffixNum);
+
+    return `${shortValue} ${suffixes[suffixNum]}+`;
+  }
+  if (value > 10) {
+    return `${Math.floor(value / 10)}0+`;
+  }
+  return value.toString();
+};
+
 export default function StakedDistributionSummary({
   data,
   staked,
@@ -14,11 +29,11 @@ export default function StakedDistributionSummary({
 }) {
   const stats = useMemo(() => {
     return [
-      { name: 'Top', stat: Math.floor(topStakedAmount).toLocaleString() },
-      { name: 'Average', stat: Math.floor(staked / stakers).toLocaleString() },
-      { name: '95th %', stat: Math.floor(data[95]).toLocaleString() },
-      { name: '75th %', stat: Math.floor(data[75]).toLocaleString() },
-      { name: '50th %', stat: Math.floor(data[50]).toLocaleString() },
+      { name: 'Top', stat: abbreviateNumber(topStakedAmount) },
+      { name: 'Average', stat: abbreviateNumber(staked / stakers) },
+      { name: '95th %', stat: abbreviateNumber(data[95]) },
+      { name: '75th %', stat: abbreviateNumber(data[75]) },
+      { name: '50th %', stat: abbreviateNumber(data[50]) },
     ];
   }, [data, staked, stakers, topStakedAmount]);
 
