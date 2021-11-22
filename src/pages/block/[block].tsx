@@ -17,6 +17,7 @@ import { getBlockInsightAndCache } from '../../modules/eden-block-insight';
 import { getLastSupportedBlock } from '../../modules/getters';
 import { EtherscanLogo } from '../../modules/icons';
 import { stableSort, getSorting } from '../../modules/table/sort';
+import { weiToETH } from '../../modules/utils';
 import { AppConfig } from '../../utils/AppConfig';
 import { NormalizedBlockType } from '../../utils/type';
 
@@ -46,6 +47,12 @@ const FAST_FORWARD_ICON = (
     />
   </svg>
 );
+
+export const parseWei = (_wei) => {
+  const base = _wei.toString().startsWith('0x') ? 16 : 10;
+  const intVal = parseInt(_wei, base);
+  return intVal;
+};
 
 export default function Block({
   labeledTxs,
@@ -84,14 +91,15 @@ export default function Block({
     resetCurrentPage();
   };
 
-  const parsedTxs = labeledTxs.map((v) => {
+  const shpedTxs = labeledTxs.map((v) => {
     return {
       ...v,
-      parsedMaxPriorityFee: parseFloat(v.maxPriorityFee),
+      parsedMaxPriorityFee: parseWei(v.maxPriorityFee),
+      minerReward: v.minerReward && weiToETH(v.minerReward),
     };
   });
 
-  const sortedRows = stableSort(parsedTxs, getSorting(order, orderBy));
+  const sortedRows = stableSort(shpedTxs, getSorting(order, orderBy));
   const currentTxs = sortedRows.slice(
     (currentPage - 1) * pageSize,
     currentPage * pageSize
