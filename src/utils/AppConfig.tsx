@@ -94,6 +94,7 @@ export const AppConfig = {
   minerAlias: {
     '0x00192fb10df37c9fb26829eb2cc623cd1bf599e8': '2Miners: PPLNS',
     '0x002e08000acbbae2155fab7ac01929564949070d': '2Miners: Solo',
+    '0x45a36a8e118c37e4c47ef4ab827a7c9e579e11e2': 'Ant Pool',
     '0x005e288d713a5fb3d7c9cf1b43810a98688c7223': 'Xn Pool',
     '0x01ca8a0ba4a80d12a8fb6e3655688f57b16608cf': 'Spark Pool',
     '0x04668ec2f57cc15c381b461b9fedab5d451c8f7f': 'Zhizhu.top',
