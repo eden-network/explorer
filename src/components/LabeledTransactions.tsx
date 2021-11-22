@@ -8,7 +8,7 @@ import ReactToolTip from 'react-tooltip';
 import useWindowSize from '../hooks/useWindowSize.hook';
 import { formatAddress, formatTxHash } from '../modules/formatter';
 import { LockClosed, LockOpen } from '../modules/icons';
-import { weiToETH, formatWei } from '../modules/utils';
+import { formatWei } from '../modules/utils';
 import { AppConfig } from '../utils/AppConfig';
 import ClipboardButton from './ClipboardButton';
 import TableSortLabel from './table/TableSortLabel';
@@ -177,14 +177,12 @@ export default function LabeledTransactions({
                   labeledTxs[0].minerReward !== undefined ? (
                     <th
                       scope="col"
-                      className="px-2 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider"
+                      className="px-2 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider"
                     >
                       <TableSortLabel
-                        active={orderBy === 'parsedMaxPriorityFee'}
+                        active={orderBy === 'minerReward'}
                         direction={order}
-                        onClick={() =>
-                          handleRequestSort('parsedMaxPriorityFee')
-                        }
+                        onClick={() => handleRequestSort('minerReward')}
                       >
                         <span data-tip data-for="MinerReward">
                           <FontAwesomeIcon icon="question-circle" /> Miner
@@ -325,7 +323,7 @@ export default function LabeledTransactions({
                       </td>
                       {tx.minerReward !== undefined ? (
                         <td className="px-2 py-4 text-right whitespace-nowrap">
-                          {tx.minerReward && weiToETH(tx.minerReward)} Eth
+                          {tx.minerReward} Eth
                         </td>
                       ) : (
                         ''
