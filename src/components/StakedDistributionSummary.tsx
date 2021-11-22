@@ -10,10 +10,10 @@ const abbreviateNumber = (num: number): string => {
   const value = Math.floor(num);
   if (value >= 1000) {
     const suffixes = ['', 'k', 'M', 'B', 'T'];
-    const suffixNum = Math.floor(value.toString().length / 3);
-    const shortValue = (
-      Math.floor((value * 10) / 1000 ** suffixNum) / 10
-    ).toFixed(1);
+    const suffixNum = Math.floor((value.toString().length - 1) / 3);
+    const val = Math.floor((value * 10) / 1000 ** suffixNum);
+    const shortValue =
+      val >= 1000 ? Math.floor(val / 10) : (val / 10).toFixed(1);
     return `${shortValue}${suffixes[suffixNum]}+`;
   }
   if (value >= 100) {
