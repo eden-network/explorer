@@ -261,6 +261,28 @@ export default function TransactionPage({ txInfo }: { txInfo: TxInfo }) {
                       : statusBoxes.fail}
                   </td>
                 </tr>
+                {txInfo.erc20Transfers && txInfo.erc20Transfers.length > 0 ? (
+                  <tr key="Transfers">
+                    <td className="px-2 sm:px-6 py-4">Transfers:</td>
+                    <td className="px-2 sm:px-6 py-4">
+                      {makeInputBox(
+                        formatERC20Transfers(txInfo.erc20Transfers)
+                      )}
+                    </td>
+                  </tr>
+                ) : (
+                  ''
+                )}
+                {txInfo.input && txInfo.input.length > 2 ? (
+                  <tr key="Input">
+                    <td className="px-2 sm:px-6 py-4">Input:</td>
+                    <td className="px-2 sm:px-6 py-4">
+                      {makeInputBox(txInfo.input)}
+                    </td>
+                  </tr>
+                ) : (
+                  ''
+                )}
                 {txInfo.senderStake !== null && txInfo.senderStake > 0 ? (
                   <tr key="Sender stake">
                     <td className="px-2 sm:px-6 py-4 whitespace-nowrap">
@@ -268,7 +290,7 @@ export default function TransactionPage({ txInfo }: { txInfo: TxInfo }) {
                     </td>
                     <td className="px-2 sm:px-6 py-4 whitespace-nowrap">
                       {Math.round(txInfo.senderStake).toLocaleString()} EDEN{' '}
-                      {txInfo.senderRank ? ` (Rank #${txInfo.senderRank})` : ''}
+                      {txInfo.senderRank ? ` - Rank #${txInfo.senderRank}` : ''}
                     </td>
                   </tr>
                 ) : (
@@ -344,8 +366,8 @@ export default function TransactionPage({ txInfo }: { txInfo: TxInfo }) {
                     </td>
                     <td className="px-2 sm:px-6 py-4 whitespace-nowrap">
                       {txInfo.gasUsed.toLocaleString()} of{' '}
-                      {txInfo.gasLimit.toLocaleString()} (
-                      {Math.round((100 * txInfo.gasUsed) / txInfo.gasLimit)}%)
+                      {txInfo.gasLimit.toLocaleString()} {' - '}
+                      {Math.round((100 * txInfo.gasUsed) / txInfo.gasLimit)}%
                     </td>
                   </tr>
                 ) : (
@@ -372,28 +394,6 @@ export default function TransactionPage({ txInfo }: { txInfo: TxInfo }) {
                       {(txInfo.minerTip + txInfo.gasCost).toPrecision(2)} ETH
                       (GasCost: {txInfo.gasCost} ETH + MinerTip:{' '}
                       {txInfo.minerTip} ETH)
-                    </td>
-                  </tr>
-                ) : (
-                  ''
-                )}
-                {txInfo.erc20Transfers && txInfo.erc20Transfers.length > 0 ? (
-                  <tr key="Transfers">
-                    <td className="px-2 sm:px-6 py-4">Transfers:</td>
-                    <td className="px-2 sm:px-6 py-4">
-                      {makeInputBox(
-                        formatERC20Transfers(txInfo.erc20Transfers)
-                      )}
-                    </td>
-                  </tr>
-                ) : (
-                  ''
-                )}
-                {txInfo.input && txInfo.input.length > 2 ? (
-                  <tr key="Input">
-                    <td className="px-2 sm:px-6 py-4">Input:</td>
-                    <td className="px-2 sm:px-6 py-4">
-                      {makeInputBox(txInfo.input)}
                     </td>
                   </tr>
                 ) : (
