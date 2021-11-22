@@ -257,20 +257,6 @@ export default function TransactionPage({ txInfo }: { txInfo: TxInfo }) {
                 ) : (
                   ''
                 )}
-                {!txInfo.pending ? (
-                  <tr key="In Bundle">
-                    <td className="px-2 sm:px-6 py-4 whitespace-nowrap">
-                      In Bundle:
-                    </td>
-                    <td className="px-2 sm:px-6 py-4 whitespace-nowrap">
-                      {txInfo.bundleIndex !== null
-                        ? `True (Bundle #${txInfo.bundleIndex})`
-                        : 'False'}
-                    </td>
-                  </tr>
-                ) : (
-                  ''
-                )}
                 <tr key="Nonce">
                   <td className="px-2 sm:px-6 py-4 whitespace-nowrap">
                     Nonce:
