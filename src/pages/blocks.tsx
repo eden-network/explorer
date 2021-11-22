@@ -126,13 +126,13 @@ export default function BlocksPage({ blocks }) {
 
   const nextClick = () => {
     updateQuery({
-      pageNum: router.query.p === undefined ? 2 : Number(router.query.p) + 1,
+      pageNum: !router.query.p ? 2 : Number(router.query.p) + 1,
     });
   };
 
   const prevClick = () => {
     updateQuery({
-      pageNum: router.query.p === undefined ? 1 : Number(router.query.p) - 1,
+      pageNum: !router.query.p ? 1 : Number(router.query.p) - 1,
     });
   };
 
