@@ -16,12 +16,6 @@ const abbreviateNumber = (num: number): string => {
       val >= 1000 ? Math.floor(val / 10) : (val / 10).toFixed(1);
     return `${shortValue}${suffixes[suffixNum]}+`;
   }
-  if (value >= 100) {
-    return `${Math.floor(value / 50) * 50}+`;
-  }
-  if (value >= 10) {
-    return `${Math.floor(value / 10) * 10}+`;
-  }
   return value.toString();
 };
 
