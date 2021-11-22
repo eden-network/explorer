@@ -30,7 +30,7 @@ export default function BlocksPage({ blocks }) {
   });
 
   const [miners, setMiners] = useState<string[]>(() => {
-    if (router.query.miner) return [router.query.miner as string];
+    if (router.query.miner) return (router.query.miner as string).split(',');
     return [];
   });
   const [edenProducerOnly, setEdenProducerOnly] = useState(true);
@@ -185,19 +185,20 @@ export default function BlocksPage({ blocks }) {
 
   const handleChangeProducerFilter = (e) => {
     setEdenProducerOnly(e.target.checked);
+    updateQuery({});
   };
 
   const renderCheckBox = () => (
     <label
       htmlFor="edenProducerOnly"
-      className="inline-flex items-center checkbox-no-tick"
+      className="inline-flex items-center checkbox-no-tick cursor-pointer"
     >
       <input
         type="checkbox"
         id="edenProducerOnly"
         onChange={handleChangeProducerFilter}
         checked={edenProducerOnly}
-        className="mr-2 form-checkbox rounded-sm w-4 h-4 inline-block text-green border-none"
+        className="mr-2 form-checkbox rounded-sm w-4 h-4 inline-block text-green border-none cursor-pointer"
       />
       <span className="inline-block text-sm">Eden Producer Only</span>
     </label>
