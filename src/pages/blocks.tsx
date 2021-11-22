@@ -61,9 +61,11 @@ export default function BlocksPage({ blocks }) {
   const updateQuery = ({
     epoch = router.query.beforeEpoch,
     pageNum = null,
+    fromAllProducer = !edenProducerOnly,
   }: {
     epoch?: string | string[] | undefined | number | null;
     pageNum?: number | undefined | null;
+    fromAllProducer?: boolean;
   }) => {
     const params = [];
     if (epoch) {
@@ -87,7 +89,7 @@ export default function BlocksPage({ blocks }) {
         });
       });
     }
-    if (!edenProducerOnly) {
+    if (fromAllProducer) {
       params.push({
         key: 'fromAllProducer',
         value: true,
@@ -185,7 +187,7 @@ export default function BlocksPage({ blocks }) {
 
   const handleChangeProducerFilter = (e) => {
     setEdenProducerOnly(e.target.checked);
-    updateQuery({});
+    updateQuery({ fromAllProducer: !e.target.checked });
   };
 
   const renderCheckBox = () => (
