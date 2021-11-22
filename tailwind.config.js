@@ -44,6 +44,7 @@ module.exports = {
       indigo: colors.green['300'],
       yellow: colors.yellow['300'],
       red: colors.red['300'],
+      orange: colors.orange['300'],
     },
     fontFamily: {
       sans: ['Titillium Web', 'sans-serif'],

@@ -12,8 +12,10 @@ import {
 } from './utils';
 
 const {
+  monitorEndpointEthermineRPC,
   cacheBlockConfirmations,
   providerEndpointGraphQl,
+  monitorEndpointEdenRPC,
   graphNetworkEndpoint,
   flashbotsAPIEndpoint,
   coingeckoTokensAPI,
@@ -446,7 +448,6 @@ export const getTxsForAccount = async (_account, _offset = 10, _page = 1) => {
 };
 
 export const getEdenRPCTxs = async (_txs) => {
-  const monitorEndpointEdenRPC = 'https://api.edennetwork.io/v1/monitor';
   const query = {
     method: 'eth_getTransactionsByHash',
     params: [_txs],
@@ -468,6 +469,18 @@ export const getEdenRPCTxs = async (_txs) => {
       return res;
     }
   );
+  return response;
+};
+
+export const getEthermineRPCTx = async (_tx) => {
+  const url = monitorEndpointEthermineRPC + _tx;
+  const response = await safeFetch(url, {}, ({ success, res }) => {
+    if (!success) {
+      console.error(`request to ethermine-monitor api failed: ${res}`);
+      return {};
+    }
+    return res;
+  });
   return response;
 };
 

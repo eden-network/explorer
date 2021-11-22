@@ -34,13 +34,18 @@ const makeInputBox = (_input) => (
 
 const submissionBoxes = {
   flashbots: (
-    <span className="p-3 rounded-3xl py-2 bg-purple inline-block text-xs text-bold text-blue-light shadow-sm font-bold text-center">
-      Flashbots Relay
+    <span className="m-1 p-3 rounded-3xl py-2 bg-purple inline-block text-xs text-bold text-blue-light shadow-sm font-bold text-center">
+      Flashbots
     </span>
   ),
   eden: (
-    <span className="p-3 rounded-3xl py-2 bg-green inline-block text-xs text-bold text-blue-light shadow-sm font-bold text-center">
-      Eden Relay
+    <span className="m-1 p-3 rounded-3xl py-2 bg-green inline-block text-xs text-bold text-blue-light shadow-sm font-bold text-center">
+      Eden
+    </span>
+  ),
+  ethermine: (
+    <span className="m-1 p-3 rounded-3xl py-2 bg-orange inline-block text-xs text-bold text-blue-light shadow-sm font-bold text-center">
+      Ethermine
     </span>
   ),
   unknown: (
@@ -61,14 +66,19 @@ const statusBoxes = {
       {crossSVG} FAIL
     </span>
   ),
-  'pending-mempool': (
-    <span className="p-3 rounded-3xl py-2 bg-yellow inline-block text-xs text-bold text-blue-light shadow-sm font-bold text-center">
+  public: (
+    <span className="m-1 p-3 rounded-3xl py-2 bg-yellow inline-block text-xs text-bold text-blue-light shadow-sm font-bold text-center">
       {clockSVG} PENDING IN PUBLIC MEMPOOL
     </span>
   ),
-  'pending-eden': (
-    <span className="p-3 rounded-3xl py-2 bg-purple inline-block text-xs text-bold text-blue-light shadow-sm font-bold text-center">
+  eden: (
+    <span className="m-1 p-3 rounded-3xl py-2 bg-purple inline-block text-xs text-bold text-blue-light shadow-sm font-bold text-center">
       {clockSVG} PENDING IN EDEN MEMPOOL
+    </span>
+  ),
+  ethermine: (
+    <span className="m-1 p-3 rounded-3xl py-2 bg-orange inline-block text-xs text-bold text-blue-light shadow-sm font-bold text-center">
+      {clockSVG} PENDING IN ETHERMINE MEMPOOL
     </span>
   ),
 };
@@ -136,47 +146,55 @@ export default function TransactionPage({ txInfo }: { txInfo: TxInfo }) {
                     </a>
                   </td>
                 </tr>
-                <tr key="From">
-                  <td className="px-2 sm:px-6 py-4 whitespace-nowrap">
-                    Sender:
-                  </td>
-                  <td className="px-2 sm:px-6 py-4 whitespace-nowrap">
-                    <a
-                      href={`/address/${txInfo.from}`}
-                      className="hover:text-green"
-                      target="_blank"
-                      rel="noreferrer"
-                    >
-                      {txInfo.from}
-                      <sup className="px-1">
-                        <FontAwesomeIcon icon="external-link-alt" />
-                      </sup>
-                    </a>
-                  </td>
-                </tr>
-                <tr key="To">
-                  <td className="px-2 sm:px-6 py-4 whitespace-nowrap">
-                    Recipient:
-                  </td>
-                  <td className="px-2 sm:px-6 py-4 whitespace-nowrap">
-                    <a
-                      href={`/address/${txInfo.to}`}
-                      className="hover:text-green"
-                      target="_blank"
-                      rel="noreferrer"
-                    >
-                      {txInfo.contractName
-                        ? `Contract: ${txInfo.contractName}`
-                        : txInfo.to}
-                      {txInfo.toSlot !== null
-                        ? ` - SLOT #${txInfo.toSlot} DELEGATE`
-                        : ''}
-                      <sup className="px-1">
-                        <FontAwesomeIcon icon="external-link-alt" />
-                      </sup>
-                    </a>
-                  </td>
-                </tr>
+                {txInfo.from ? (
+                  <tr key="From">
+                    <td className="px-2 sm:px-6 py-4 whitespace-nowrap">
+                      Sender:
+                    </td>
+                    <td className="px-2 sm:px-6 py-4 whitespace-nowrap">
+                      <a
+                        href={`/address/${txInfo.from}`}
+                        className="hover:text-green"
+                        target="_blank"
+                        rel="noreferrer"
+                      >
+                        {txInfo.from}
+                        <sup className="px-1">
+                          <FontAwesomeIcon icon="external-link-alt" />
+                        </sup>
+                      </a>
+                    </td>
+                  </tr>
+                ) : (
+                  ''
+                )}
+                {txInfo.to ? (
+                  <tr key="To">
+                    <td className="px-2 sm:px-6 py-4 whitespace-nowrap">
+                      Recipient:
+                    </td>
+                    <td className="px-2 sm:px-6 py-4 whitespace-nowrap">
+                      <a
+                        href={`/address/${txInfo.to}`}
+                        className="hover:text-green"
+                        target="_blank"
+                        rel="noreferrer"
+                      >
+                        {txInfo.contractName
+                          ? `Contract: ${txInfo.contractName}`
+                          : txInfo.to}
+                        {txInfo.toSlot !== null
+                          ? ` - SLOT #${txInfo.toSlot} DELEGATE`
+                          : ''}
+                        <sup className="px-1">
+                          <FontAwesomeIcon icon="external-link-alt" />
+                        </sup>
+                      </a>
+                    </td>
+                  </tr>
+                ) : (
+                  ''
+                )}
                 {txInfo.blockNumber ? (
                   <tr key="Block Number">
                     <td className="px-2 sm:px-6 py-4 whitespace-nowrap">
@@ -193,7 +211,10 @@ export default function TransactionPage({ txInfo }: { txInfo: TxInfo }) {
                           <span className="block">
                             {txInfo.fromEdenProducer ? EdenLogo : EthLogo}
                           </span>
-                          {txInfo.blockNumber}
+                          {txInfo.blockNumber}{' '}
+                          {txInfo.bundleIndex
+                            ? ` - Bundle #${txInfo.bundleIndex}`
+                            : ''}
                           <sup className="px-1">
                             <FontAwesomeIcon icon="external-link-alt" />
                           </sup>
@@ -223,10 +244,8 @@ export default function TransactionPage({ txInfo }: { txInfo: TxInfo }) {
                     Submission:
                   </td>
                   <td className="px-2 sm:px-6 py-4 whitespace-nowrap">
-                    {txInfo.viaEdenRPC
-                      ? submissionBoxes.eden
-                      : txInfo.bundleIndex !== null
-                      ? submissionBoxes.flashbots
+                    {txInfo.submissions.length > 0
+                      ? txInfo.submissions.map((s) => submissionBoxes[s])
                       : submissionBoxes.unknown}
                   </td>
                 </tr>
@@ -236,9 +255,7 @@ export default function TransactionPage({ txInfo }: { txInfo: TxInfo }) {
                   </td>
                   <td className="px-2 sm:px-6 py-4 whitespace-nowrap">
                     {txInfo.pending
-                      ? txInfo.viaEdenRPC
-                        ? statusBoxes['pending-eden']
-                        : statusBoxes['pending-mempool']
+                      ? txInfo.pendingPools.map((p) => statusBoxes[p])
                       : txInfo.status === 1
                       ? statusBoxes.success
                       : statusBoxes.fail}
@@ -257,14 +274,18 @@ export default function TransactionPage({ txInfo }: { txInfo: TxInfo }) {
                 ) : (
                   ''
                 )}
-                <tr key="Nonce">
-                  <td className="px-2 sm:px-6 py-4 whitespace-nowrap">
-                    Nonce:
-                  </td>
-                  <td className="px-2 sm:px-6 py-4 whitespace-nowrap">
-                    {txInfo.nonce.toLocaleString()}
-                  </td>
-                </tr>
+                {txInfo.nonce ? (
+                  <tr key="Nonce">
+                    <td className="px-2 sm:px-6 py-4 whitespace-nowrap">
+                      Nonce:
+                    </td>
+                    <td className="px-2 sm:px-6 py-4 whitespace-nowrap">
+                      {txInfo.nonce.toLocaleString()}
+                    </td>
+                  </tr>
+                ) : (
+                  ''
+                )}
                 {!txInfo.pending ? (
                   <tr key="Transaction index">
                     <td className="px-2 sm:px-6 py-4 whitespace-nowrap">
@@ -289,7 +310,7 @@ export default function TransactionPage({ txInfo }: { txInfo: TxInfo }) {
                       {txInfo.priorityFee} Gwei
                     </td>
                   </tr>
-                ) : (
+                ) : txInfo.gasPrice ? (
                   <tr key="Gas Price">
                     <td className="px-2 sm:px-6 py-4 whitespace-nowrap">
                       Gas Price:
@@ -298,6 +319,8 @@ export default function TransactionPage({ txInfo }: { txInfo: TxInfo }) {
                       {txInfo.gasPrice.toLocaleString()} Gwei
                     </td>
                   </tr>
+                ) : (
+                  ''
                 )}
                 {txInfo.baseFee !== null ? (
                   <tr key="Base fee">
@@ -366,7 +389,7 @@ export default function TransactionPage({ txInfo }: { txInfo: TxInfo }) {
                 ) : (
                   ''
                 )}
-                {txInfo.input.length > 2 ? (
+                {txInfo.input && txInfo.input.length > 2 ? (
                   <tr key="Input">
                     <td className="px-2 sm:px-6 py-4">Input:</td>
                     <td className="px-2 sm:px-6 py-4">
