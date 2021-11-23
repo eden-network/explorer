@@ -7,12 +7,8 @@ import { useMemo } from 'react';
 // ];
 
 const abbreviateNumber = (num: number): string => {
-  const value = Math.floor(num);
-  if (value >= 1000) {
-    const formatter = Intl.NumberFormat('en', { notation: 'compact' });
-    return formatter.format(num);
-  }
-  return value.toString();
+  const formatter = Intl.NumberFormat('en', { notation: 'compact' });
+  return formatter.format(num);
 };
 
 export default function StakedDistributionSummary({
