@@ -18,7 +18,6 @@ import { getAccountInfo } from '../../modules/account-info';
 import { getAddressForENS, checkIfContractlike } from '../../modules/getters';
 import { validateEns } from '../../modules/validators';
 import { AppConfig } from '../../utils/AppConfig';
-import { LocalStorageKeyMinerFilter } from '../blocks';
 
 const PAGE_SIZE = 10;
 
@@ -75,12 +74,7 @@ export default function Address({ accountOverview, transactions, error }) {
           </h2>
           {accountOverview.label && (
             <Link href={`/blocks?miner=${accountOverview.address}`}>
-              <a
-                onClick={() => {
-                  window.localStorage.removeItem(LocalStorageKeyMinerFilter);
-                }}
-                className="px-3 py-1 mt-4 bg-blue-light text-sm font-medium rounded-md betterhover:hover:bg-green betterhover:hover:text-blue cursor-pointer select-none betterhover:disabled:opacity-50 betterhover:disabled:bg-blue-light betterhover:disabled:text-white"
-              >
+              <a className="px-3 py-1 mt-4 bg-blue-light text-sm font-medium rounded-md betterhover:hover:bg-green betterhover:hover:text-blue cursor-pointer select-none betterhover:disabled:opacity-50 betterhover:disabled:bg-blue-light betterhover:disabled:text-white">
                 See miner blocks
               </a>
             </Link>

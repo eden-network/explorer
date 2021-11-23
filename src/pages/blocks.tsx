@@ -10,7 +10,6 @@ import AutoCompleteInput from '../components/AutocompleteInput';
 import Blocks from '../components/Blocks';
 import Chip from '../components/Chip';
 import EndlessPagination from '../components/EndlessPagination';
-import useLocalStorage from '../hooks/useLocalStorage.hook';
 import { Meta } from '../layout/Meta';
 import Shell from '../layout/Shell';
 import { getBlockInsightAndCache } from '../modules/eden-block-insight';
@@ -24,26 +23,17 @@ const PER_PAGE = 10;
 
 const MINERS = Object.values(minerAlias);
 
-export const LocalStorageKeyMinerFilter = 'block-list-miner-filters';
-const LocalStorageKeyMinerFilterProducerFilter = 'block-list-producer-filter';
-
 export default function BlocksPage({ blocks }) {
   const router = useRouter();
   const [beforeEpoch, setbeforeEpoch] = useState(() => {
     return router.query.beforeEpoch ?? new Date().getTime() / 1e3;
   });
 
-  const [miners, setMiners] = useLocalStorage<string[]>(
-    LocalStorageKeyMinerFilter,
-    () => {
-      if (router.query.miner) return [router.query.miner as string];
-      return [];
-    }
-  );
-  const [edenProducerOnly, setEdenProducerOnly] = useLocalStorage(
-    LocalStorageKeyMinerFilterProducerFilter,
-    true
-  );
+  const [miners, setMiners] = useState<string[]>(() => {
+    if (router.query.miner) return (router.query.miner as string).split(',');
+    return [];
+  });
+  const [edenProducerOnly, setEdenProducerOnly] = useState(true);
   const [inputValue, setInputValue] = useState('');
   const [selectedVal, setSelectedVal] = useState('');
 
@@ -71,9 +61,11 @@ export default function BlocksPage({ blocks }) {
   const updateQuery = ({
     epoch = router.query.beforeEpoch,
     pageNum = null,
+    fromAllProducer = !edenProducerOnly,
   }: {
     epoch?: string | string[] | undefined | number | null;
     pageNum?: number | undefined | null;
+    fromAllProducer?: boolean;
   }) => {
     const params = [];
     if (epoch) {
@@ -97,7 +89,7 @@ export default function BlocksPage({ blocks }) {
         });
       });
     }
-    if (!edenProducerOnly) {
+    if (fromAllProducer) {
       params.push({
         key: 'fromAllProducer',
         value: true,
@@ -195,19 +187,20 @@ export default function BlocksPage({ blocks }) {
 
   const handleChangeProducerFilter = (e) => {
     setEdenProducerOnly(e.target.checked);
+    updateQuery({ fromAllProducer: !e.target.checked });
   };
 
   const renderCheckBox = () => (
     <label
       htmlFor="edenProducerOnly"
-      className="inline-flex items-center checkbox-no-tick"
+      className="inline-flex items-center checkbox-no-tick cursor-pointer"
     >
       <input
         type="checkbox"
         id="edenProducerOnly"
         onChange={handleChangeProducerFilter}
         checked={edenProducerOnly}
-        className="mr-2 form-checkbox rounded-sm w-4 h-4 inline-block text-green border-none"
+        className="mr-2 form-checkbox rounded-sm w-4 h-4 inline-block text-green border-none cursor-pointer"
       />
       <span className="inline-block text-sm">Eden Producer Only</span>
     </label>
