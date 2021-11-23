@@ -7,13 +7,7 @@ import moment from 'moment';
 import Image from 'next/image';
 
 import { formatAddress } from '../modules/formatter';
-import {
-  clockSVG,
-  crossSVG,
-  tickSVG,
-  EdenLogo,
-  EthLogo,
-} from '../modules/icons';
+import { clockSVG, tickSVG, EdenLogo, EthLogo } from '../modules/icons';
 import { TxInfo } from '../modules/tx-info';
 import { AppConfig } from '../utils/AppConfig';
 
@@ -63,7 +57,7 @@ const statusBoxes = {
   ),
   fail: (
     <span className="p-3 rounded-3xl py-2 bg-red inline-block text-xs text-bold text-blue-light shadow-sm font-bold text-center">
-      {crossSVG} FAIL
+      <FontAwesomeIcon icon="exclamation-circle" /> FAIL
     </span>
   ),
   indexing: (
