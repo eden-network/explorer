@@ -183,7 +183,7 @@ export const getTransactionInfo = async (txHash) => {
       }
     }
     if (mined) {
-      const maxAttempts = 3;
+      const maxAttempts = 10;
       const waitMs = 2000;
       for (let i = 0; i < maxAttempts; i++) {
         try {
