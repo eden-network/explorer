@@ -6,6 +6,11 @@ import { useMemo } from 'react';
 //   { name: 'Avg. Click Rate', stat: '24.57%' },
 // ];
 
+const abbreviateNumber = (num: number): string => {
+  const formatter = Intl.NumberFormat('en', { notation: 'compact' });
+  return formatter.format(num);
+};
+
 export default function StakedDistributionSummary({
   data,
   staked,
@@ -14,11 +19,11 @@ export default function StakedDistributionSummary({
 }) {
   const stats = useMemo(() => {
     return [
-      { name: 'Top', stat: Math.floor(topStakedAmount).toLocaleString() },
-      { name: 'Average', stat: Math.floor(staked / stakers).toLocaleString() },
-      { name: '95th %', stat: Math.floor(data[95]).toLocaleString() },
-      { name: '75th %', stat: Math.floor(data[75]).toLocaleString() },
-      { name: '50th %', stat: Math.floor(data[50]).toLocaleString() },
+      { name: 'Top', stat: abbreviateNumber(topStakedAmount) },
+      { name: 'Average', stat: abbreviateNumber(staked / stakers) },
+      { name: '95th %', stat: abbreviateNumber(data[95]) },
+      { name: '75th %', stat: abbreviateNumber(data[75]) },
+      { name: '50th %', stat: abbreviateNumber(data[50]) },
     ];
   }, [data, staked, stakers, topStakedAmount]);
 
