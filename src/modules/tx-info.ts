@@ -5,6 +5,7 @@ import {
   getTknInfoForAddresses,
   getBlockInfoForBlocks,
   isFromEdenProducer,
+  getEthermineRPCTx,
   getSlotDelegates,
   getNextBaseFee,
   getStakerInfo,
@@ -23,8 +24,9 @@ import {
 } from './utils';
 
 interface TxInfo {
-  viaEdenRPC: boolean;
-  pending: boolean;
+  pendingPools: string[];
+  submissions: string[];
+  state: 'mined' | 'pending' | 'indexing';
   gasPrice: number;
   gasLimit: number;
   nonce: number;
@@ -72,17 +74,33 @@ const formatDecodedTxCalldata = (_decoded) => {
 
 export const getTransactionInfo = async (txHash) => {
   // Get general transaction info
-  const [txRequest, txReceipt, edenRPCInfoRes] = await Promise.all([
-    getTxRequest(txHash),
-    getTxReceipt(txHash),
-    getEdenRPCTxs([txHash]),
-  ]);
+  const [txRequest, txReceipt, edenRPCInfoRes, etherminePoolInfo] =
+    await Promise.all([
+      getTxRequest(txHash),
+      getTxReceipt(txHash),
+      getEdenRPCTxs([txHash]),
+      getEthermineRPCTx(txHash),
+    ]);
   const edenRPCInfo = edenRPCInfoRes.result[0];
-  const mined = txReceipt !== null;
+  const mined = txRequest !== null && txRequest.blockNumber !== null;
   const viaEdenRPC = edenRPCInfo !== undefined;
+  const viaEthermineRPC = etherminePoolInfo.status !== undefined;
   const pendingInEdenMempool = !mined && viaEdenRPC;
+  const pendingInEthermineMempool = !mined && viaEthermineRPC;
   const pendingInPublicMempool = !mined && txRequest !== null;
-  if (!(pendingInPublicMempool || pendingInEdenMempool || mined)) {
+  const txState = mined
+    ? txReceipt !== null
+      ? 'mined'
+      : 'indexing'
+    : 'pending';
+  if (
+    !(
+      pendingInPublicMempool ||
+      pendingInEthermineMempool ||
+      pendingInEdenMempool ||
+      mined
+    )
+  ) {
     console.error(`Can't find any info for transaction ${txHash}`);
     return null;
   }
@@ -90,7 +108,7 @@ export const getTransactionInfo = async (txHash) => {
 
   // Get tx info
   const transactionInfo = {
-    viaEdenRPC,
+    hash: txHash,
     fromEdenProducer: null,
     contractName: null,
     blockTxCount: null,
@@ -99,7 +117,9 @@ export const getTransactionInfo = async (txHash) => {
     priorityFee: null,
     timestamp: null,
     bundleIndex: null,
-    pending: true,
+    pendingPools: [],
+    submissions: [],
+    state: txState,
     gasUsed: null,
     gasCost: null,
     baseFee: null,
@@ -110,6 +130,24 @@ export const getTransactionInfo = async (txHash) => {
     logs: null,
     nextBaseFee,
   } as TxInfo;
+
+  // Pending pools
+  if (pendingInEdenMempool) {
+    transactionInfo.pendingPools.push('eden');
+  }
+  if (pendingInEthermineMempool) {
+    transactionInfo.pendingPools.push('ethermine');
+  }
+  if (pendingInPublicMempool) {
+    transactionInfo.pendingPools.push('public');
+  }
+  // Submissions
+  if (viaEdenRPC) {
+    transactionInfo.submissions.push('eden');
+  }
+  if (viaEthermineRPC) {
+    transactionInfo.submissions.push('ethermine');
+  }
 
   if (pendingInEdenMempool) {
     // use just eden rpc source
@@ -149,8 +187,8 @@ export const getTransactionInfo = async (txHash) => {
           weiToGwei(txRequest.gasPrice) - transactionInfo.priorityFee;
       }
     }
-    if (mined) {
-      const maxAttempts = 3;
+    if (txReceipt !== null) {
+      const maxAttempts = 10;
       const waitMs = 2000;
       for (let i = 0; i < maxAttempts; i++) {
         try {
@@ -184,7 +222,10 @@ export const getTransactionInfo = async (txHash) => {
             slotDelegates[txRequest.to.toLowerCase()] ?? null;
           if (bundledTxsRes[0] && txHash in bundledTxsRes[1]) {
             const { minerTip, bundleIndex } = bundledTxsRes[1][txHash];
-            transactionInfo.bundleIndex = bundleIndex ?? null;
+            if (bundleIndex) {
+              transactionInfo.bundleIndex = bundleIndex ?? null;
+              transactionInfo.submissions.push('flashbots');
+            }
             transactionInfo.minerTip = (minerTip && weiToETH(minerTip)) ?? 0;
           }
           const erc20Transfers = decodeERC20Transfers(txReceipt.logs);
@@ -231,10 +272,14 @@ export const getTransactionInfo = async (txHash) => {
           );
           transactionInfo.priorityFee =
             weiToGwei(txReceipt.effectiveGasPrice, 4) - transactionInfo.baseFee;
-          transactionInfo.pending = false;
           break;
         } catch (err) {
           console.error(`Error getting tx info for ${txHash}`, err);
+          if (maxAttempts - 1 === i) {
+            throw new Error(
+              `Max attempts reached to fetch tx-info for ${txHash}`
+            );
+          }
           await sleep(waitMs);
         } // eslint-disable-line no-empty
       }
