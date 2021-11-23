@@ -66,21 +66,28 @@ const statusBoxes = {
       {crossSVG} FAIL
     </span>
   ),
-  public: (
-    <span className="m-1 p-3 rounded-3xl py-2 bg-yellow inline-block text-xs text-bold text-blue-light shadow-sm font-bold text-center">
-      {clockSVG} PENDING IN PUBLIC MEMPOOL
+  indexing: (
+    <span className="p-3 rounded-3xl py-2 bg-white inline-block text-xs text-bold text-blue-light shadow-sm font-bold text-center">
+      {clockSVG} INDEXING
     </span>
   ),
-  eden: (
-    <span className="m-1 p-3 rounded-3xl py-2 bg-purple inline-block text-xs text-bold text-blue-light shadow-sm font-bold text-center">
-      {clockSVG} PENDING IN EDEN MEMPOOL
-    </span>
-  ),
-  ethermine: (
-    <span className="m-1 p-3 rounded-3xl py-2 bg-orange inline-block text-xs text-bold text-blue-light shadow-sm font-bold text-center">
-      {clockSVG} PENDING IN ETHERMINE MEMPOOL
-    </span>
-  ),
+  pending: {
+    public: (
+      <span className="m-1 p-3 rounded-3xl py-2 bg-yellow inline-block text-xs text-bold text-blue-light shadow-sm font-bold text-center">
+        {clockSVG} PENDING IN PUBLIC MEMPOOL
+      </span>
+    ),
+    eden: (
+      <span className="m-1 p-3 rounded-3xl py-2 bg-purple inline-block text-xs text-bold text-blue-light shadow-sm font-bold text-center">
+        {clockSVG} PENDING IN EDEN MEMPOOL
+      </span>
+    ),
+    ethermine: (
+      <span className="m-1 p-3 rounded-3xl py-2 bg-orange inline-block text-xs text-bold text-blue-light shadow-sm font-bold text-center">
+        {clockSVG} PENDING IN ETHERMINE MEMPOOL
+      </span>
+    ),
+  },
 };
 
 export default function TransactionPage({ txInfo }: { txInfo: TxInfo }) {
@@ -254,11 +261,13 @@ export default function TransactionPage({ txInfo }: { txInfo: TxInfo }) {
                     Status:
                   </td>
                   <td className="px-2 sm:px-6 py-4 whitespace-nowrap">
-                    {txInfo.pending
-                      ? txInfo.pendingPools.map((p) => statusBoxes[p])
-                      : txInfo.status === 1
-                      ? statusBoxes.success
-                      : statusBoxes.fail}
+                    {txInfo.state === 'mined'
+                      ? txInfo.status === 1
+                        ? statusBoxes.success
+                        : statusBoxes.fail
+                      : txInfo.state === 'pending'
+                      ? txInfo.pendingPools.map((p) => statusBoxes.pending[p])
+                      : statusBoxes.indexing}
                   </td>
                 </tr>
                 {txInfo.erc20Transfers && txInfo.erc20Transfers.length > 0 ? (
@@ -308,7 +317,7 @@ export default function TransactionPage({ txInfo }: { txInfo: TxInfo }) {
                 ) : (
                   ''
                 )}
-                {!txInfo.pending ? (
+                {txInfo.state === 'mined' ? (
                   <tr key="Transaction index">
                     <td className="px-2 sm:px-6 py-4 whitespace-nowrap">
                       Transaction index:
@@ -359,7 +368,7 @@ export default function TransactionPage({ txInfo }: { txInfo: TxInfo }) {
                 ) : (
                   ''
                 )}
-                {!txInfo.pending ? (
+                {txInfo.state === 'mined' ? (
                   <tr key="Gas used">
                     <td className="px-2 sm:px-6 py-4 whitespace-nowrap">
                       Gas used:
@@ -385,7 +394,7 @@ export default function TransactionPage({ txInfo }: { txInfo: TxInfo }) {
                 ) : (
                   ''
                 )}
-                {!txInfo.pending ? (
+                {txInfo.state === 'mined' ? (
                   <tr key="Fee">
                     <td className="px-2 sm:px-6 py-4 whitespace-nowrap">
                       Fee:

@@ -18,7 +18,7 @@ export default function Tx({ txInfo, error }) {
     router.push(`/tx/${router.query.tx}`);
   }, [router]);
   useEffect(() => {
-    if (txInfo.pending) {
+    if (txInfo.state !== 'mined') {
       // TODO: RPC provider to frontend to track tx
       // Refresh page every Xs
       new Promise((resolve) => setTimeout(resolve, 7e3)).then(() =>

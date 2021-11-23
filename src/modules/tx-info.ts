@@ -26,7 +26,7 @@ import {
 interface TxInfo {
   pendingPools: string[];
   submissions: string[];
-  pending: boolean;
+  state: 'mined' | 'pending' | 'indexing';
   gasPrice: number;
   gasLimit: number;
   nonce: number;
@@ -82,12 +82,17 @@ export const getTransactionInfo = async (txHash) => {
       getEthermineRPCTx(txHash),
     ]);
   const edenRPCInfo = edenRPCInfoRes.result[0];
-  const mined = txReceipt !== null;
+  const mined = txRequest !== null && txRequest.blockNumber !== null;
   const viaEdenRPC = edenRPCInfo !== undefined;
   const viaEthermineRPC = etherminePoolInfo.status !== undefined;
   const pendingInEdenMempool = !mined && viaEdenRPC;
   const pendingInEthermineMempool = !mined && viaEthermineRPC;
   const pendingInPublicMempool = !mined && txRequest !== null;
+  const txState = mined
+    ? txReceipt !== null
+      ? 'mined'
+      : 'indexing'
+    : 'pending';
   if (
     !(
       pendingInPublicMempool ||
@@ -114,7 +119,7 @@ export const getTransactionInfo = async (txHash) => {
     bundleIndex: null,
     pendingPools: [],
     submissions: [],
-    pending: true,
+    state: txState,
     gasUsed: null,
     gasCost: null,
     baseFee: null,
@@ -182,7 +187,7 @@ export const getTransactionInfo = async (txHash) => {
           weiToGwei(txRequest.gasPrice) - transactionInfo.priorityFee;
       }
     }
-    if (mined) {
+    if (txReceipt !== null) {
       const maxAttempts = 10;
       const waitMs = 2000;
       for (let i = 0; i < maxAttempts; i++) {
@@ -267,7 +272,6 @@ export const getTransactionInfo = async (txHash) => {
           );
           transactionInfo.priorityFee =
             weiToGwei(txReceipt.effectiveGasPrice, 4) - transactionInfo.baseFee;
-          transactionInfo.pending = false;
           break;
         } catch (err) {
           console.error(`Error getting tx info for ${txHash}`, err);
