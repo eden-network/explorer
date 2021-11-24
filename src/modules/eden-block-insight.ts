@@ -1,5 +1,6 @@
 import { safeReadFromBucket, safeWriteToBucket } from './gcloud-cache';
 import {
+  fetchMinerTipsForTxs,
   getMinerAlias,
   isFromEdenProducer,
   checkIfValidCache,
@@ -27,9 +28,10 @@ export const getBlockInsight = async (_blockNumber) => {
     blockInfo.transactions.map((tx) => tx.from)
   );
   const txHashes = blockInfo.transactions.map((tx) => tx.hash);
-  const [stakersStake, edenRPCTxs] = await Promise.all([
+  const [stakersStake, edenRPCTxs, minerTipToTx] = await Promise.all([
     getStakersStake(uniqueSenders, _blockNumber - 1),
     getEdenRPCTxs(txHashes),
+    fetchMinerTipsForTxs(_blockNumber, blockInfo.miner),
   ]);
   const edenRPCInfoForTx = Object.fromEntries(
     edenRPCTxs.result.map((tx) => [tx.hash, tx.blocknumber])
@@ -43,11 +45,12 @@ export const getBlockInsight = async (_blockNumber) => {
     const fromLocalMiner =
       tx.from.toLowerCase() === blockInfo.miner.toLowerCase();
     const toLocalMiner = tx.to.toLowerCase() === blockInfo.miner.toLowerCase();
-    const minerReward = tx.txFee
-      ? bundledTx
+    const minerReward =
+      bundledTx && bundledTx.minerReward
         ? bundledTx.minerReward
-        : tx.txFee
-      : null;
+        : parseInt(tx.txFee, 10)
+        ? parseInt(tx.txFee, 10) + (minerTipToTx[tx.hash] * 1e18 || 0)
+        : null;
     const labeledTx = {
       ...tx,
       fromLabel:
