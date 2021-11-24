@@ -73,7 +73,9 @@ export default function Address({ accountOverview, transactions, error }) {
             />
           </h2>
           {accountOverview.isKnownMiner && (
-            <Link href={`/blocks?miner=${accountOverview.address}`}>
+            <Link
+              href={`/blocks?miner=${accountOverview.address}&fromAllProducer=true`}
+            >
               <a className="px-3 py-1 mt-4 bg-blue-light text-sm font-medium rounded-md betterhover:hover:bg-green betterhover:hover:text-blue cursor-pointer select-none betterhover:disabled:opacity-50 betterhover:disabled:bg-blue-light betterhover:disabled:text-white">
                 See miner blocks
               </a>

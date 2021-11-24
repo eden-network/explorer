@@ -33,7 +33,9 @@ export default function BlocksPage({ blocks }) {
     if (router.query.miner) return (router.query.miner as string).split(',');
     return [];
   });
-  const [edenProducerOnly, setEdenProducerOnly] = useState(true);
+  const [edenProducerOnly, setEdenProducerOnly] = useState(
+    router.query.fromAllProducer === 'false'
+  );
   const [inputValue, setInputValue] = useState('');
   const [selectedVal, setSelectedVal] = useState('');
 
