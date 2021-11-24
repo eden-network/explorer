@@ -91,7 +91,7 @@ export const sendRawJsonRPCRequest = async (_method, _params, _provider) => {
     method: 'post',
   }).then((r) => r.json());
   if (error) {
-    throw new Error(`RPC request failed: ${error}`);
+    throw new Error(`RPC request failed: ${JSON.stringify(error)}`);
   }
   return result;
 };
