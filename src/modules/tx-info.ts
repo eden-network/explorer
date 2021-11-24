@@ -4,6 +4,7 @@ import { decodeTx } from './contract-info';
 import {
   getTknInfoForAddresses,
   getBlockInfoForBlocks,
+  getInternalTransfers,
   isFromEdenProducer,
   getEthermineRPCTx,
   getSlotDelegates,
@@ -200,6 +201,7 @@ export const getTransactionInfo = async (txHash) => {
             slotDelegates,
             [blockInfo],
             decodedTx,
+            internalTransfers,
           ] = await Promise.all([
             getStakerInfo(txRequest.from.toLowerCase(), blockNum),
             isFromEdenProducer(blockNum),
@@ -207,6 +209,7 @@ export const getTransactionInfo = async (txHash) => {
             getSlotDelegates(blockNum - 1),
             getBlockInfoForBlocks([blockNum]),
             decodeTx(txRequest.to, txRequest.input),
+            getInternalTransfers(blockNum),
           ]);
           if (decodedTx.parsedCalldata) {
             transactionInfo.input = formatDecodedTxCalldata(
@@ -222,11 +225,25 @@ export const getTransactionInfo = async (txHash) => {
             slotDelegates[txRequest.to.toLowerCase()] ?? null;
           if (bundledTxsRes[0] && txHash in bundledTxsRes[1]) {
             const { minerTip, bundleIndex } = bundledTxsRes[1][txHash];
-            if (bundleIndex) {
+            if (bundleIndex !== undefined) {
               transactionInfo.bundleIndex = bundleIndex ?? null;
               transactionInfo.submissions.push('flashbots');
             }
-            transactionInfo.minerTip = (minerTip && weiToETH(minerTip)) ?? 0;
+            if (minerTip !== undefined) {
+              transactionInfo.minerTip = minerTip / 1e18;
+            }
+          }
+          if (!transactionInfo.minerTip) {
+            let minerTipInternalTxsETH = 0;
+            internalTransfers.forEach((transfer) => {
+              if (
+                transfer.hash === txHash &&
+                transfer.to === blockInfo.result.miner
+              ) {
+                minerTipInternalTxsETH += transfer.value;
+              }
+            });
+            transactionInfo.minerTip = minerTipInternalTxsETH;
           }
           const erc20Transfers = decodeERC20Transfers(txReceipt.logs);
           if (erc20Transfers.length > 0) {
