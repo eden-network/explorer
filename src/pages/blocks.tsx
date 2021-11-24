@@ -19,7 +19,7 @@ import { AppConfig } from '../utils/AppConfig';
 
 const { minerAlias } = AppConfig;
 
-const PER_PAGE = 10;
+const PER_PAGE = 5;
 
 const MINERS = Object.values(minerAlias);
 
