@@ -34,6 +34,36 @@ export const getBlockInsight = async (_blockNumber) => {
   const edenRPCInfoForTx = Object.fromEntries(
     edenRPCTxs.result.map((tx) => [tx.hash, tx.blocknumber])
   );
+  const orderedStake = Object.values(stakersStake).sort((a, b) => b - a);
+  const isNextStake = (stake) => {
+    const nextStakeMin = orderedStake[0];
+    if (stake === nextStakeMin) {
+      orderedStake.splice(0, 1);
+      return true;
+    }
+    // In case there is a repeat (same sender in different txs)
+    return stake > nextStakeMin;
+  };
+  // Dont trust tx-index of flashbots bundle txs
+  const getHighestBundleTxIndex = () => {
+    let highestIndex = 0;
+    let bundledTxsCount = Object.keys(bundledTxs).length;
+    if (bundledTxsCount > 0) {
+      for (const tx of transactions) {
+        if (bundledTxs[tx.hash]) {
+          if (tx.index > highestIndex) {
+            highestIndex = tx.index;
+          }
+          if (bundledTxsCount === 1) {
+            return highestIndex;
+          }
+          bundledTxsCount--;
+        }
+      }
+    }
+    return null;
+  };
+  const highestBundleTxIndex = getHighestBundleTxIndex();
   const slotGasCap = getSlotGasCap();
   const slotAvlGas = Object.fromEntries([0, 1, 2].map((s) => [s, slotGasCap]));
   const labeledTxs = [];
@@ -81,12 +111,21 @@ export const getBlockInsight = async (_blockNumber) => {
       }
       return false;
     };
+    const hasStakePriority = () => {
+      return (
+        fromEdenProducer &&
+        labeledTx.senderStake >= 100 &&
+        isNextStake(labeledTx.senderStake) &&
+        (highestBundleTxIndex === null ||
+          labeledTx.index > highestBundleTxIndex)
+      );
+    };
 
     if (hasSlotPriority()) {
       labeledTx.type = 'slot';
     } else if (labeledTx.bundleIndex !== null) {
       labeledTx.type = 'fb-bundle';
-    } else if (fromEdenProducer && labeledTx.senderStake >= 100) {
+    } else if (hasStakePriority()) {
       labeledTx.type = 'stake';
     } else if (labeledTx.from.toLowerCase() === blockInfo.miner.toLowerCase()) {
       labeledTx.type = 'local-tx';
