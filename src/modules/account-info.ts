@@ -29,6 +29,7 @@ interface TxOverview {
 
 interface AccountOverview {
   slotDelegate: number | null;
+  isKnownMiner: boolean;
   label: string | null;
   edenStaked: number;
   stakerRank: number;
@@ -97,6 +98,7 @@ export const getAccountInfo = async (
     edenStaked: parseInt(edenStaked, 10) / 1e18,
     label: minerAlias || contractLabel || null,
     address: ethers.utils.getAddress(_account),
+    isKnownMiner: minerAlias !== null,
     txCount: accountTxCount,
   };
   const formatTx = (_tx) => ({

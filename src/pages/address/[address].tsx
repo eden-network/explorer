@@ -72,7 +72,7 @@ export default function Address({ accountOverview, transactions, error }) {
               path={`address/${accountOverview.ens || accountOverview.address}`}
             />
           </h2>
-          {accountOverview.label && (
+          {accountOverview.isKnownMiner && (
             <Link href={`/blocks?miner=${accountOverview.address}`}>
               <a className="px-3 py-1 mt-4 bg-blue-light text-sm font-medium rounded-md betterhover:hover:bg-green betterhover:hover:text-blue cursor-pointer select-none betterhover:disabled:opacity-50 betterhover:disabled:bg-blue-light betterhover:disabled:text-white">
                 See miner blocks
