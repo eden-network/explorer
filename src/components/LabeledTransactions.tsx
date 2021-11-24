@@ -424,7 +424,7 @@ export default function LabeledTransactions({
         border
       >
         ETH miner recieved from this transaction. Includes non-burned gas fees
-        and direct miner payments if transaction is in a bundle.
+        and direct miner payments.
       </ReactToolTip>
       <ReactToolTip
         className="tooltip"
