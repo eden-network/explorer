@@ -18,7 +18,7 @@ export const formatWei = (_wei, _pre = 2) => {
   if (intVal === 0) {
     return { value: '0', unit: 'Wei' };
   }
-  if (intVal >= 1e14) {
+  if (intVal >= 1e16) {
     return { value: (intVal / 1e18).toFixed(_pre), unit: 'Eth' };
   }
   if (intVal >= 1e5) {
@@ -91,7 +91,7 @@ export const sendRawJsonRPCRequest = async (_method, _params, _provider) => {
     method: 'post',
   }).then((r) => r.json());
   if (error) {
-    throw new Error(`RPC request failed: ${error}`);
+    throw new Error(`RPC request failed: ${JSON.stringify(error)}`);
   }
   return result;
 };

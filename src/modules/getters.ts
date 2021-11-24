@@ -87,6 +87,46 @@ export const getTxRequest = (_txHash) => {
   );
 };
 
+export const getInternalTransfers = async (blockNum, from?, to?) => {
+  // Only available on mainnet
+  if (network !== 'mainnet') {
+    return [];
+  }
+  try {
+    const blockNumHex = `0x${blockNum.toString(16)}`;
+    const args = {
+      category: ['internal'],
+      fromBlock: blockNumHex,
+      toBlock: blockNumHex,
+    } as any;
+    if (from) {
+      args.fromAddress = from;
+    }
+    if (to) {
+      args.toAddress = to;
+    }
+    const res = await sendRawJsonRPCRequest(
+      'alchemy_getAssetTransfers',
+      [args],
+      providerEndpoint
+    );
+    return res.transfers;
+  } catch (err) {
+    console.error(`Error while fetching miner tip ${err}`);
+    return [];
+  }
+};
+
+export const getMinerTips = async (blockNum, miner) => {
+  const internalTransfers = await getInternalTransfers(blockNum, null, miner);
+  const minerTipToTx = {};
+  internalTransfers.forEach((t) => {
+    const currentVal = minerTipToTx[t.hash];
+    minerTipToTx[t.hash] = currentVal ? currentVal + t.value : t.value;
+  });
+  return minerTipToTx;
+};
+
 export const getLatestBlock = async () => {
   return provider.getBlockNumber();
 };
