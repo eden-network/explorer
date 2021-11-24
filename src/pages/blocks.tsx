@@ -34,7 +34,7 @@ export default function BlocksPage({ blocks }) {
     return [];
   });
   const [edenProducerOnly, setEdenProducerOnly] = useState(
-    router.query.fromAllProducer === 'false'
+    router.query.fromAllProducer !== 'true'
   );
   const [inputValue, setInputValue] = useState('');
   const [selectedVal, setSelectedVal] = useState('');
