@@ -1,6 +1,6 @@
 import { safeReadFromBucket, safeWriteToBucket } from './gcloud-cache';
 import {
-  fetchMinerTipsForTxs,
+  getMinerTips,
   getMinerAlias,
   isFromEdenProducer,
   checkIfValidCache,
@@ -31,7 +31,7 @@ export const getBlockInsight = async (_blockNumber) => {
   const [stakersStake, edenRPCTxs, minerTipToTx] = await Promise.all([
     getStakersStake(uniqueSenders, _blockNumber - 1),
     getEdenRPCTxs(txHashes),
-    fetchMinerTipsForTxs(_blockNumber, blockInfo.miner),
+    getMinerTips(_blockNumber, blockInfo.miner),
   ]);
   const edenRPCInfoForTx = Object.fromEntries(
     edenRPCTxs.result.map((tx) => [tx.hash, tx.blocknumber])
@@ -48,8 +48,8 @@ export const getBlockInsight = async (_blockNumber) => {
     const minerReward =
       bundledTx && bundledTx.minerReward
         ? bundledTx.minerReward
-        : parseInt(tx.txFee, 10)
-        ? parseInt(tx.txFee, 10) + (minerTipToTx[tx.hash] * 1e18 || 0)
+        : tx.txFee
+        ? parseInt(tx.txFee, 16) + (minerTipToTx[tx.hash] * 1e18 || 0)
         : null;
     const labeledTx = {
       ...tx,
