@@ -62,7 +62,7 @@ export const getBlockInsight = async (_blockNumber) => {
       viaEdenRPC: edenRPCInfoForTx[tx.hash] !== undefined,
       type: '',
     };
-    if (minerReward) labeledTx.minerReward = minerReward;
+    if (minerReward !== null) labeledTx.minerReward = minerReward;
 
     const hasSlotPriority = () => {
       if (fromEdenProducer && labeledTx.toSlot !== false) {
