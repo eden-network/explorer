@@ -18,7 +18,7 @@ const {
   monitorEndpointEdenRPC,
   graphNetworkEndpoint,
   flashbotsAPIEndpoint,
-  coingeckoTokensAPI,
+  tokensAPI,
   providerEndpoint,
   cacheBlockParams,
   etherscanAPIKey,
@@ -656,20 +656,23 @@ export const getTimestampsForBlocks = async (_minTimestamp, _maxTimestamp) => {
   return blocksRes;
 };
 
-export const getTknInfoFromCoingecko = async () => {
-  const coingeckoDataRaw = await fetch(coingeckoTokensAPI).then(
-    safeParseResponse
-  );
-  return Object.fromEntries(
-    coingeckoDataRaw.tokens.map((tknInfo) => [
-      tknInfo.address,
-      {
-        decimals: tknInfo.decimals,
-        logoURL: tknInfo.logoURI,
-        symbol: tknInfo.symbol,
-      },
-    ])
-  );
+export const getTknInfoFromAPI = async () => {
+  try {
+    const dataRaw = await fetch(tokensAPI).then(safeParseResponse);
+    return Object.fromEntries(
+      dataRaw.tokens.map((tknInfo) => [
+        tknInfo.address,
+        {
+          decimals: tknInfo.decimals,
+          logoURL: tknInfo.logoURI,
+          symbol: tknInfo.symbol,
+        },
+      ])
+    );
+  } catch (e) {
+    console.error(e);
+    return null;
+  }
 };
 
 export const getTknInfoFromChain = async (_tokenAddress) => {
@@ -714,14 +717,14 @@ export const getTknInfoForAddresses = async (_addresses) => {
     decimals: 18,
     logoURL: null,
   });
-  // Fetch coingecko data
-  const coingeckoData = await getTknInfoFromCoingecko();
+  // Fetch token data
+  const tknData = await getTknInfoFromAPI();
   const tknInfo = await Promise.all(
     _addresses.map(async (tknAdd) => {
-      // Fetch token info from coingecko
-      const coingeckoTknInfo = coingeckoData[tknAdd.toLowerCase()];
-      if (coingeckoTknInfo) {
-        return [tknAdd, await coingeckoTknInfo];
+      // Fetch token info from API
+      const tknInfoAPI = tknData && tknData[ethers.utils.getAddress(tknAdd)];
+      if (tknInfoAPI) {
+        return [tknAdd, tknInfoAPI];
       }
       // Fetch token info from blockchain
       try {
