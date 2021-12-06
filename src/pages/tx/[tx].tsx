@@ -1,6 +1,7 @@
 import { useCallback, useEffect } from 'react';
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { ethers } from 'ethers';
 import { useRouter } from 'next/router';
 
 import ErrorMsg from '../../components/ErrorMsg';
@@ -17,16 +18,27 @@ export default function Tx({ txInfo, error }) {
   const handleClickRefresh = useCallback(() => {
     router.push(`/tx/${router.query.tx}`);
   }, [router]);
+
+  async function waitForTx(txhash, confirmations = 1) {
+    try {
+      const provider = new ethers.providers.JsonRpcProvider(
+        AppConfig.publicEdenAlchemyAPI
+      );
+      await provider.waitForTransaction(txhash, confirmations);
+    } catch (_) {
+      console.log(`Couldnt connect to ethereum provider`);
+      // Wait for few sec and try again
+      await new Promise((resolve) => setTimeout(resolve, 5000));
+    }
+  }
+
   useEffect(() => {
     if (txInfo.state !== 'mined') {
-      // TODO: RPC provider to frontend to track tx
-      // Refresh page every Xs
-      new Promise((resolve) => setTimeout(resolve, 7e3)).then(() =>
-        handleClickRefresh()
-      );
+      waitForTx(router.query.tx).then(() => handleClickRefresh());
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [txInfo]);
+
   if (error) {
     return (
       <ErrorMsg errorMsg={`Couldn't fetch data for the tx: ${router.query.tx}`}>
