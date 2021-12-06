@@ -62,7 +62,7 @@ export const safeFetch = async (url, options, callback) => {
     const res: any = await fetch(url, options).catch((e) => {
       // eslint-disable-next-line no-console
       console.error(`REST call failed:`, e);
-      return handleFailResponse(res);
+      return handleFailResponse(e);
     });
     const resText = await res.text();
     if (res.status !== 200) {

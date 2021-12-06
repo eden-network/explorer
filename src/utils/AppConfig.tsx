@@ -37,6 +37,8 @@ export const AppConfig = {
   tokensAPI: 'http://tokens.1inch.eth.link',
   monitorEndpointEdenRPC: 'https://api.edennetwork.io/v1/monitor',
   monitorEndpointEthermineRPC: 'https://rpc.ethermine.org/tx/',
+  publicEdenAlchemyAPI:
+    'https://eth-mainnet.alchemyapi.io/v2/P8rzfqKR51hxNVhF0OfA3WDiACi0phmU', // Restricted domain
   providerEndpointGraphQl: process.env.ETH_GRAPHQL_MAINNET,
   etherscanAPIKey: process.env.ETHERSCAN_API_TOKEN,
   flashbotsAPIEndpoint: process.env.FLASHBOTS_API,

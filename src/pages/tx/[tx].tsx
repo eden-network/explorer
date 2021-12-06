@@ -1,6 +1,7 @@
-import { useCallback, useEffect } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { ethers } from 'ethers';
 import { useRouter } from 'next/router';
 
 import ErrorMsg from '../../components/ErrorMsg';
@@ -17,16 +18,68 @@ export default function Tx({ txInfo, error }) {
   const handleClickRefresh = useCallback(() => {
     router.push(`/tx/${router.query.tx}`);
   }, [router]);
-  useEffect(() => {
-    if (txInfo.state !== 'mined') {
-      // TODO: RPC provider to frontend to track tx
-      // Refresh page every Xs
-      new Promise((resolve) => setTimeout(resolve, 7e3)).then(() =>
-        handleClickRefresh()
+
+  const setProvider = async () => {
+    // TODO: Support Ropsten
+    try {
+      const provider = new ethers.providers.JsonRpcProvider(
+        AppConfig.publicEdenAlchemyAPI
       );
+      await provider.getNetwork(); // Double check that connection is available
+      return provider;
+    } catch (_) {
+      return null;
+    }
+  };
+  const provider = setProvider();
+
+  const [nextBaseFee, setNextBaseFee] = useState(txInfo.nextBaseFee);
+
+  async function waitForTx(txhash, confirmations = 2) {
+    return provider.then(async (_provider) => {
+      if (_provider) {
+        await _provider.waitForTransaction(txhash, confirmations);
+      } else {
+        console.log(`Couldnt connect to ethereum provider`);
+        // Wait for few sec and try again
+        await new Promise((resolve) => setTimeout(resolve, 5000));
+      }
+    });
+  }
+
+  useEffect(() => {
+    if (txInfo.state === 'pending') {
+      waitForTx(router.query.tx).then(() => handleClickRefresh());
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [txInfo]);
+
+  useEffect(() => {
+    if (txInfo.state === 'pending') {
+      let interval;
+      provider.then((_provider) => {
+        if (_provider) {
+          interval = setInterval(() => {
+            _provider
+              .send('eth_getBlockByNumber', ['pending', false])
+              .then((pendingBlock) => {
+                const pendingBaseFee =
+                  parseInt(pendingBlock.baseFeePerGas, 16) / 1e9;
+                setNextBaseFee(pendingBaseFee);
+              });
+          }, 7e3);
+        }
+      });
+      return () => {
+        if (interval) {
+          setNextBaseFee(null);
+          clearInterval(interval);
+        }
+      };
+    }
+    return () => {};
+  }, [txInfo]);
+
   if (error) {
     return (
       <ErrorMsg errorMsg={`Couldn't fetch data for the tx: ${router.query.tx}`}>
@@ -72,7 +125,7 @@ export default function Tx({ txInfo, error }) {
         <div className="flex flex-col rounded-lg shadow-lg overflow-hidden bg-blue">
           <div className="p-3 flex-1 sm:p-6 flex flex-col justify-between">
             <div className="flex-1 mt-4">
-              <TransactionPage txInfo={txInfo} />
+              <TransactionPage txInfo={txInfo} nextBaseFee={nextBaseFee} />
             </div>
           </div>
         </div>
