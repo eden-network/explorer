@@ -84,7 +84,13 @@ const statusBoxes = {
   },
 };
 
-export default function TransactionPage({ txInfo }: { txInfo: TxInfo }) {
+export default function TransactionPage({
+  txInfo,
+  nextBaseFee,
+}: {
+  txInfo: TxInfo;
+  nextBaseFee: number;
+}) {
   const makeAddressHyperlink = (_text, _address) => (
     <a
       href={`${AppConfig.etherscanEndpoint}/address/${_address}`}
@@ -354,8 +360,8 @@ export default function TransactionPage({ txInfo }: { txInfo: TxInfo }) {
                     </td>
                     <td className="px-2 sm:px-6 py-4 whitespace-nowrap">
                       {txInfo.baseFee} Gwei{' '}
-                      {txInfo.nextBaseFee
-                        ? ` / Next base-fee: ${txInfo.nextBaseFee.toLocaleString()} Gwei`
+                      {nextBaseFee && txInfo.state === 'pending'
+                        ? ` / Next base-fee: ${nextBaseFee.toLocaleString()} Gwei`
                         : ''}
                     </td>
                   </tr>
