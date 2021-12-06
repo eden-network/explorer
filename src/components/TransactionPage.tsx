@@ -72,7 +72,7 @@ const statusBoxes = {
       </span>
     ),
     eden: (
-      <span className="m-1 p-3 rounded-3xl py-2 bg-purple inline-block text-xs text-bold text-blue-light shadow-sm font-bold text-center">
+      <span className="m-1 p-3 rounded-3xl py-2 bg-green inline-block text-xs text-bold text-blue-light shadow-sm font-bold text-center">
         {clockSVG} PENDING IN EDEN MEMPOOL
       </span>
     ),
