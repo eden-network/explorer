@@ -40,7 +40,9 @@ export default function BlockStatus({
       </Info.Container>
       <Info.Container>
         <Info.Label>Gas-used</Info.Label>
-        <Info.Description>{block.gasUsed}</Info.Description>
+        <Info.Description>
+          {((Number(block.gasUsed) * 100) / Number(block.gasLimit)).toFixed(1)}%
+        </Info.Description>
       </Info.Container>
       <Info.Container>
         <div className="inline-flex items-center">
