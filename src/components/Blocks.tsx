@@ -3,7 +3,6 @@ import { useEffect, useMemo } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import TimeAgo from 'javascript-time-ago';
 import en from 'javascript-time-ago/locale/en';
-import Link from 'next/link';
 import ReactToolTip from 'react-tooltip';
 
 import { formatAddress } from '../modules/formatter';
@@ -112,11 +111,14 @@ export default function Blocks({
                 {shapedBlocks.map((block) => (
                   <tr key={block.number}>
                     <td className="px-2 sm:px-6 py-4 whitespace-nowrap">
-                      <Link href={`/block/${block.number}`}>
-                        <a className="text-green">
-                          {block.number.toLocaleString()}
-                        </a>
-                      </Link>
+                      <a
+                        target="_blank"
+                        rel="noreferrer"
+                        href={`/block/${block.number}`}
+                        className="text-green"
+                      >
+                        {block.number.toLocaleString()}
+                      </a>
                     </td>
                     <td className="px-2 sm:px-6 py-4 whitespace-nowrap">
                       {block.timestamp}
