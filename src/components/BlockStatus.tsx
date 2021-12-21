@@ -41,7 +41,7 @@ export default function BlockStatus({
       <Info.Container>
         <Info.Label>Gas-used</Info.Label>
         <Info.Description>
-          {((Number(block.gasUsed) * 100) / Number(block.gasLimit)).toFixed(1)}%
+          {((Number(block.gasUsed) * 100) / Number(block.gasLimit)).toFixed(2)}%
         </Info.Description>
       </Info.Container>
       <Info.Container>
