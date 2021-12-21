@@ -16,6 +16,8 @@ import {
   faSync,
   faQuestionCircle,
   faSearch,
+  faLowVision,
+  faEye,
 } from '@fortawesome/free-solid-svg-icons';
 
 library.add(
@@ -33,5 +35,7 @@ library.add(
   faExclamationCircle,
   faSync,
   faQuestionCircle,
-  faSearch
+  faSearch,
+  faLowVision,
+  faEye
 );
