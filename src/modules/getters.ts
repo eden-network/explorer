@@ -368,8 +368,8 @@ export const fetchBlockInfoGraphQl = async (
   const baseFeePerGas = ethers.BigNumber.from(blockInfoRaw.baseFeePerGas);
   const miner = ethers.utils.getAddress(blockInfoRaw.miner.address);
   const timestamp = parseInt(blockInfoRaw.timestamp, 16);
-  const gasLimit = parseInt(blockInfoRaw.gasLimit, 16);
-  const gasUsed = parseInt(blockInfoRaw.gasUsed, 16);
+  const gasLimit = parseInt(blockInfoRaw.gasLimit, 10);
+  const gasUsed = parseInt(blockInfoRaw.gasUsed, 10);
   const transactions = blockInfoRaw.transactions.map((tx, index) => {
     const maxPriorityFee = ethers.BigNumber.from(tx.gasPrice).sub(
       baseFeePerGas
