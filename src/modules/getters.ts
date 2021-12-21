@@ -4,6 +4,7 @@ import { request, gql } from 'graphql-request';
 
 import { AppConfig } from '../utils/AppConfig';
 import { formatAddress } from './formatter';
+import { ETH_GET_TRANSACTION_BY_HASH } from './graphql/query/transaction';
 import {
   safeFetch,
   sendRawJsonRPCRequest,
@@ -610,6 +611,22 @@ export const fetchMethodSig = async (_methodSigHex) => {
   const url = `${endpoint}?hex_signature=${_methodSigHex}`;
   const res = await fetch(url).then((r) => r.json());
   return res;
+};
+
+export const getTxRequestByGraphQL = async (txHash) => {
+  try {
+    const response = await request(
+      providerEndpointGraphQl,
+      ETH_GET_TRANSACTION_BY_HASH,
+      {
+        hash: txHash,
+      }
+    );
+    return response.transaction;
+  } catch (err) {
+    console.log(err);
+    return null;
+  }
 };
 
 export const getTimestampsForBlocks = async (_minTimestamp, _maxTimestamp) => {

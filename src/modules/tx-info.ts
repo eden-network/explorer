@@ -12,13 +12,11 @@ import {
   getStakerInfo,
   getEdenRPCTxs,
   getBundledTxs,
-  getTxRequest,
-  getTxReceipt,
+  getTxRequestByGraphQL,
 } from './getters';
 import {
   getChecksumAddress,
   weiToGwei,
-  weiToETH,
   gweiToETH,
   decodeERC20Transfers,
   sleep,
@@ -73,24 +71,39 @@ const formatDecodedTxCalldata = (_decoded) => {
   return msgFull;
 };
 
+const normalizeLogs = (rawTx) => {
+  const { logs } = rawTx;
+  return logs.map((log) => ({
+    blockHash: rawTx.block.hash,
+    address: log.account.address,
+    logIndex: log.index,
+    data: log.data,
+    removed: false,
+    topics: log.topics,
+    blockNumber: rawTx.block.number,
+    transactionIndex: rawTx.index,
+    transactionHash: rawTx.hash,
+  }));
+};
+
 export const getTransactionInfo = async (txHash) => {
   // Get general transaction info
-  const [txRequest, txReceipt, edenRPCInfoRes, etherminePoolInfo] =
-    await Promise.all([
-      getTxRequest(txHash),
-      getTxReceipt(txHash),
-      getEdenRPCTxs([txHash]),
-      getEthermineRPCTx(txHash),
-    ]);
+
+  const [rawTx, edenRPCInfoRes, etherminePoolInfo] = await Promise.all([
+    getTxRequestByGraphQL(txHash),
+    getEdenRPCTxs([txHash]),
+    getEthermineRPCTx(txHash),
+  ]);
+
   const edenRPCInfo = edenRPCInfoRes.result[0];
-  const mined = txRequest !== null && txRequest.blockNumber !== null;
+  const mined = rawTx.from !== null && rawTx.from.address !== null;
   const viaEdenRPC = edenRPCInfo !== undefined;
   const viaEthermineRPC = etherminePoolInfo.status !== undefined;
   const pendingInEdenMempool = !mined && viaEdenRPC;
   const pendingInEthermineMempool = !mined && viaEthermineRPC;
-  const pendingInPublicMempool = !mined && txRequest !== null;
+  const pendingInPublicMempool = !mined && rawTx.from !== null;
   const txState = mined
-    ? txReceipt !== null
+    ? rawTx.to !== null
       ? 'mined'
       : 'indexing'
     : 'pending';
@@ -132,6 +145,31 @@ export const getTransactionInfo = async (txHash) => {
     nextBaseFee,
   } as TxInfo;
 
+  transactionInfo.gasUsed = rawTx.gasUsed;
+  transactionInfo.blockNumber = rawTx.block && rawTx.block.number;
+  transactionInfo.from = rawTx.from && rawTx.from.address;
+  transactionInfo.to = rawTx.to && rawTx.to.address;
+  transactionInfo.blockTxCount = rawTx.block && rawTx.block.transactionCount;
+  transactionInfo.index = rawTx.index;
+  transactionInfo.hash = rawTx.hash;
+  transactionInfo.timestamp = parseInt(rawTx.block.timestamp, 16);
+  transactionInfo.nonce = parseInt(rawTx.nonce, 16);
+  transactionInfo.nextBaseFee = nextBaseFee;
+  transactionInfo.value = parseInt(rawTx.value, 16);
+  transactionInfo.gasLimit = parseInt(rawTx.gas, 16);
+  transactionInfo.status = parseInt(rawTx.status, 10);
+  transactionInfo.gasPrice = weiToGwei(rawTx.gasPrice);
+  transactionInfo.logs = normalizeLogs(rawTx);
+
+  transactionInfo.fromEdenProducer = await isFromEdenProducer(
+    rawTx.block.number
+  );
+  const decodedTx = await decodeTx(rawTx.to.address, rawTx.inputData);
+  transactionInfo.contractName = decodedTx.contractName;
+  if (decodedTx.parsedCalldata) {
+    transactionInfo.input = formatDecodedTxCalldata(decodedTx.parsedCalldata);
+  }
+
   // Pending pools
   if (pendingInEdenMempool) {
     transactionInfo.pendingPools.push('eden');
@@ -157,10 +195,6 @@ export const getTransactionInfo = async (txHash) => {
     );
     transactionInfo.from = getChecksumAddress(edenRPCInfo.from);
     transactionInfo.gasLimit = parseInt(edenRPCInfo.gas, 16);
-    transactionInfo.nonce = parseInt(edenRPCInfo.nonce, 10);
-    transactionInfo.value = weiToETH(edenRPCInfo.value);
-    transactionInfo.input = edenRPCInfo.input;
-    transactionInfo.hash = edenRPCInfo.hash;
     if (edenRPCInfo.maxpriorityfeepergas) {
       transactionInfo.priorityFee = weiToGwei(edenRPCInfo.maxpriorityfeepergas);
       transactionInfo.baseFee =
@@ -168,61 +202,38 @@ export const getTransactionInfo = async (txHash) => {
     } else {
       transactionInfo.gasPrice = weiToGwei(edenRPCInfo.gasprice);
     }
-  } else if (txRequest !== null) {
+  } else if (rawTx.from !== null) {
     // use tx-request object
-    transactionInfo.to = getChecksumAddress(
-      txRequest.to || ethers.constants.AddressZero
-    );
-    transactionInfo.index = parseInt(txRequest.transactionIndex, 16);
-    transactionInfo.gasPrice = weiToGwei(txRequest.gasPrice);
-    transactionInfo.from = getChecksumAddress(txRequest.from);
-    transactionInfo.gasLimit = parseInt(txRequest.gas, 16);
-    transactionInfo.nonce = parseInt(txRequest.nonce, 16);
-    transactionInfo.value = weiToETH(txRequest.value);
-    transactionInfo.input = txRequest.input;
-    transactionInfo.hash = txRequest.hash;
-    if (txRequest.maxPriorityFeePerGas) {
-      transactionInfo.priorityFee = weiToGwei(txRequest.maxPriorityFeePerGas);
-      if (transactionInfo.priorityFee !== transactionInfo.gasPrice) {
+    if (rawTx.gas) {
+      transactionInfo.priorityFee = weiToGwei(rawTx.gas);
+      if (transactionInfo.priorityFee !== rawTx.gasPrice) {
         transactionInfo.baseFee =
-          weiToGwei(txRequest.gasPrice) - transactionInfo.priorityFee;
+          weiToGwei(rawTx.gasPrice) - transactionInfo.priorityFee;
       }
     }
-    if (txReceipt !== null) {
+    if (rawTx.to !== null) {
       const maxAttempts = 10;
       const waitMs = 2000;
       for (let i = 0; i < maxAttempts; i++) {
         try {
-          const blockNum = parseInt(txRequest.blockNumber, 16);
+          const blockNum = parseInt(rawTx.block.number, 10);
           const [
             { staked: senderStake, rank: senderRank },
-            fromEdenProducer,
             bundledTxsRes,
             slotDelegates,
             [blockInfo],
-            decodedTx,
             internalTransfers,
           ] = await Promise.all([
-            getStakerInfo(txRequest.from.toLowerCase(), blockNum),
-            isFromEdenProducer(blockNum),
+            getStakerInfo(rawTx.from.address.toLowerCase(), blockNum),
             getBundledTxs(blockNum),
             getSlotDelegates(blockNum - 1),
             getBlockInfoForBlocks([blockNum]),
-            decodeTx(txRequest.to, txRequest.input),
             getInternalTransfers(blockNum),
           ]);
-          if (decodedTx.parsedCalldata) {
-            transactionInfo.input = formatDecodedTxCalldata(
-              decodedTx.parsedCalldata
-            );
-          }
-          transactionInfo.blockNumber = parseInt(txRequest.blockNumber, 16);
-          transactionInfo.contractName = decodedTx.contractName;
-          transactionInfo.fromEdenProducer = fromEdenProducer;
           transactionInfo.senderStake = parseInt(senderStake, 10) / 1e18;
           transactionInfo.senderRank = senderRank;
           transactionInfo.toSlot =
-            slotDelegates[txRequest.to.toLowerCase()] ?? null;
+            slotDelegates[rawTx.to.address.toLowerCase()] ?? null;
           if (bundledTxsRes[0] && txHash in bundledTxsRes[1]) {
             const { minerTip, bundleIndex } = bundledTxsRes[1][txHash];
             if (bundleIndex !== undefined) {
@@ -245,15 +256,15 @@ export const getTransactionInfo = async (txHash) => {
             });
             transactionInfo.minerTip = minerTipInternalTxsETH;
           }
-          const erc20Transfers = decodeERC20Transfers(txReceipt.logs);
+          const erc20Transfers = decodeERC20Transfers(transactionInfo.logs);
           if (erc20Transfers.length > 0) {
             const tknAddresses = erc20Transfers.map((t) => t.address);
             const tknInfos = await getTknInfoForAddresses(tknAddresses);
             const erc20TransfersEnriched = erc20Transfers.map((transfer) => {
               const tknInfo = tknInfos[transfer.address.toLowerCase()];
               const localLabels = Object.fromEntries([
-                [txRequest.from.toLowerCase(), 'TxSender'],
-                [txRequest.to.toLowerCase(), 'TxRecipient'],
+                [rawTx.from.address.toLowerCase(), 'TxSender'],
+                [rawTx.to.address.toLowerCase(), 'TxRecipient'],
               ]);
               return {
                 value:
@@ -275,20 +286,15 @@ export const getTransactionInfo = async (txHash) => {
             });
             transactionInfo.erc20Transfers = erc20TransfersEnriched;
           }
-          transactionInfo.timestamp = parseInt(blockInfo.result.timestamp, 16);
-          transactionInfo.blockTxCount = blockInfo.result.transactions.length;
           transactionInfo.baseFee = weiToGwei(
             blockInfo.result.baseFeePerGas,
             4
           );
-          transactionInfo.gasUsed = parseInt(txReceipt.gasUsed, 16);
-          transactionInfo.status = parseInt(txReceipt.status, 16);
-          transactionInfo.logs = txReceipt.logs;
           transactionInfo.gasCost = gweiToETH(
             transactionInfo.gasUsed * transactionInfo.gasPrice
           );
           transactionInfo.priorityFee =
-            weiToGwei(txReceipt.effectiveGasPrice, 4) - transactionInfo.baseFee;
+            weiToGwei(rawTx.gasPrice, 4) - transactionInfo.baseFee;
           break;
         } catch (err) {
           console.error(`Error getting tx info for ${txHash}`, err);
