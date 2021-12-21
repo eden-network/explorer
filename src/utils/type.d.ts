@@ -4,4 +4,5 @@ export interface NormalizedBlockType {
   miner: string;
   baseFeePerGas: string;
   gasUsed: string;
+  gasLimit: string;
 }

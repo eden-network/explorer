@@ -272,7 +272,8 @@ export default function Block({
 const normailizeBlockInfo = (block): NormalizedBlockType => {
   return {
     baseFeePerGas: block.baseFeePerGas.toString(),
-    gasUsed: block.gasUsed.toLocaleString(),
+    gasUsed: block.gasUsed,
+    gasLimit: block.gasLimit,
     timestamp: block.timestamp,
     number: block.number,
     miner: block.miner,
