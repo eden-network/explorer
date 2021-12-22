@@ -235,7 +235,9 @@ export const getTransactionInfo = async (txHash) => {
             const { minerTip, bundleIndex } = bundledTxsRes[1][txHash];
             if (bundleIndex !== undefined) {
               transactionInfo.bundleIndex = bundleIndex ?? null;
-              transactionInfo.submissions.push('flashbots');
+              if (!viaAggregator) {
+                transactionInfo.submissions.push('flashbots');
+              }
             }
             if (minerTip !== undefined) {
               transactionInfo.minerTip = minerTip / 1e18;
