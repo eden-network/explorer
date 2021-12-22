@@ -164,9 +164,9 @@ export const getTransactionInfo = async (txHash) => {
     rawTx.from && rawTx.to && rawTx.block ? 'mined' : 'pending';
   if (rawTx.block && rawTx.block.baseFeePerGas) {
     transactionInfo.baseFee = weiToGwei(rawTx.block.baseFeePerGas, 4);
-    if (transactionInfo.gasPrice)
+    if (rawTx.gasPrice)
       transactionInfo.priorityFee =
-        transactionInfo.gasPrice - transactionInfo.baseFee;
+        weiToGwei(rawTx.gasPrice, 4) - transactionInfo.baseFee;
   }
 
   if (transactionInfo.state === 'mined')
