@@ -160,10 +160,19 @@ export const getTransactionInfo = async (txHash) => {
   transactionInfo.status = parseInt(rawTx.status, 10);
   transactionInfo.gasPrice = weiToGwei(rawTx.gasPrice);
   transactionInfo.logs = normalizeLogs(rawTx);
+  transactionInfo.state =
+    rawTx.from && rawTx.to && rawTx.block ? 'mined' : 'pending';
+  if (rawTx.block && rawTx.block.baseFeePerGas) {
+    transactionInfo.baseFee = weiToGwei(rawTx.block.baseFeePerGas, 4);
+    if (transactionInfo.gasPrice)
+      transactionInfo.priorityFee =
+        transactionInfo.gasPrice - transactionInfo.baseFee;
+  }
 
-  transactionInfo.fromEdenProducer = await isFromEdenProducer(
-    rawTx.block.number
-  );
+  if (transactionInfo.state === 'mined')
+    transactionInfo.fromEdenProducer = await isFromEdenProducer(
+      rawTx.block.number
+    );
   const decodedTx = await decodeTx(rawTx.to.address, rawTx.inputData);
   transactionInfo.contractName = decodedTx.contractName;
   if (decodedTx.parsedCalldata) {
@@ -206,10 +215,6 @@ export const getTransactionInfo = async (txHash) => {
     // use tx-request object
     if (rawTx.gas) {
       transactionInfo.priorityFee = weiToGwei(rawTx.gas);
-      if (transactionInfo.priorityFee !== rawTx.gasPrice) {
-        transactionInfo.baseFee =
-          weiToGwei(rawTx.gasPrice) - transactionInfo.priorityFee;
-      }
     }
     if (rawTx.to !== null) {
       const maxAttempts = 10;

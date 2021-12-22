@@ -14,22 +14,18 @@ export const ETH_GET_TRANSACTION_BY_HASH = gql`
         address
       }
       value
+      gasPrice
+      gas
+      inputData
       block {
-        hash
         number
+        hash
+        baseFeePerGas
         transactionCount
         timestamp
       }
-      value
-      gasPrice
-      gas
-      gasUsed
       status
-      inputData
-      cumulativeGasUsed
-      createdContract {
-        address
-      }
+      gasUsed
       logs {
         index
         account {
