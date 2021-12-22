@@ -37,6 +37,11 @@ const submissionBoxes = {
       Eden
     </span>
   ),
+  agg: (
+    <span className="m-1 p-3 rounded-3xl py-2 bg-green inline-block text-xs text-bold text-blue-light shadow-sm font-bold text-center">
+      Eden Aggregator
+    </span>
+  ),
   ethermine: (
     <span className="m-1 p-3 rounded-3xl py-2 bg-orange inline-block text-xs text-bold text-blue-light shadow-sm font-bold text-center">
       Ethermine
@@ -79,6 +84,11 @@ const statusBoxes = {
     ethermine: (
       <span className="m-1 p-3 rounded-3xl py-2 bg-orange inline-block text-xs text-bold text-blue-light shadow-sm font-bold text-center">
         {clockSVG} PENDING IN ETHERMINE MEMPOOL
+      </span>
+    ),
+    flashbots: (
+      <span className="m-1 p-3 rounded-3xl py-2 bg-purple inline-block text-xs text-bold text-blue-light shadow-sm font-bold text-center">
+        {clockSVG} PENDING IN FLASHBOTS MEMPOOL
       </span>
     ),
   },

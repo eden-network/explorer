@@ -86,6 +86,7 @@ export const getTransactionInfo = async (txHash) => {
   const mined = txRequest !== null && txRequest.blockNumber !== null;
   const viaEdenRPC = edenRPCInfo !== undefined;
   const viaEthermineRPC = etherminePoolInfo.status !== undefined;
+  const viaAggregator = edenRPCInfo !== undefined && edenRPCInfo.agg;
   const pendingInEdenMempool = !mined && viaEdenRPC;
   const pendingInEthermineMempool = !mined && viaEthermineRPC;
   const pendingInPublicMempool = !mined && txRequest !== null;
@@ -133,21 +134,28 @@ export const getTransactionInfo = async (txHash) => {
   } as TxInfo;
 
   // Pending pools
-  if (pendingInEdenMempool) {
+  if (viaAggregator) {
+    transactionInfo.pendingPools.push('flashbots');
+  }
+  if (pendingInEdenMempool || viaAggregator) {
     transactionInfo.pendingPools.push('eden');
   }
-  if (pendingInEthermineMempool) {
+  if (pendingInEthermineMempool || viaAggregator) {
     transactionInfo.pendingPools.push('ethermine');
   }
   if (pendingInPublicMempool) {
     transactionInfo.pendingPools.push('public');
   }
   // Submissions
-  if (viaEdenRPC) {
-    transactionInfo.submissions.push('eden');
-  }
-  if (viaEthermineRPC) {
-    transactionInfo.submissions.push('ethermine');
+  if (viaAggregator) {
+    transactionInfo.submissions.push('agg');
+  } else {
+    if (viaEdenRPC) {
+      transactionInfo.submissions.push('eden');
+    }
+    if (viaEthermineRPC) {
+      transactionInfo.submissions.push('ethermine');
+    }
   }
 
   if (pendingInEdenMempool) {
