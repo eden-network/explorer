@@ -1,0 +1,32 @@
+export interface TxInfoType {
+  pendingPools: string[];
+  submissions: string[];
+  state: 'mined' | 'pending' | 'indexing';
+  gasPrice: number;
+  gasLimit: number;
+  nonce: number;
+  value: number;
+  input: string;
+  from: string;
+  hash: string;
+  to: string;
+  nextBaseFee: number | null;
+  erc20Transfers: Array<Object> | null;
+  contractName: string | null;
+  bundleIndex: number | null;
+  fromEdenProducer: boolean | null;
+  blockTxCount: number | null;
+  senderStake: number | null;
+  gasCost: number | null;
+  logs: Array<Object> | null;
+  blockNumber: number | null;
+  priorityFee: number | null;
+  senderRank: number | null;
+  timestamp: number | null;
+  minerTip: number | null;
+  toSlot: number | null;
+  gasUsed: number | null;
+  baseFee: number | null;
+  status: number | null;
+  index: number | null;
+}

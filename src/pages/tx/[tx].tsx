@@ -9,7 +9,7 @@ import TransactionPage from '../../components/TransactionPage';
 import { Meta } from '../../layout/Meta';
 import Shell from '../../layout/Shell';
 import { EtherscanLogo } from '../../modules/icons';
-import { getTransactionInfo } from '../../modules/tx-info';
+import { getTransactionInfo } from '../../modules/transaction';
 import { validateTxHash } from '../../modules/validators';
 import { AppConfig } from '../../utils/AppConfig';
 
