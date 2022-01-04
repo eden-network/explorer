@@ -19,6 +19,7 @@ import {
   gweiToETH,
   decodeERC20Transfers,
   sleep,
+  weiToETH,
 } from '@modules/utils';
 
 import { TxInfoType } from '../typings/transaction-info.type';
@@ -37,6 +38,8 @@ export const getTransactionInfo = async (txHash) => {
     getEdenRPCTxs([txHash]),
     getEthermineRPCTx(txHash),
   ]);
+
+  console.log({ tx });
 
   const edenRPCInfo = edenRPCInfoRes.result[0];
   const mined = tx.from !== null && tx.from.address !== null;
@@ -67,7 +70,7 @@ export const getTransactionInfo = async (txHash) => {
     gasPrice: weiToGwei(tx.gasPrice),
     gasLimit: parseInt(tx.gas, 16),
     nonce: parseInt(tx.nonce, 16),
-    value: parseInt(tx.value, 16),
+    value: weiToETH(parseInt(tx.value, 16)),
     input: '',
     from: tx.from && tx.from.address,
     hash: txHash,
