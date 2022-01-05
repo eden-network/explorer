@@ -235,7 +235,7 @@ export const getTransactionInfo = async (txHash) => {
           }
           txInfo.timestamp = parseInt(blockInfo.result.timestamp, 16);
           txInfo.blockTxCount = blockInfo.result.transactions.length;
-          // txInfo.baseFee = weiToGwei(blockInfo.result.baseFeePerGas, 4);
+          txInfo.baseFee = weiToGwei(blockInfo.result.baseFeePerGas, 4);
           txInfo.gasUsed = tx.gasUsed;
           txInfo.status = parseInt(tx.status, 10);
           txInfo.gasCost = gweiToETH(txInfo.gasUsed * txInfo.gasPrice);
