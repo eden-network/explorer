@@ -47,7 +47,7 @@ export const getTransactionInfo = async (txHash) => {
   const pendingInEthermineMempool = !mined && viaEthermineRPC;
   const viaAggregator = edenRPCInfo !== undefined && edenRPCInfo.agg;
   const pendingInPublicMempool = !mined && tx !== null;
-  const txState = mined ? (tx.to !== null ? 'mined' : 'indexing') : 'pending';
+  const txState = mined ? 'mined' : 'pending';
   if (
     !(
       pendingInPublicMempool ||
@@ -56,6 +56,11 @@ export const getTransactionInfo = async (txHash) => {
       mined
     )
   ) {
+    console.error(`Can't find any info for transaction ${txHash}`);
+    return null;
+  }
+
+  if (tx && tx.to === null) {
     console.error(`Can't find any info for transaction ${txHash}`);
     return null;
   }
@@ -111,8 +116,6 @@ export const getTransactionInfo = async (txHash) => {
     }
   }
 
-  console.log({ tx });
-
   if (pendingInEdenMempool) {
     // use just eden rpc source
     txInfo.to = getChecksumAddress(
@@ -148,7 +151,7 @@ export const getTransactionInfo = async (txHash) => {
     //     txInfo.priorityFee = weiToGwei(tx.gasPrice, 4) - txInfo.baseFee;
     // }
 
-    if (tx.block !== null && tx.to !== null) {
+    if (tx.block !== null) {
       const maxAttempts = 10;
       const waitMs = 2000;
       for (let i = 0; i < maxAttempts; i++) {
