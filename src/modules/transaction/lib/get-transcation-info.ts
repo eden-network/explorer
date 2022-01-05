@@ -135,7 +135,7 @@ export const getTransactionInfo = async (txHash) => {
       (tx.to && tx.to.address) || ethers.constants.AddressZero
     );
     txInfo.index = tx.index;
-    txInfo.gasPrice = weiToGwei(tx.gasPrice);
+    txInfo.gasPrice = weiToGwei(parseInt(tx.gasPrice, 16));
     txInfo.from = getChecksumAddress(tx.from.address);
     txInfo.gasLimit = parseInt(tx.gas, 16);
     txInfo.nonce = parseInt(tx.nonce, 16);
@@ -147,9 +147,6 @@ export const getTransactionInfo = async (txHash) => {
     //   if (tx.gasPrice)
     //     txInfo.priorityFee = weiToGwei(tx.gasPrice, 4) - txInfo.baseFee;
     // }
-    if (tx.gas) {
-      txInfo.priorityFee = weiToGwei(tx.gas);
-    }
 
     if (tx.block !== null) {
       const maxAttempts = 10;
