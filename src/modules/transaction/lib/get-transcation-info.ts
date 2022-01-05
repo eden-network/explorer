@@ -61,6 +61,7 @@ export const getTransactionInfo = async (txHash) => {
   }
 
   if (tx && tx.to === null) {
+    // Contract deployment
     console.error(`Can't find any info for transaction ${txHash}`);
     return null;
   }
