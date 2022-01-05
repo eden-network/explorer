@@ -148,7 +148,7 @@ export const getTransactionInfo = async (txHash) => {
     //     txInfo.priorityFee = weiToGwei(tx.gasPrice, 4) - txInfo.baseFee;
     // }
 
-    if (tx.block !== null) {
+    if (tx.block !== null && tx.to !== null) {
       const maxAttempts = 10;
       const waitMs = 2000;
       for (let i = 0; i < maxAttempts; i++) {
