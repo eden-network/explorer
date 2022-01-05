@@ -39,16 +39,14 @@ export const getTransactionInfo = async (txHash) => {
     getEthermineRPCTx(txHash),
   ]);
 
-  console.log({ tx });
-
   const edenRPCInfo = edenRPCInfoRes.result[0];
-  const mined = tx.from !== null && tx.from.address !== null;
+  const mined = tx.block !== null;
   const viaEdenRPC = edenRPCInfo !== undefined;
   const viaEthermineRPC = etherminePoolInfo.status !== undefined;
   const pendingInEdenMempool = !mined && viaEdenRPC;
   const pendingInEthermineMempool = !mined && viaEthermineRPC;
   const pendingInPublicMempool = !mined && tx.from !== null;
-  // const txState = mined ? (tx.to !== null ? 'mined' : 'indexing') : 'pending';
+  const txState = mined ? (tx.to !== null ? 'mined' : 'indexing') : 'pending';
   if (
     !(
       pendingInPublicMempool ||
@@ -64,52 +62,28 @@ export const getTransactionInfo = async (txHash) => {
 
   // Get tx info
   const txInfo = {
+    hash: txHash,
+    fromEdenProducer: null,
+    contractName: null,
+    blockTxCount: null,
+    senderStake: null,
+    blockNumber: null,
+    priorityFee: null,
+    timestamp: null,
+    bundleIndex: null,
     pendingPools: [],
     submissions: [],
-    state: 'pending',
-    gasPrice: weiToGwei(tx.gasPrice),
-    gasLimit: parseInt(tx.gas, 16),
-    nonce: parseInt(tx.nonce, 16),
-    value: weiToETH(parseInt(tx.value, 16)),
-    input: '',
-    from: tx.from && tx.from.address,
-    hash: txHash,
-    to: tx.to && tx.to.address,
-    nextBaseFee,
-    erc20Transfers: null,
-    contractName: null,
-    bundleIndex: null,
-    fromEdenProducer: null,
-    blockTxCount: tx.block && tx.block.transactionCount,
-    senderStake: null,
+    state: txState,
+    gasUsed: null,
     gasCost: null,
-    logs: normalizeLogs(tx),
-    blockNumber: tx.block && tx.block.number,
-    priorityFee: null,
-    senderRank: null,
-    timestamp: parseInt(tx.block.timestamp, 16),
-    minerTip: null,
-    toSlot: null,
-    gasUsed: tx.gasUsed,
     baseFee: null,
-    status: parseInt(tx.status, 10),
-    index: tx.index,
+    toSlot: null,
+    status: null,
+    minerTip: 0,
+    index: null,
+    logs: null,
+    nextBaseFee,
   } as TxInfoType;
-
-  txInfo.state = tx.from && tx.to && tx.block ? 'mined' : 'pending';
-  if (tx.block && tx.block.baseFeePerGas) {
-    txInfo.baseFee = weiToGwei(tx.block.baseFeePerGas, 4);
-    if (tx.gasPrice)
-      txInfo.priorityFee = weiToGwei(tx.gasPrice, 4) - txInfo.baseFee;
-  }
-
-  if (txInfo.state === 'mined')
-    txInfo.fromEdenProducer = await isFromEdenProducer(tx.block.number);
-  const decodedTx = await decodeTx(tx.to.address, tx.inputData);
-  txInfo.contractName = decodedTx.contractName;
-  if (decodedTx.parsedCalldata) {
-    txInfo.input = formatDecodedTxCalldata(decodedTx.parsedCalldata);
-  }
 
   // Pending pools
   if (pendingInEdenMempool) {
@@ -136,6 +110,10 @@ export const getTransactionInfo = async (txHash) => {
     );
     txInfo.from = getChecksumAddress(edenRPCInfo.from);
     txInfo.gasLimit = parseInt(edenRPCInfo.gas, 16);
+    txInfo.nonce = parseInt(edenRPCInfo.nonce, 10);
+    txInfo.value = weiToETH(edenRPCInfo.value);
+    txInfo.input = edenRPCInfo.input;
+    txInfo.hash = edenRPCInfo.hash;
     if (edenRPCInfo.maxpriorityfeepergas) {
       txInfo.priorityFee = weiToGwei(edenRPCInfo.maxpriorityfeepergas);
       txInfo.baseFee = weiToGwei(edenRPCInfo.maxfeepergas) - txInfo.priorityFee;
@@ -143,10 +121,26 @@ export const getTransactionInfo = async (txHash) => {
       txInfo.gasPrice = weiToGwei(edenRPCInfo.gasprice);
     }
   } else if (tx.from !== null) {
-    // use tx-request object
+    txInfo.to = getChecksumAddress(
+      (tx.to && tx.to.address) || ethers.constants.AddressZero
+    );
+    txInfo.index = tx.index;
+    txInfo.gasPrice = weiToGwei(tx.gasPrice);
+    txInfo.from = getChecksumAddress(tx.from.address);
+    txInfo.gasLimit = parseInt(tx.gas, 16);
+    txInfo.nonce = parseInt(tx.nonce, 16);
+    txInfo.value = weiToETH(parseInt(tx.value, 16));
+    txInfo.input = tx.inputData;
+
+    if (tx.block.baseFeePerGas) {
+      txInfo.baseFee = weiToGwei(tx.block.baseFeePerGas, 4);
+      if (tx.gasPrice)
+        txInfo.priorityFee = weiToGwei(tx.gasPrice, 4) - txInfo.baseFee;
+    }
     if (tx.gas) {
       txInfo.priorityFee = weiToGwei(tx.gas);
     }
+
     if (tx.to !== null) {
       const maxAttempts = 10;
       const waitMs = 2000;
@@ -155,17 +149,27 @@ export const getTransactionInfo = async (txHash) => {
           const blockNum = parseInt(tx.block.number, 10);
           const [
             { staked: senderStake, rank: senderRank },
+            fromEdenProducer,
             bundledTxsRes,
             slotDelegates,
             [blockInfo],
             internalTransfers,
           ] = await Promise.all([
             getStakerInfo(tx.from.address.toLowerCase(), blockNum),
+            isFromEdenProducer(blockNum),
             getBundledTxs(blockNum),
             getSlotDelegates(blockNum - 1),
             getBlockInfoForBlocks([blockNum]),
             getInternalTransfers(blockNum),
           ]);
+
+          const decodedTx = await decodeTx(tx.to.address, tx.inputData);
+          txInfo.contractName = decodedTx.contractName;
+          if (decodedTx.parsedCalldata) {
+            txInfo.input = formatDecodedTxCalldata(decodedTx.parsedCalldata);
+          }
+          txInfo.blockNumber = blockNum;
+          txInfo.fromEdenProducer = fromEdenProducer;
           txInfo.senderStake = parseInt(senderStake, 10) / 1e18;
           txInfo.senderRank = senderRank;
           txInfo.toSlot = slotDelegates[tx.to.address.toLowerCase()] ?? null;
@@ -191,6 +195,7 @@ export const getTransactionInfo = async (txHash) => {
             });
             txInfo.minerTip = minerTipInternalTxsETH;
           }
+          txInfo.logs = normalizeLogs(tx);
           const erc20Transfers = decodeERC20Transfers(txInfo.logs);
           if (erc20Transfers.length > 0) {
             const tknAddresses = erc20Transfers.map((t) => t.address);
@@ -221,7 +226,11 @@ export const getTransactionInfo = async (txHash) => {
             });
             txInfo.erc20Transfers = erc20TransfersEnriched;
           }
+          txInfo.timestamp = parseInt(blockInfo.result.timestamp, 16);
+          txInfo.blockTxCount = blockInfo.result.transactions.length;
           txInfo.baseFee = weiToGwei(blockInfo.result.baseFeePerGas, 4);
+          txInfo.gasUsed = tx.gasUsed;
+          txInfo.status = parseInt(tx.status, 10);
           txInfo.gasCost = gweiToETH(txInfo.gasUsed * txInfo.gasPrice);
           txInfo.priorityFee = weiToGwei(tx.gasPrice, 4) - txInfo.baseFee;
           break;
