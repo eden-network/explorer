@@ -40,13 +40,13 @@ export const getTransactionInfo = async (txHash) => {
   ]);
 
   const edenRPCInfo = edenRPCInfoRes.result[0];
-  const mined = tx.block !== null;
+  const mined = tx && tx.block;
   const viaEdenRPC = edenRPCInfo !== undefined;
   const viaEthermineRPC = etherminePoolInfo.status !== undefined;
   const pendingInEdenMempool = !mined && viaEdenRPC;
   const pendingInEthermineMempool = !mined && viaEthermineRPC;
   const viaAggregator = edenRPCInfo !== undefined && edenRPCInfo.agg;
-  const pendingInPublicMempool = !mined && tx.from !== null;
+  const pendingInPublicMempool = !mined && tx !== null;
   const txState = mined ? (tx.to !== null ? 'mined' : 'indexing') : 'pending';
   if (
     !(
@@ -111,6 +111,8 @@ export const getTransactionInfo = async (txHash) => {
     }
   }
 
+  console.log({ tx });
+
   if (pendingInEdenMempool) {
     // use just eden rpc source
     txInfo.to = getChecksumAddress(
@@ -128,7 +130,7 @@ export const getTransactionInfo = async (txHash) => {
     } else {
       txInfo.gasPrice = weiToGwei(edenRPCInfo.gasprice);
     }
-  } else if (tx.from !== null) {
+  } else if (tx && tx.from !== null) {
     txInfo.to = getChecksumAddress(
       (tx.to && tx.to.address) || ethers.constants.AddressZero
     );
@@ -140,16 +142,16 @@ export const getTransactionInfo = async (txHash) => {
     txInfo.value = weiToETH(parseInt(tx.value, 16));
     txInfo.input = tx.inputData;
 
-    if (tx.block.baseFeePerGas) {
-      txInfo.baseFee = weiToGwei(tx.block.baseFeePerGas, 4);
-      if (tx.gasPrice)
-        txInfo.priorityFee = weiToGwei(tx.gasPrice, 4) - txInfo.baseFee;
-    }
+    // if (tx.block.baseFeePerGas !== null) {
+    //   txInfo.baseFee = weiToGwei(tx.block.baseFeePerGas, 4);
+    //   if (tx.gasPrice)
+    //     txInfo.priorityFee = weiToGwei(tx.gasPrice, 4) - txInfo.baseFee;
+    // }
     if (tx.gas) {
       txInfo.priorityFee = weiToGwei(tx.gas);
     }
 
-    if (tx.to !== null) {
+    if (tx.block !== null) {
       const maxAttempts = 10;
       const waitMs = 2000;
       for (let i = 0; i < maxAttempts; i++) {
@@ -236,7 +238,7 @@ export const getTransactionInfo = async (txHash) => {
           }
           txInfo.timestamp = parseInt(blockInfo.result.timestamp, 16);
           txInfo.blockTxCount = blockInfo.result.transactions.length;
-          txInfo.baseFee = weiToGwei(blockInfo.result.baseFeePerGas, 4);
+          // txInfo.baseFee = weiToGwei(blockInfo.result.baseFeePerGas, 4);
           txInfo.gasUsed = tx.gasUsed;
           txInfo.status = parseInt(tx.status, 10);
           txInfo.gasCost = gweiToETH(txInfo.gasUsed * txInfo.gasPrice);
