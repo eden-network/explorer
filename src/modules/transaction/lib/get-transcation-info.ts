@@ -40,7 +40,7 @@ export const getTransactionInfo = async (txHash) => {
   ]);
 
   const edenRPCInfo = edenRPCInfoRes.result[0];
-  const mined = tx && tx.block;
+  const mined = !!(tx && tx.block);
   const viaEdenRPC = edenRPCInfo !== undefined;
   const viaEthermineRPC = etherminePoolInfo.status !== undefined;
   const pendingInEdenMempool = !mined && viaEdenRPC;
@@ -60,11 +60,6 @@ export const getTransactionInfo = async (txHash) => {
     return null;
   }
 
-  if (tx && tx.to === null) {
-    // Contract deployment
-    console.error(`Can't find any info for transaction ${txHash}`);
-    return null;
-  }
   const nextBaseFee = !mined ? await getNextBaseFee() : null;
 
   // Get tx info
@@ -146,11 +141,11 @@ export const getTransactionInfo = async (txHash) => {
     txInfo.value = weiToETH(parseInt(tx.value, 16));
     txInfo.input = tx.inputData;
 
-    // if (tx.block.baseFeePerGas !== null) {
-    //   txInfo.baseFee = weiToGwei(tx.block.baseFeePerGas, 4);
-    //   if (tx.gasPrice)
-    //     txInfo.priorityFee = weiToGwei(tx.gasPrice, 4) - txInfo.baseFee;
-    // }
+    if (tx.block.baseFeePerGas !== null) {
+      txInfo.baseFee = weiToGwei(tx.block.baseFeePerGas, 4);
+      if (tx.gasPrice)
+        txInfo.priorityFee = weiToGwei(tx.gasPrice, 4) - txInfo.baseFee;
+    }
 
     if (tx.block !== null) {
       const maxAttempts = 10;
@@ -173,8 +168,7 @@ export const getTransactionInfo = async (txHash) => {
             getBlockInfoForBlocks([blockNum]),
             getInternalTransfers(blockNum),
           ]);
-
-          const decodedTx = await decodeTx(tx.to.address, tx.inputData);
+          const decodedTx = await decodeTx(txInfo.to, tx.inputData);
           txInfo.contractName = decodedTx.contractName;
           if (decodedTx.parsedCalldata) {
             txInfo.input = formatDecodedTxCalldata(decodedTx.parsedCalldata);
@@ -183,7 +177,7 @@ export const getTransactionInfo = async (txHash) => {
           txInfo.fromEdenProducer = fromEdenProducer;
           txInfo.senderStake = parseInt(senderStake, 10) / 1e18;
           txInfo.senderRank = senderRank;
-          txInfo.toSlot = slotDelegates[tx.to.address.toLowerCase()] ?? null;
+          txInfo.toSlot = slotDelegates[txInfo.to.toLowerCase()] ?? null;
           if (bundledTxsRes[0] && txHash in bundledTxsRes[1]) {
             const { minerTip, bundleIndex } = bundledTxsRes[1][txHash];
             if (bundleIndex !== undefined) {
