@@ -141,12 +141,6 @@ export const getTransactionInfo = async (txHash) => {
     txInfo.value = weiToETH(parseInt(tx.value, 16));
     txInfo.input = tx.inputData;
 
-    if (tx.block.baseFeePerGas !== null) {
-      txInfo.baseFee = weiToGwei(tx.block.baseFeePerGas, 4);
-      if (tx.gasPrice)
-        txInfo.priorityFee = weiToGwei(tx.gasPrice, 4) - txInfo.baseFee;
-    }
-
     if (tx.block !== null) {
       const maxAttempts = 10;
       const waitMs = 2000;
