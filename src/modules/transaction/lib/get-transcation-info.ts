@@ -12,7 +12,6 @@ import {
   getStakerInfo,
   getEdenRPCTxs,
   getBundledTxs,
-  getTxRequest,
 } from '@modules/getters';
 import {
   getChecksumAddress,
@@ -34,8 +33,7 @@ import {
 
 export const getTransactionInfo = async (txHash) => {
   // Get general transaction info
-  const [txRequest, tx, edenRPCInfoRes, etherminePoolInfo] = await Promise.all([
-    getTxRequest(txHash),
+  const [tx, edenRPCInfoRes, etherminePoolInfo] = await Promise.all([
     getTxRequestByGraphQL(txHash),
     getEdenRPCTxs([txHash]),
     getEthermineRPCTx(txHash),
@@ -143,10 +141,10 @@ export const getTransactionInfo = async (txHash) => {
     txInfo.value = weiToETH(parseInt(tx.value, 16));
     txInfo.input = tx.inputData;
 
-    if (txRequest.maxPriorityFeePerGas) {
-      txInfo.priorityFee = weiToGwei(txRequest.maxPriorityFeePerGas);
-      if (txInfo.priorityFee !== txRequest.gasPrice) {
-        txInfo.baseFee = weiToGwei(txRequest.gasPrice) - txInfo.priorityFee;
+    if (tx.maxPriorityFeePerGas) {
+      txInfo.priorityFee = weiToGwei(parseInt(tx.maxPriorityFeePerGas, 16));
+      if (txInfo.priorityFee !== tx.gasPrice) {
+        txInfo.baseFee = weiToGwei(tx.gasPrice) - txInfo.priorityFee;
       }
     }
 

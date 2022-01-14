@@ -102,7 +102,6 @@ export default function TransactionPage({
   txInfo: TxInfoType;
   nextBaseFee: number;
 }) {
-  console.log(txInfo, nextBaseFee);
   const makeAddressHyperlink = (_text, _address) => (
     <a
       href={`${AppConfig.etherscanEndpoint}/address/${_address}`}

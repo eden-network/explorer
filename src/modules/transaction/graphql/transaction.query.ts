@@ -26,6 +26,7 @@ export const ETH_GET_TRANSACTION_BY_HASH = gql`
       }
       status
       gasUsed
+      maxPriorityFeePerGas
       logs {
         index
         account {
