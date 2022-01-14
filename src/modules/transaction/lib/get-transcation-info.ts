@@ -143,8 +143,6 @@ export const getTransactionInfo = async (txHash) => {
     txInfo.value = weiToETH(parseInt(tx.value, 16));
     txInfo.input = tx.inputData;
 
-    console.log({ txRequest });
-    console.log({ tx });
     if (txRequest.maxPriorityFeePerGas) {
       txInfo.priorityFee = weiToGwei(txRequest.maxPriorityFeePerGas);
       if (txInfo.priorityFee !== txRequest.gasPrice) {
