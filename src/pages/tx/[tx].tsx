@@ -22,12 +22,13 @@ const useJsonRpcProvider = () => {
     const connect = async () => {
       try {
         const jsonRpcProvider = new ethers.providers.JsonRpcProvider(
-          AppConfig.publicEdenAlchemyAPI
+          'https://eth-mainnet.alchemyapi.io/v2/awt83g13tadp-1A58eC0nKS2Od0jPJQK'
         );
         await jsonRpcProvider.getNetwork(); // Double check that connection is available
         setProvider(jsonRpcProvider);
         return jsonRpcProvider;
-      } catch (_) {
+      } catch (err) {
+        console.log(err);
         return null;
       }
     };
