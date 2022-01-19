@@ -11,8 +11,8 @@ import {
   getSlotDelegates,
   getNextBaseFee,
   getStakerInfo,
-  getEdenRPCTxs,
   getBundledTxs,
+  getEdenRPCTx,
   getTxRequest,
   getTxReceipt,
 } from './getters';
@@ -80,10 +80,10 @@ export const getTransactionInfo = async (txHash) => {
     await Promise.all([
       getTxRequest(txHash),
       getTxReceipt(txHash),
-      getEdenRPCTxs([txHash]),
+      getEdenRPCTx(txHash),
       getEthermineRPCTx(txHash),
     ]);
-  const edenRPCInfo = edenRPCInfoRes.result[0];
+  const edenRPCInfo = edenRPCInfoRes.result;
   const mined = txRequest !== null && txRequest.blockNumber !== null;
   const viaEdenRPC = edenRPCInfo !== undefined;
   const viaEthermineRPC = etherminePoolInfo.status !== undefined;

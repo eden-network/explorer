@@ -512,6 +512,31 @@ export const getEdenRPCTxs = async (_txs) => {
   return response;
 };
 
+export const getEdenRPCTx = async (_tx) => {
+  const query = {
+    method: 'eth_getTransactionByHash',
+    params: [_tx],
+    jsonrpc: '2.0',
+    id: Date.now(),
+  };
+  const response = await safeFetch(
+    monitorEndpointEdenRPC,
+    {
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(query),
+      method: 'POST',
+    },
+    ({ success, res }) => {
+      if (!success) {
+        console.error(`request to eden-monitor api failed: ${res}`);
+        return { result: null };
+      }
+      return res;
+    }
+  );
+  return response;
+};
+
 export const getEthermineRPCTx = async (_tx) => {
   const url = monitorEndpointEthermineRPC + _tx;
   const response = await safeFetch(url, {}, ({ success, res }) => {
