@@ -487,10 +487,10 @@ export const getTxsForAccount = async (_account, _offset = 10, _page = 1) => {
   return result;
 };
 
-export const getEdenRPCTxs = async (_txs) => {
+export const getEdenRPCTxsForBlock = async (_blockNum) => {
   const query = {
-    method: 'eth_getTransactionsByHash',
-    params: [_txs],
+    method: 'eden_getTransactionsByBlockNumber',
+    params: [`0x${_blockNum.toString(16)}`],
     jsonrpc: '2.0',
     id: Date.now(),
   };
@@ -509,7 +509,34 @@ export const getEdenRPCTxs = async (_txs) => {
       return res;
     }
   );
-  return response;
+  const hashes = response.result.map((tx) => tx.hash);
+  return { result: hashes };
+};
+
+export const getEdenRPCTxsForAccount = async (_address) => {
+  const query = {
+    method: 'eden_getTransactionsByAccount',
+    params: [_address],
+    jsonrpc: '2.0',
+    id: Date.now(),
+  };
+  const response = await safeFetch(
+    monitorEndpointEdenRPC,
+    {
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(query),
+      method: 'POST',
+    },
+    ({ success, res }) => {
+      if (!success) {
+        console.error(`request to eden-monitor api failed: ${res}`);
+        return { result: [] };
+      }
+      return res;
+    }
+  );
+  const hashes = response.result.map((tx) => tx.hash);
+  return { result: hashes };
 };
 
 export const getEdenRPCTx = async (_tx) => {

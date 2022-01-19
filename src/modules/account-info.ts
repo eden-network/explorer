@@ -2,13 +2,13 @@ import { ethers } from 'ethers';
 
 import { getContractInfo } from './contract-info';
 import {
+  getEdenRPCTxsForAccount,
   getBlockInfoForBlocks,
   getTxCountForAccount,
   filterForEdenBlocks,
   getTxsForAccount,
   getSlotDelegates,
   getStakerInfo,
-  getEdenRPCTxs,
   getMinerAlias,
 } from './getters';
 import { weiToGwei } from './utils';
@@ -40,14 +40,13 @@ interface AccountOverview {
 
 async function getEdenTxsForAccount(_account, _txPerPage, _page) {
   const txsForAccount = await getTxsForAccount(_account, _txPerPage, _page);
-  const txHashesForAccount = txsForAccount.map((tx) => tx.hash);
   const blocksForAccount = txsForAccount
     .map((tx) => tx.blockNumber)
     .filter((b, i, a) => a.indexOf(b) === i); // Remove duplicates
   const [edenBlocks, blockInfos, edenRPCTxs] = await Promise.all([
     filterForEdenBlocks(blocksForAccount),
     getBlockInfoForBlocks(blocksForAccount),
-    getEdenRPCTxs(txHashesForAccount),
+    getEdenRPCTxsForAccount(_account),
   ]);
   // Filter out txs that were not mined in an Eden block
   const isEdenBlock = Object.fromEntries(
@@ -56,15 +55,12 @@ async function getEdenTxsForAccount(_account, _txPerPage, _page) {
   const infoForBlock = Object.fromEntries(
     blockInfos.map((r) => [r.id, r.result])
   );
-  const edenRPCInfoForTx = Object.fromEntries(
-    edenRPCTxs.result.map((tx) => [tx.hash, tx.blocknumber])
-  );
   const txsForAccountEnriched = txsForAccount.map((tx) => {
     const blockInfo = infoForBlock[tx.blockNumber];
     tx.blockTxCount = blockInfo.transactions.length;
     tx.baseFee = blockInfo.baseFeePerGas || 0;
     tx.fromEdenProducer = isEdenBlock[tx.blockNumber] ?? false;
-    tx.viaEdenRPC = edenRPCInfoForTx[tx.hash] !== undefined;
+    tx.viaEdenRPC = edenRPCTxs.result.includes(tx.hash);
     return tx;
   });
   return txsForAccountEnriched;
@@ -75,6 +71,7 @@ export const getAccountInfo = async (
   _txPerPage = 1000,
   _page = 1
 ) => {
+  const accountChecksum = ethers.utils.getAddress(_account);
   const [
     txsForAccount,
     { staked: edenStaked, rank: stakerRank },
@@ -82,7 +79,7 @@ export const getAccountInfo = async (
     contractInfo,
     slotDelegates,
   ] = await Promise.all([
-    getEdenTxsForAccount(_account.toLowerCase(), _txPerPage, _page),
+    getEdenTxsForAccount(accountChecksum, _txPerPage, _page),
     getStakerInfo(_account.toLowerCase()),
     getTxCountForAccount(_account),
     getContractInfo(_account),
@@ -97,7 +94,7 @@ export const getAccountInfo = async (
     stakerRank: stakerRank && parseInt(stakerRank, 10),
     edenStaked: parseInt(edenStaked, 10) / 1e18,
     label: minerAlias || contractLabel || null,
-    address: ethers.utils.getAddress(_account),
+    address: accountChecksum,
     isKnownMiner: minerAlias !== null,
     txCount: accountTxCount,
   };
