@@ -4,14 +4,15 @@ import { decodeTx } from './contract-info';
 import {
   getTknInfoForAddresses,
   getBlockInfoForBlocks,
+  getLastSupportedBlock,
   getInternalTransfers,
   isFromEdenProducer,
   getEthermineRPCTx,
   getSlotDelegates,
   getNextBaseFee,
   getStakerInfo,
-  getEdenRPCTxs,
   getBundledTxs,
+  getEdenRPCTx,
   getTxRequest,
   getTxReceipt,
 } from './getters';
@@ -79,10 +80,10 @@ export const getTransactionInfo = async (txHash) => {
     await Promise.all([
       getTxRequest(txHash),
       getTxReceipt(txHash),
-      getEdenRPCTxs([txHash]),
+      getEdenRPCTx(txHash),
       getEthermineRPCTx(txHash),
     ]);
-  const edenRPCInfo = edenRPCInfoRes.result[0];
+  const edenRPCInfo = edenRPCInfoRes.result;
   const mined = txRequest !== null && txRequest.blockNumber !== null;
   const viaEdenRPC = edenRPCInfo !== undefined;
   const viaEthermineRPC = etherminePoolInfo.status !== undefined;
@@ -198,118 +199,113 @@ export const getTransactionInfo = async (txHash) => {
     }
     if (txReceipt !== null) {
       const maxAttempts = 10;
-      const waitMs = 2000;
+      const waitMs = 3000;
       for (let i = 0; i < maxAttempts; i++) {
-        try {
-          const blockNum = parseInt(txRequest.blockNumber, 16);
-          const [
-            { staked: senderStake, rank: senderRank },
-            fromEdenProducer,
-            bundledTxsRes,
-            slotDelegates,
-            [blockInfo],
-            decodedTx,
-            internalTransfers,
-          ] = await Promise.all([
-            getStakerInfo(txRequest.from.toLowerCase(), blockNum),
-            isFromEdenProducer(blockNum),
-            getBundledTxs(blockNum),
-            getSlotDelegates(blockNum - 1),
-            getBlockInfoForBlocks([blockNum]),
-            decodeTx(txRequest.to, txRequest.input),
-            getInternalTransfers(blockNum),
-          ]);
-          if (decodedTx.parsedCalldata) {
-            transactionInfo.input = formatDecodedTxCalldata(
-              decodedTx.parsedCalldata
-            );
-          }
-          transactionInfo.blockNumber = parseInt(txRequest.blockNumber, 16);
-          transactionInfo.contractName = decodedTx.contractName;
-          transactionInfo.fromEdenProducer = fromEdenProducer;
-          transactionInfo.senderStake = parseInt(senderStake, 10) / 1e18;
-          transactionInfo.senderRank = senderRank;
-          transactionInfo.toSlot =
-            slotDelegates[txRequest.to.toLowerCase()] ?? null;
-          if (bundledTxsRes[0] && txHash in bundledTxsRes[1]) {
-            const { minerTip, bundleIndex } = bundledTxsRes[1][txHash];
-            if (bundleIndex !== undefined) {
-              transactionInfo.bundleIndex = bundleIndex ?? null;
-              if (!viaAggregator) {
-                transactionInfo.submissions.push('flashbots');
-              }
-            }
-            if (minerTip !== undefined) {
-              transactionInfo.minerTip = minerTip / 1e18;
-            }
-          }
-          if (!transactionInfo.minerTip) {
-            let minerTipInternalTxsETH = 0;
-            internalTransfers.forEach((transfer) => {
-              if (
-                transfer.hash === txHash &&
-                transfer.to === blockInfo.result.miner
-              ) {
-                minerTipInternalTxsETH += transfer.value;
-              }
-            });
-            transactionInfo.minerTip = minerTipInternalTxsETH;
-          }
-          const erc20Transfers = decodeERC20Transfers(txReceipt.logs);
-          if (erc20Transfers.length > 0) {
-            const tknAddresses = erc20Transfers.map((t) => t.address);
-            const tknInfos = await getTknInfoForAddresses(tknAddresses);
-            const erc20TransfersEnriched = erc20Transfers.map((transfer) => {
-              const tknInfo = tknInfos[transfer.address.toLowerCase()];
-              const localLabels = Object.fromEntries([
-                [txRequest.from.toLowerCase(), 'TxSender'],
-                [txRequest.to.toLowerCase(), 'TxRecipient'],
-              ]);
-              return {
-                value:
-                  transfer.args.value === '0x'
-                    ? 0
-                    : ethers.utils.formatUnits(
-                        ethers.BigNumber.from(transfer.args.value),
-                        tknInfo.decimals
-                      ),
-                fromLabel:
-                  localLabels[transfer.args.from.toLowerCase()] || null,
-                toLabel: localLabels[transfer.args.to.toLowerCase()] || null,
-                tknAddress: transfer.address,
-                tknSymbol: tknInfo.symbol,
-                tknLogoUrl: tknInfo.logoURL,
-                from: transfer.args.from,
-                to: transfer.args.to,
-              };
-            });
-            transactionInfo.erc20Transfers = erc20TransfersEnriched;
-          }
-          transactionInfo.timestamp = parseInt(blockInfo.result.timestamp, 16);
-          transactionInfo.blockTxCount = blockInfo.result.transactions.length;
-          transactionInfo.baseFee = weiToGwei(
-            blockInfo.result.baseFeePerGas,
-            4
-          );
-          transactionInfo.gasUsed = parseInt(txReceipt.gasUsed, 16);
-          transactionInfo.status = parseInt(txReceipt.status, 16);
-          transactionInfo.logs = txReceipt.logs;
-          transactionInfo.gasCost = gweiToETH(
-            transactionInfo.gasUsed * transactionInfo.gasPrice
-          );
-          transactionInfo.priorityFee =
-            weiToGwei(txReceipt.effectiveGasPrice, 4) - transactionInfo.baseFee;
-          break;
-        } catch (err) {
-          console.error(`Error getting tx info for ${txHash}`, err);
-          if (maxAttempts - 1 === i) {
-            throw new Error(
-              `Max attempts reached to fetch tx-info for ${txHash}`
-            );
-          }
+        const blockNum = parseInt(txRequest.blockNumber, 16);
+        // Check if tx block is gte to latest block indexed by the graph
+        const latestGraphBlock = await getLastSupportedBlock();
+        if (latestGraphBlock < blockNum) {
+          console.log(`Waiting for block ${blockNum} to be indexed`);
           await sleep(waitMs);
-        } // eslint-disable-line no-empty
+          continue; // eslint-disable-line no-continue
+        }
+        const [
+          { staked: senderStake, rank: senderRank },
+          fromEdenProducer,
+          bundledTxsRes,
+          slotDelegates,
+          [blockInfo],
+          decodedTx,
+          internalTransfers,
+        ] = await Promise.all([
+          getStakerInfo(txRequest.from.toLowerCase(), blockNum),
+          isFromEdenProducer(blockNum),
+          getBundledTxs(blockNum),
+          getSlotDelegates(blockNum - 1),
+          getBlockInfoForBlocks([blockNum]),
+          decodeTx(txRequest.to, txRequest.input),
+          getInternalTransfers(blockNum),
+        ]);
+        if (decodedTx.parsedCalldata) {
+          transactionInfo.input = formatDecodedTxCalldata(
+            decodedTx.parsedCalldata
+          );
+        }
+        transactionInfo.blockNumber = parseInt(txRequest.blockNumber, 16);
+        transactionInfo.contractName = decodedTx.contractName;
+        transactionInfo.fromEdenProducer = fromEdenProducer;
+        transactionInfo.senderStake = parseInt(senderStake, 10) / 1e18;
+        transactionInfo.senderRank = senderRank;
+        transactionInfo.toSlot =
+          slotDelegates[txRequest.to.toLowerCase()] ?? null;
+        if (bundledTxsRes[0] && txHash in bundledTxsRes[1]) {
+          const { minerTip, bundleIndex } = bundledTxsRes[1][txHash];
+          if (bundleIndex !== undefined) {
+            transactionInfo.bundleIndex = bundleIndex ?? null;
+            if (!viaAggregator) {
+              transactionInfo.submissions.push('flashbots');
+            }
+          }
+          if (minerTip !== undefined) {
+            transactionInfo.minerTip = minerTip / 1e18;
+          }
+        }
+        if (!transactionInfo.minerTip) {
+          let minerTipInternalTxsETH = 0;
+          internalTransfers.forEach((transfer) => {
+            if (
+              transfer.hash === txHash &&
+              transfer.to === blockInfo.result.miner
+            ) {
+              minerTipInternalTxsETH += transfer.value;
+            }
+          });
+          transactionInfo.minerTip = minerTipInternalTxsETH;
+        }
+        const erc20Transfers = decodeERC20Transfers(txReceipt.logs);
+        if (erc20Transfers.length > 0) {
+          const tknAddresses = erc20Transfers.map((t) => t.address);
+          const tknInfos = await getTknInfoForAddresses(tknAddresses);
+          const erc20TransfersEnriched = erc20Transfers.map((transfer) => {
+            const tknInfo = tknInfos[transfer.address.toLowerCase()];
+            const localLabels = Object.fromEntries([
+              [txRequest.from.toLowerCase(), 'TxSender'],
+              [txRequest.to.toLowerCase(), 'TxRecipient'],
+            ]);
+            return {
+              value:
+                transfer.args.value === '0x'
+                  ? 0
+                  : ethers.utils.formatUnits(
+                      ethers.BigNumber.from(transfer.args.value),
+                      tknInfo.decimals
+                    ),
+              fromLabel: localLabels[transfer.args.from.toLowerCase()] || null,
+              toLabel: localLabels[transfer.args.to.toLowerCase()] || null,
+              tknAddress: transfer.address,
+              tknSymbol: tknInfo.symbol,
+              tknLogoUrl: tknInfo.logoURL,
+              from: transfer.args.from,
+              to: transfer.args.to,
+            };
+          });
+          transactionInfo.erc20Transfers = erc20TransfersEnriched;
+        }
+        transactionInfo.timestamp = parseInt(blockInfo.result.timestamp, 16);
+        transactionInfo.blockTxCount = blockInfo.result.transactions.length;
+        transactionInfo.baseFee = weiToGwei(blockInfo.result.baseFeePerGas, 4);
+        transactionInfo.gasUsed = parseInt(txReceipt.gasUsed, 16);
+        transactionInfo.status = parseInt(txReceipt.status, 16);
+        transactionInfo.logs = txReceipt.logs;
+        transactionInfo.gasCost = gweiToETH(
+          transactionInfo.gasUsed * transactionInfo.gasPrice
+        );
+        transactionInfo.priorityFee =
+          weiToGwei(txReceipt.effectiveGasPrice, 4) - transactionInfo.baseFee;
+        return transactionInfo;
       }
+      console.error(`Max limit reached to get data from graph-ql ${txHash}`);
+      return null;
     }
   }
   return transactionInfo;
