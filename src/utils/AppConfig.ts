@@ -38,6 +38,7 @@ export const AppConfig = {
   monitorEndpointEdenRPC: 'https://api.edennetwork.io/v1/monitor',
   monitorEndpointEthermineRPC: 'https://rpc.ethermine.org/tx/',
   publicEdenAlchemyAPI:
+    process.env.PUBLIC_EDEN_ALCEMY_API ||
     'https://eth-mainnet.alchemyapi.io/v2/P8rzfqKR51hxNVhF0OfA3WDiACi0phmU', // Restricted domain
   providerEndpointGraphQl: process.env.ETH_GRAPHQL_MAINNET,
   etherscanAPIKey: process.env.ETHERSCAN_API_TOKEN,

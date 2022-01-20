@@ -4,81 +4,79 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { ethers } from 'ethers';
 import { useRouter } from 'next/router';
 
+import useInterval from '@hooks/useInterval.hook';
+import { AppConfig } from '@utils/AppConfig';
+
 import ErrorMsg from '../../components/ErrorMsg';
 import TransactionPage from '../../components/TransactionPage';
 import { Meta } from '../../layout/Meta';
 import Shell from '../../layout/Shell';
 import { EtherscanLogo } from '../../modules/icons';
-import { getTransactionInfo } from '../../modules/tx-info';
+import { getTransactionInfo } from '../../modules/transaction';
 import { validateTxHash } from '../../modules/validators';
-import { AppConfig } from '../../utils/AppConfig';
+
+const useJsonRpcProvider = () => {
+  const [provider, setProvider] = useState(null);
+
+  useEffect(() => {
+    const connect = async () => {
+      try {
+        const jsonRpcProvider = new ethers.providers.JsonRpcProvider(
+          AppConfig.publicEdenAlchemyAPI
+        );
+        await jsonRpcProvider.getNetwork(); // Double check that connection is available
+        setProvider(jsonRpcProvider);
+        return jsonRpcProvider;
+      } catch (err) {
+        console.log(err);
+        return null;
+      }
+    };
+    connect();
+  });
+
+  return [provider];
+};
 
 export default function Tx({ txInfo, error }) {
   const router = useRouter();
+  const [provider] = useJsonRpcProvider();
+  const [nextBaseFee, setNextBaseFee] = useState(txInfo.nextBaseFee);
+  const isPending = txInfo.state === 'pending';
+
   const handleClickRefresh = useCallback(() => {
     router.push(`/tx/${router.query.tx}`);
   }, [router]);
 
-  const setProvider = async () => {
-    // TODO: Support Ropsten
-    try {
-      const provider = new ethers.providers.JsonRpcProvider(
-        AppConfig.publicEdenAlchemyAPI
-      );
-      await provider.getNetwork(); // Double check that connection is available
-      return provider;
-    } catch (_) {
-      return null;
+  const waitForTx = async (txhash, confirmations = 2) => {
+    if (provider) {
+      await provider.waitForTransaction(txhash, confirmations);
+    } else {
+      console.log(`Couldnt connect to ethereum provider`);
+      // Wait for few sec and try again
+      await new Promise((resolve) => setTimeout(resolve, 5000));
     }
   };
-  const provider = setProvider();
-
-  const [nextBaseFee, setNextBaseFee] = useState(txInfo.nextBaseFee);
-
-  async function waitForTx(txhash, confirmations = 2) {
-    return provider.then(async (_provider) => {
-      if (_provider) {
-        await _provider.waitForTransaction(txhash, confirmations);
-      } else {
-        console.log(`Couldnt connect to ethereum provider`);
-        // Wait for few sec and try again
-        await new Promise((resolve) => setTimeout(resolve, 5000));
-      }
-    });
-  }
 
   useEffect(() => {
-    if (txInfo.state === 'pending') {
+    if (isPending) {
       waitForTx(router.query.tx).then(() => handleClickRefresh());
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [txInfo]);
 
-  useEffect(() => {
-    if (txInfo.state === 'pending') {
-      let interval;
-      provider.then((_provider) => {
-        if (_provider) {
-          interval = setInterval(() => {
-            _provider
-              .send('eth_getBlockByNumber', ['pending', false])
-              .then((pendingBlock) => {
-                const pendingBaseFee =
-                  parseInt(pendingBlock.baseFeePerGas, 16) / 1e9;
-                setNextBaseFee(pendingBaseFee);
-              });
-          }, 7e3);
-        }
-      });
-      return () => {
-        if (interval) {
-          setNextBaseFee(null);
-          clearInterval(interval);
-        }
-      };
+  const updateNextBaseFee = () => {
+    if (provider) {
+      provider
+        .send('eth_getBlockByNumber', ['pending', false])
+        .then((pendingBlock) => {
+          const pendingBaseFee = parseInt(pendingBlock.baseFeePerGas, 16) / 1e9;
+          setNextBaseFee(pendingBaseFee);
+        });
     }
-    return () => {};
-  }, [txInfo]);
+  };
+
+  useInterval(updateNextBaseFee, isPending && provider ? 7e3 : null);
 
   if (error) {
     return (

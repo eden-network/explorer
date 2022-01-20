@@ -6,9 +6,10 @@ import en from 'javascript-time-ago/locale/en';
 import moment from 'moment';
 import Image from 'next/image';
 
+import { TxInfoType } from '@modules/transaction';
+
 import { formatAddress } from '../modules/formatter';
 import { clockSVG, tickSVG, EdenLogo, EthLogo } from '../modules/icons';
-import { TxInfo } from '../modules/tx-info';
 import { AppConfig } from '../utils/AppConfig';
 
 TimeAgo.addDefaultLocale(en);
@@ -98,7 +99,7 @@ export default function TransactionPage({
   txInfo,
   nextBaseFee,
 }: {
-  txInfo: TxInfo;
+  txInfo: TxInfoType;
   nextBaseFee: number;
 }) {
   const makeAddressHyperlink = (_text, _address) => (
