@@ -22,7 +22,7 @@ const useJsonRpcProvider = () => {
     const connect = async () => {
       try {
         const jsonRpcProvider = new ethers.providers.JsonRpcProvider(
-          'https://eth-mainnet.alchemyapi.io/v2/awt83g13tadp-1A58eC0nKS2Od0jPJQK'
+          AppConfig.providerEndpoint
         );
         await jsonRpcProvider.getNetwork(); // Double check that connection is available
         setProvider(jsonRpcProvider);
