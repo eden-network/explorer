@@ -10,7 +10,8 @@ import {
   getSlotDelegates,
   getNextBaseFee,
   getStakerInfo,
-  getEdenRPCTxs,
+  getEdenRPCTx,
+  getLastSupportedBlock,
   getBundledTxs,
 } from '@modules/getters';
 import {
@@ -35,7 +36,7 @@ export const getTransactionInfo = async (txHash) => {
   // Get general transaction info
   const [tx, edenRPCInfoRes, etherminePoolInfo] = await Promise.all([
     getTxRequestByGraphQL(txHash),
-    getEdenRPCTxs([txHash]),
+    getEdenRPCTx([txHash]),
     getEthermineRPCTx(txHash),
   ]);
 
@@ -150,106 +151,107 @@ export const getTransactionInfo = async (txHash) => {
 
     if (tx.block !== null) {
       const maxAttempts = 10;
-      const waitMs = 2000;
+      const waitMs = 3000;
+
       for (let i = 0; i < maxAttempts; i++) {
-        try {
-          const blockNum = parseInt(tx.block.number, 10);
-          const [
-            { staked: senderStake, rank: senderRank },
-            fromEdenProducer,
-            bundledTxsRes,
-            slotDelegates,
-            [blockInfo],
-            internalTransfers,
-          ] = await Promise.all([
-            getStakerInfo(tx.from.address.toLowerCase(), blockNum),
-            isFromEdenProducer(blockNum),
-            getBundledTxs(blockNum),
-            getSlotDelegates(blockNum - 1),
-            getBlockInfoForBlocks([blockNum]),
-            getInternalTransfers(blockNum),
-          ]);
-          const decodedTx = await decodeTx(txInfo.to, tx.inputData);
-          txInfo.contractName = decodedTx.contractName;
-          if (decodedTx.parsedCalldata) {
-            txInfo.input = formatDecodedTxCalldata(decodedTx.parsedCalldata);
-          }
-          txInfo.blockNumber = blockNum;
-          txInfo.fromEdenProducer = fromEdenProducer;
-          txInfo.senderStake = parseInt(senderStake, 10) / 1e18;
-          txInfo.senderRank = senderRank;
-          txInfo.toSlot = slotDelegates[txInfo.to.toLowerCase()] ?? null;
-          if (bundledTxsRes[0] && txHash in bundledTxsRes[1]) {
-            const { minerTip, bundleIndex } = bundledTxsRes[1][txHash];
-            if (bundleIndex !== undefined) {
-              txInfo.bundleIndex = bundleIndex ?? null;
-              txInfo.submissions.push('flashbots');
-            }
-            if (minerTip !== undefined) {
-              txInfo.minerTip = minerTip / 1e18;
-            }
-          }
-          if (!txInfo.minerTip) {
-            let minerTipInternalTxsETH = 0;
-            internalTransfers.forEach((transfer) => {
-              if (
-                transfer.hash === txHash &&
-                transfer.to === blockInfo.result.miner
-              ) {
-                minerTipInternalTxsETH += transfer.value;
-              }
-            });
-            txInfo.minerTip = minerTipInternalTxsETH;
-          }
-          txInfo.logs = normalizeLogs(tx);
-          const erc20Transfers = decodeERC20Transfers(txInfo.logs);
-          if (erc20Transfers.length > 0) {
-            const tknAddresses = erc20Transfers.map((t) => t.address);
-            const tknInfos = await getTknInfoForAddresses(tknAddresses);
-            const erc20TransfersEnriched = erc20Transfers.map((transfer) => {
-              const tknInfo = tknInfos[transfer.address.toLowerCase()];
-              const localLabels = Object.fromEntries([
-                [tx.from.address.toLowerCase(), 'TxSender'],
-                [tx.to.address.toLowerCase(), 'TxRecipient'],
-              ]);
-              return {
-                value:
-                  transfer.args.value === '0x'
-                    ? 0
-                    : ethers.utils.formatUnits(
-                        ethers.BigNumber.from(transfer.args.value),
-                        tknInfo.decimals
-                      ),
-                fromLabel:
-                  localLabels[transfer.args.from.toLowerCase()] || null,
-                toLabel: localLabels[transfer.args.to.toLowerCase()] || null,
-                tknAddress: transfer.address,
-                tknSymbol: tknInfo.symbol,
-                tknLogoUrl: tknInfo.logoURL,
-                from: transfer.args.from,
-                to: transfer.args.to,
-              };
-            });
-            txInfo.erc20Transfers = erc20TransfersEnriched;
-          }
-          txInfo.timestamp = parseInt(blockInfo.result.timestamp, 16);
-          txInfo.blockTxCount = blockInfo.result.transactions.length;
-          txInfo.baseFee = weiToGwei(blockInfo.result.baseFeePerGas, 4);
-          txInfo.gasUsed = tx.gasUsed;
-          txInfo.status = parseInt(tx.status, 10);
-          txInfo.gasCost = gweiToETH(txInfo.gasUsed * txInfo.gasPrice);
-          txInfo.priorityFee = weiToGwei(tx.gasPrice, 4) - txInfo.baseFee;
-          break;
-        } catch (err) {
-          console.error(`Error getting tx info for ${txHash}`, err);
-          if (maxAttempts - 1 === i) {
-            throw new Error(
-              `Max attempts reached to fetch tx-info for ${txHash}`
-            );
-          }
+        const blockNum = parseInt(tx.block.number, 10);
+
+        // Check if tx block is gte to latest block indexed by the graph
+        const latestGraphBlock = await getLastSupportedBlock();
+        if (latestGraphBlock < blockNum) {
+          console.log(`Waiting for block ${blockNum} to be indexed`);
           await sleep(waitMs);
-        } // eslint-disable-line no-empty
+          continue; // eslint-disable-line no-continue
+        }
+
+        const [
+          { staked: senderStake, rank: senderRank },
+          fromEdenProducer,
+          bundledTxsRes,
+          slotDelegates,
+          [blockInfo],
+          internalTransfers,
+        ] = await Promise.all([
+          getStakerInfo(tx.from.address.toLowerCase(), blockNum),
+          isFromEdenProducer(blockNum),
+          getBundledTxs(blockNum),
+          getSlotDelegates(blockNum - 1),
+          getBlockInfoForBlocks([blockNum]),
+          getInternalTransfers(blockNum),
+        ]);
+        const decodedTx = await decodeTx(txInfo.to, tx.inputData);
+        txInfo.contractName = decodedTx.contractName;
+        if (decodedTx.parsedCalldata) {
+          txInfo.input = formatDecodedTxCalldata(decodedTx.parsedCalldata);
+        }
+        txInfo.blockNumber = blockNum;
+        txInfo.fromEdenProducer = fromEdenProducer;
+        txInfo.senderStake = parseInt(senderStake, 10) / 1e18;
+        txInfo.senderRank = senderRank;
+        txInfo.toSlot = slotDelegates[txInfo.to.toLowerCase()] ?? null;
+        if (bundledTxsRes[0] && txHash in bundledTxsRes[1]) {
+          const { minerTip, bundleIndex } = bundledTxsRes[1][txHash];
+          if (bundleIndex !== undefined) {
+            txInfo.bundleIndex = bundleIndex ?? null;
+            txInfo.submissions.push('flashbots');
+          }
+          if (minerTip !== undefined) {
+            txInfo.minerTip = minerTip / 1e18;
+          }
+        }
+        if (!txInfo.minerTip) {
+          let minerTipInternalTxsETH = 0;
+          internalTransfers.forEach((transfer) => {
+            if (
+              transfer.hash === txHash &&
+              transfer.to === blockInfo.result.miner
+            ) {
+              minerTipInternalTxsETH += transfer.value;
+            }
+          });
+          txInfo.minerTip = minerTipInternalTxsETH;
+        }
+        txInfo.logs = normalizeLogs(tx);
+        const erc20Transfers = decodeERC20Transfers(txInfo.logs);
+        if (erc20Transfers.length > 0) {
+          const tknAddresses = erc20Transfers.map((t) => t.address);
+          const tknInfos = await getTknInfoForAddresses(tknAddresses);
+          const erc20TransfersEnriched = erc20Transfers.map((transfer) => {
+            const tknInfo = tknInfos[transfer.address.toLowerCase()];
+            const localLabels = Object.fromEntries([
+              [tx.from.address.toLowerCase(), 'TxSender'],
+              [tx.to.address.toLowerCase(), 'TxRecipient'],
+            ]);
+            return {
+              value:
+                transfer.args.value === '0x'
+                  ? 0
+                  : ethers.utils.formatUnits(
+                      ethers.BigNumber.from(transfer.args.value),
+                      tknInfo.decimals
+                    ),
+              fromLabel: localLabels[transfer.args.from.toLowerCase()] || null,
+              toLabel: localLabels[transfer.args.to.toLowerCase()] || null,
+              tknAddress: transfer.address,
+              tknSymbol: tknInfo.symbol,
+              tknLogoUrl: tknInfo.logoURL,
+              from: transfer.args.from,
+              to: transfer.args.to,
+            };
+          });
+          txInfo.erc20Transfers = erc20TransfersEnriched;
+        }
+        txInfo.timestamp = parseInt(blockInfo.result.timestamp, 16);
+        txInfo.blockTxCount = blockInfo.result.transactions.length;
+        txInfo.baseFee = weiToGwei(blockInfo.result.baseFeePerGas, 4);
+        txInfo.gasUsed = tx.gasUsed;
+        txInfo.status = parseInt(tx.status, 10);
+        txInfo.gasCost = gweiToETH(txInfo.gasUsed * txInfo.gasPrice);
+        txInfo.priorityFee = weiToGwei(tx.gasPrice, 4) - txInfo.baseFee;
+        return txInfo;
       }
+      console.error(`Max limit reached to get data from graph-ql ${txHash}`);
+      return null;
     }
   }
   return txInfo;

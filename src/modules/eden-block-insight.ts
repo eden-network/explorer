@@ -2,12 +2,12 @@ import { safeReadFromBucket, safeWriteToBucket } from './gcloud-cache';
 import {
   getMinerTips,
   getMinerAlias,
+  getEdenRPCTxsForBlock,
   isFromEdenProducer,
   checkIfValidCache,
   getSlotDelegates,
   getStakersStake,
   getSlotGasCap,
-  getEdenRPCTxs,
   isBlockSecure,
   getBundledTxs,
   getBlockInfo,
@@ -27,15 +27,11 @@ export const getBlockInsight = async (_blockNumber) => {
   const uniqueSenders = makeArrayUnique(
     blockInfo.transactions.map((tx) => tx.from)
   );
-  const txHashes = blockInfo.transactions.map((tx) => tx.hash);
   const [stakersStake, edenRPCTxs, minerTipToTx] = await Promise.all([
     getStakersStake(uniqueSenders, _blockNumber - 1),
-    getEdenRPCTxs(txHashes),
+    getEdenRPCTxsForBlock(_blockNumber),
     getMinerTips(_blockNumber, blockInfo.miner),
   ]);
-  const edenRPCInfoForTx = Object.fromEntries(
-    edenRPCTxs.result.map((tx) => [tx.hash, tx.blocknumber])
-  );
   const orderedStake = Object.values(stakersStake).sort((a, b) => b - a);
   const isNextStake = (stake) => {
     const nextStakeMin = orderedStake[0];
@@ -89,7 +85,7 @@ export const getBlockInsight = async (_blockNumber) => {
       toSlot: (toSlotDelegate !== undefined ? toSlotDelegate : false) as any,
       bundleIndex: bundledTx !== undefined ? bundledTx.bundleIndex : null,
       senderStake: stakersStake[tx.from.toLowerCase()] || 0,
-      viaEdenRPC: edenRPCInfoForTx[tx.hash] !== undefined,
+      viaEdenRPC: edenRPCTxs.result.includes(tx.hash),
       type: '',
     };
     if (minerReward !== null) labeledTx.minerReward = minerReward;
