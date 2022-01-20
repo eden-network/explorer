@@ -22,7 +22,7 @@ const useJsonRpcProvider = () => {
     const connect = async () => {
       try {
         const jsonRpcProvider = new ethers.providers.JsonRpcProvider(
-          AppConfig.providerEndpoint
+          AppConfig.publicEdenAlchemyAPI
         );
         await jsonRpcProvider.getNetwork(); // Double check that connection is available
         setProvider(jsonRpcProvider);
