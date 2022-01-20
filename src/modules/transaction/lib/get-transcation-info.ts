@@ -40,7 +40,7 @@ export const getTransactionInfo = async (txHash) => {
     getEthermineRPCTx(txHash),
   ]);
 
-  const edenRPCInfo = edenRPCInfoRes.result[0];
+  const edenRPCInfo = edenRPCInfoRes.result;
   const mined = !!(tx && tx.block);
   const viaEdenRPC = edenRPCInfo !== undefined;
   const viaEthermineRPC = etherminePoolInfo.status !== undefined;
