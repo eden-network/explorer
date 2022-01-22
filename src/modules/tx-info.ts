@@ -85,9 +85,9 @@ export const getTransactionInfo = async (txHash) => {
     ]);
   const edenRPCInfo = edenRPCInfoRes.result;
   const mined = txRequest !== null && txRequest.blockNumber !== null;
-  const viaEdenRPC = edenRPCInfo !== undefined;
+  const viaEdenRPC = edenRPCInfo !== null;
   const viaEthermineRPC = etherminePoolInfo.status !== undefined;
-  const viaAggregator = edenRPCInfo !== undefined && edenRPCInfo.agg;
+  const viaAggregator = viaEdenRPC && edenRPCInfo.agg;
   const pendingInEdenMempool = !mined && viaEdenRPC;
   const pendingInEthermineMempool = !mined && viaEthermineRPC;
   const pendingInPublicMempool = !mined && txRequest !== null;
