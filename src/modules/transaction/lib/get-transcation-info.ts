@@ -79,6 +79,7 @@ export const getTransactionInfo = async (txHash) => {
     state: txState,
     gasUsed: null,
     gasCost: null,
+    miner: null,
     baseFee: null,
     toSlot: null,
     status: null,
@@ -152,6 +153,8 @@ export const getTransactionInfo = async (txHash) => {
     if (tx.block !== null) {
       const maxAttempts = 10;
       const waitMs = 3000;
+
+      txInfo.miner = tx.block.miner.address;
 
       for (let i = 0; i < maxAttempts; i++) {
         const blockNum = parseInt(tx.block.number, 10);

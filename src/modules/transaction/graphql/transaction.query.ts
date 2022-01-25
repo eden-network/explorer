@@ -23,6 +23,9 @@ export const ETH_GET_TRANSACTION_BY_HASH = gql`
         baseFeePerGas
         transactionCount
         timestamp
+        miner {
+          address
+        }
       }
       status
       gasUsed

@@ -29,4 +29,5 @@ export interface TxInfoType {
   baseFee: number | null;
   status: number | null;
   index: number | null;
+  miner: string | null;
 }
