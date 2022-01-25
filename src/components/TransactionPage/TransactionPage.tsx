@@ -76,7 +76,7 @@ export default function TransactionPage({
 
   const makeTknIcon = (_url) => {
     if (_url) {
-      return <Image src={_url} width={15} height={15} />;
+      return <Image src={_url} width={15} height={15} alt="transcation icon" />;
     }
     return <FontAwesomeIcon icon="question-circle" />;
   };
@@ -132,7 +132,7 @@ export default function TransactionPage({
                   </Info.Container>
                 )}
                 {txInfo.from && (
-                  <Info.Container key="From">
+                  <Info.Container>
                     <Info.Label>Sender:</Info.Label>
                     <Info.Description>
                       <a
@@ -174,7 +174,7 @@ export default function TransactionPage({
                   </Info.Container>
                 )}
                 {txInfo.blockNumber && (
-                  <Info.Container key="Block Number">
+                  <Info.Container>
                     <Info.Label className="px-2 sm:px-6 py-1.5 whitespace-nowrap">
                       Block Number:
                     </Info.Label>
@@ -232,17 +232,17 @@ export default function TransactionPage({
                   </Info.Description>
                 </Info.Container>
                 {txInfo.erc20Transfers && txInfo.erc20Transfers.length > 0 && (
-                  <tr key="Transfers">
+                  <Info.Container>
                     <td className="px-2 sm:px-6 py-4">Transfers:</td>
                     <td className="px-2 sm:px-6 py-4">
                       {makeInputBox(
                         formatERC20Transfers(txInfo.erc20Transfers)
                       )}
                     </td>
-                  </tr>
+                  </Info.Container>
                 )}
                 {txInfo.input && txInfo.input.length > 2 && (
-                  <Info.Container key="Input">
+                  <Info.Container>
                     <Info.Label className="px-2 sm:px-6 py-4">
                       Input:
                     </Info.Label>
@@ -321,7 +321,7 @@ export default function TransactionPage({
                   </Info.Container>
                 )}
                 {txInfo.value > 0 && (
-                  <Info.Container key="Value">
+                  <Info.Container>
                     <Info.Label>Value:</Info.Label>
                     <Info.Description>
                       {txInfo.value.toLocaleString()} ETH
@@ -329,7 +329,7 @@ export default function TransactionPage({
                   </Info.Container>
                 )}
                 {isMined && (
-                  <Info.Container key="Fee">
+                  <Info.Container>
                     <Info.Label>Fee:</Info.Label>
                     <Info.Description>
                       {(txInfo.minerTip + txInfo.gasCost).toPrecision(2)} ETH
