@@ -9,7 +9,7 @@ import Image from 'next/image';
 import { formatAddress } from '@modules/formatter';
 import { getMinerAlias } from '@modules/getters';
 import { EdenLogo, EthLogo } from '@modules/icons';
-import { TxInfoType } from '@modules/transaction';
+import { TxInfo } from '@modules/tx-info';
 import { AppConfig } from '@utils/AppConfig';
 
 import StatusBoxes from './components/StatusBoxes';
@@ -59,7 +59,7 @@ export default function TransactionPage({
   txInfo,
   nextBaseFee,
 }: {
-  txInfo: TxInfoType;
+  txInfo: TxInfo;
   nextBaseFee: number;
 }) {
   const isMined = txInfo.state === 'mined';
