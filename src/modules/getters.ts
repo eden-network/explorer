@@ -755,10 +755,10 @@ export const getTknInfoFromChain = async (_tokenAddress) => {
     body: JSON.stringify([callDecimals, callSymbol]),
     headers: { 'Content-Type': 'application/json' },
   }).then((res) => res.json());
-  const decimals = parseInt(decRaw.result.slice(0, 66), 16);
+  const decimals = parseInt(decRaw.result, 16);
   const symbol = ethers.utils.defaultAbiCoder.decode(
     ['string'],
-    symbolRaw.result.slice(0, 66)
+    symbolRaw.result
   )[0];
   return { decimals, symbol, logoURL: null };
 };
