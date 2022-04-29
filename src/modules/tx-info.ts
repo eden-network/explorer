@@ -56,6 +56,7 @@ interface TxInfo {
   baseFee: number | null;
   status: number | null;
   index: number | null;
+  miner: string | null;
 }
 
 // TODO: move to frontend
@@ -132,6 +133,7 @@ export const getTransactionInfo = async (txHash) => {
     index: null,
     logs: null,
     nextBaseFee,
+    miner: null,
   } as TxInfo;
 
   // Pending pools
@@ -302,6 +304,7 @@ export const getTransactionInfo = async (txHash) => {
         );
         transactionInfo.priorityFee =
           weiToGwei(txReceipt.effectiveGasPrice, 4) - transactionInfo.baseFee;
+        transactionInfo.miner = blockInfo.result.miner;
         return transactionInfo;
       }
       console.error(`Max limit reached to get data from graph-ql ${txHash}`);
