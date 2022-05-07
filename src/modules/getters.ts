@@ -1,4 +1,3 @@
-import edenData, { Network } from '@eden-network/data';
 import { ethers } from 'ethers';
 import { request, gql } from 'graphql-request';
 
@@ -180,16 +179,20 @@ export const isBlockSecure = async (_blockNumber) => {
 };
 
 export const isFromEdenProducer = async (_blockNumber) => {
-  const blocksInfo = await edenData.blocks({
-    startBlock: _blockNumber,
-    endBlock: _blockNumber,
-    fromActiveProducerOnly: false,
-    network: network as Network,
-  });
-  if (blocksInfo.length === 0) {
+  const { blocks } = await request(
+    graphNetworkEndpoint,
+    gql`{
+      blocks(
+        where: {number: ${_blockNumber}}
+      ) {
+        fromActiveProducer
+      }
+    }`
+  );
+  if (blocks.length === 0) {
     throw new Error(`Can't find block-info for block: ${_blockNumber}`);
   }
-  return blocksInfo[0].fromActiveProducer;
+  return blocks[0].fromActiveProducer;
 };
 
 export const getSlotDelegates = async (_blockNumber) => {
