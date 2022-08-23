@@ -39,6 +39,9 @@ export default function LabeledTransactions({
   const router = useRouter();
   const fieldRef = useRef(null);
   const isMobile = width < AppConfig.breakpoints.small;
+  const showMinerReward = labeledTxs.every(
+    (tx) => tx.minerReward !== undefined
+  );
 
   const selectedTx = router.query.tx ? router.query.tx : null;
   const [selectedRow, setSelectedRow] = useState(null);
@@ -174,7 +177,7 @@ export default function LabeledTransactions({
                     </TableSortLabel>
                   </th>
                   {labeledTxs.length > 0 &&
-                  labeledTxs[0].minerReward !== undefined ? (
+                  labeledTxs.every((tx) => tx.minerReward !== undefined) ? (
                     <th
                       scope="col"
                       className="px-2 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider"
@@ -321,7 +324,7 @@ export default function LabeledTransactions({
                       <td className="px-2 py-4 text-right whitespace-nowrap">
                         {Object.values(formatWei(tx.maxPriorityFee)).join(' ')}
                       </td>
-                      {tx.minerReward !== undefined ? (
+                      {showMinerReward && tx.minerReward !== undefined ? (
                         <td className="px-2 py-4 text-right whitespace-nowrap">
                           {tx.minerReward} Eth
                         </td>
