@@ -14,7 +14,7 @@ TimeAgo.addDefaultLocale(en);
 
 export default function Blocks({
   blocks,
-  edenProducerOnly,
+  fromAllProducers,
 }: {
   blocks: {
     number: number;
@@ -26,7 +26,7 @@ export default function Blocks({
     fromActiveProducer: boolean;
     bundledTxsCallSuccess: boolean;
   }[];
-  edenProducerOnly: boolean;
+  fromAllProducers: boolean;
 }) {
   const timeAgo = useMemo(() => new TimeAgo('en-US'), []);
 
@@ -50,7 +50,7 @@ export default function Blocks({
 
   useEffect(() => {
     ReactToolTip.rebuild();
-  }, [edenProducerOnly]);
+  }, [fromAllProducers]);
 
   return (
     <div className="flex flex-col">

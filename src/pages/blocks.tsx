@@ -33,8 +33,8 @@ export default function BlocksPage({ blocks }) {
     if (router.query.miner) return (router.query.miner as string).split(',');
     return [];
   });
-  const [edenProducerOnly, setEdenProducerOnly] = useState(
-    router.query.fromAllProducer !== 'true'
+  const [fromAllProducers, setForAllProducers] = useState(
+    router.query.fromAllProducers !== 'false'
   );
   const [inputValue, setInputValue] = useState('');
   const [selectedVal, setSelectedVal] = useState('');
@@ -63,11 +63,11 @@ export default function BlocksPage({ blocks }) {
   const updateQuery = ({
     epoch = router.query.beforeEpoch,
     pageNum = null,
-    fromAllProducer = !edenProducerOnly,
+    fromAllProducers_ = fromAllProducers,
   }: {
     epoch?: string | string[] | undefined | number | null;
     pageNum?: number | undefined | null;
-    fromAllProducer?: boolean;
+    fromAllProducers_?: boolean;
   }) => {
     const params = [];
     if (epoch) {
@@ -91,9 +91,9 @@ export default function BlocksPage({ blocks }) {
         });
       });
     }
-    if (fromAllProducer) {
+    if (fromAllProducers_) {
       params.push({
-        key: 'fromAllProducer',
+        key: 'fromAllProducers',
         value: true,
       });
     }
@@ -188,23 +188,23 @@ export default function BlocksPage({ blocks }) {
   };
 
   const handleChangeProducerFilter = (e) => {
-    setEdenProducerOnly(e.target.checked);
-    updateQuery({ fromAllProducer: !e.target.checked });
+    setForAllProducers(e.target.checked);
+    updateQuery({ fromAllProducers_: e.target.checked });
   };
 
   const renderCheckBox = () => (
     <label
-      htmlFor="edenProducerOnly"
+      htmlFor="fromAllProducers"
       className="inline-flex items-center checkbox-no-tick cursor-pointer"
     >
       <input
         type="checkbox"
-        id="edenProducerOnly"
+        id="fromAllProducers"
         onChange={handleChangeProducerFilter}
-        checked={edenProducerOnly}
+        checked={fromAllProducers}
         className="mr-2 form-checkbox rounded-sm w-4 h-4 inline-block text-green border-none cursor-pointer"
       />
-      <span className="inline-block text-sm">Eden Producer Only</span>
+      <span className="inline-block text-sm">From all producers</span>
     </label>
   );
   return (
@@ -279,7 +279,7 @@ export default function BlocksPage({ blocks }) {
               )}
             </div>
             <div className="flex-1 mt-4">
-              <Blocks blocks={blocks} edenProducerOnly={edenProducerOnly} />
+              <Blocks blocks={blocks} fromAllProducers={fromAllProducers} />
             </div>
             <EndlessPagination
               end={blocks.length < PER_PAGE}
@@ -303,12 +303,14 @@ export async function getServerSideProps(context) {
       : [context.query.miner]
     : null;
 
-  const fromActiveProducerOnly = !context.query.fromAllProducer;
+  const fromAllProducers =
+    context.query.fromAllProducers ||
+    context.query.graphfromAllProducers === undefined;
   const beforeEpoch = context.query.beforeEpoch || null;
   try {
     const skip = (page - 1) * PER_PAGE;
     const blocks = await getBlocksPaged({
-      fromActiveProducerOnly,
+      fromActiveProducerOnly: !fromAllProducers,
       beforeTimestamp: beforeEpoch,
       miners: minersWhitelist,
       num: PER_PAGE,
@@ -346,7 +348,7 @@ export async function getServerSideProps(context) {
       },
     };
   } catch (e) {
-    console.error(e);
+    console.error(e); // eslint-disable-line no-console
     return {
       props: {
         blocks: [],
