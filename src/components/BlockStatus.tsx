@@ -46,7 +46,7 @@ export default function BlockStatus({
       </Info.Container>
       <Info.Container>
         <div className="inline-flex items-center">
-          <Info.Label>Miner</Info.Label>
+          <Info.Label>Producer</Info.Label>
           <Info.Description>
             <a
               href={`/address/${block.miner}`}

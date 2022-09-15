@@ -125,7 +125,7 @@ export default function TransactionPage({
                 </Info.Container>
                 {txInfo.miner && (
                   <Info.Container>
-                    <Info.Label>Miner:</Info.Label>
+                    <Info.Label>Producer:</Info.Label>
                     <Info.Description>
                       {getMinerAlias(txInfo.miner) || txInfo.miner}
                     </Info.Description>
@@ -333,8 +333,8 @@ export default function TransactionPage({
                     <Info.Label>Fee:</Info.Label>
                     <Info.Description>
                       {(txInfo.minerTip + txInfo.gasCost).toPrecision(2)} ETH
-                      (GasCost: {txInfo.gasCost} ETH + MinerTip:{' '}
-                      {txInfo.minerTip} ETH)
+                      (GasCost: {txInfo.gasCost} ETH + Tip: {txInfo.minerTip}{' '}
+                      ETH)
                     </Info.Description>
                   </Info.Container>
                 )}
