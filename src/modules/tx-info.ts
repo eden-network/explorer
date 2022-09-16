@@ -11,7 +11,6 @@ import {
   getNextBaseFee,
   getStakerInfo,
   getBundledTxs,
-  getEdenRPCTx,
   getTxRequest,
   getTxReceipt,
 } from './getters';
@@ -76,15 +75,13 @@ const formatDecodedTxCalldata = (_decoded) => {
 
 export const getTransactionInfo = async (txHash) => {
   // Get general transaction info
-  const [txRequest, txReceipt, edenRPCInfoRes] = await Promise.all([
+  const [txRequest, txReceipt] = await Promise.all([
     getTxRequest(txHash),
     getTxReceipt(txHash),
-    getEdenRPCTx(txHash),
   ]);
-  const edenRPCInfo = edenRPCInfoRes.result;
   const mined = txRequest !== null && txRequest.blockNumber !== null;
-  const viaEdenRPC = !!edenRPCInfo;
-  const viaAggregator = viaEdenRPC && edenRPCInfo.agg;
+  const viaEdenRPC = false;
+  const viaAggregator = false;
   const pendingInEdenMempool = !mined && viaEdenRPC;
   const pendingInEthermineMempool = !mined;
   const pendingInPublicMempool = !mined && txRequest !== null;
@@ -152,25 +149,7 @@ export const getTransactionInfo = async (txHash) => {
     transactionInfo.submissions.push('eden');
   }
 
-  if (pendingInEdenMempool) {
-    // use just eden rpc source
-    transactionInfo.to = getChecksumAddress(
-      edenRPCInfo.to || ethers.constants.AddressZero
-    );
-    transactionInfo.from = getChecksumAddress(edenRPCInfo.from);
-    transactionInfo.gasLimit = parseInt(edenRPCInfo.gas, 16);
-    transactionInfo.nonce = parseInt(edenRPCInfo.nonce, 10);
-    transactionInfo.value = weiToETH(edenRPCInfo.value);
-    transactionInfo.input = edenRPCInfo.input;
-    transactionInfo.hash = edenRPCInfo.hash;
-    if (edenRPCInfo.maxpriorityfeepergas) {
-      transactionInfo.priorityFee = weiToGwei(edenRPCInfo.maxpriorityfeepergas);
-      transactionInfo.baseFee =
-        weiToGwei(edenRPCInfo.maxfeepergas) - transactionInfo.priorityFee;
-    } else {
-      transactionInfo.gasPrice = weiToGwei(edenRPCInfo.gasprice);
-    }
-  } else if (txRequest !== null) {
+  if (txRequest !== null) {
     // use tx-request object
     transactionInfo.to = getChecksumAddress(
       txRequest.to || ethers.constants.AddressZero
