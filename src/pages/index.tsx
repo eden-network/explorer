@@ -22,7 +22,6 @@ import { AppConfig } from '../utils/AppConfig';
 const WEI = BigInt('1000000000000000000');
 
 export default function Home({
-  hashRate,
   stakers,
   staked,
   stakeDistribution,
@@ -55,12 +54,12 @@ export default function Home({
           </h2>
         </div>
       </div>
-      <HeroStats hashRate={hashRate} stakers={stakers} staked={staked} />
+      <HeroStats stakers={stakers} staked={staked} />
       <div className="max-w-7xl mx-auto grid gap-5 lg:grid-cols-2">
         <div className="flex flex-col rounded-lg shadow-lg overflow-hidden bg-blue">
           <div className="flex-1 p-6 flex flex-col justify-between">
             <div className="flex-shrink-0">
-              <h3 className="text-lg text-center">Blocks</h3>
+              <h3 className="text-lg text-center">Pre-merge Blocks</h3>
             </div>
             <div className="flex-1 mt-4">
               <Blocks blocks={blocks} />
@@ -130,34 +129,32 @@ export async function getServerSideProps() {
     sevenDaysAgo,
     now
   );
-  const [rewards, stake, blocks, leaderboard, historicalStake] =
-    await Promise.all([
-      rewardSchedule({ network: AppConfig.network as any }),
-      stakeStats({
+  const [, stake, blocks, leaderboard, historicalStake] = await Promise.all([
+    rewardSchedule({ network: AppConfig.network as any }),
+    stakeStats({
+      network: AppConfig.network as any,
+      includePercentiles: true,
+    }),
+    blocksPaged({
+      network: AppConfig.network as any,
+      fromActiveProducerOnly: true,
+      start: 0,
+      num: 6,
+    }),
+    stakerLeaderboard({
+      start: 0,
+      num: 1,
+      network: AppConfig.network as any,
+    }),
+    timeseries(
+      {
+        blocks: blocksHourlyLastSevenDays,
         network: AppConfig.network as any,
-        includePercentiles: true,
-      }),
-      blocksPaged({
-        network: AppConfig.network as any,
-        fromActiveProducerOnly: true,
-        start: 0,
-        num: 6,
-      }),
-      stakerLeaderboard({
-        start: 0,
-        num: 1,
-        network: AppConfig.network as any,
-      }),
-      timeseries(
-        {
-          blocks: blocksHourlyLastSevenDays,
-          network: AppConfig.network as any,
-          target: stakeStats,
-        },
-        { includePercentiles: false }
-      ),
-    ]);
-  const hashRate = (rewards?.pendingEpoch?.producerBlocksRatio ?? 0) * 100;
+        target: stakeStats,
+      },
+      { includePercentiles: false }
+    ),
+  ]);
   const stakers = stake?.numStakers ?? 0;
   const staked = Number((stake?.totalStaked ?? BigInt(0)) / WEI);
   const stakeDistribution = stake
@@ -172,7 +169,6 @@ export async function getServerSideProps() {
   };
   return {
     props: {
-      hashRate,
       stakers,
       staked,
       stakeDistribution,

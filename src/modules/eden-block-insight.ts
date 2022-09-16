@@ -2,7 +2,6 @@ import { safeReadFromBucket, safeWriteToBucket } from './gcloud-cache';
 import {
   getMinerTips,
   getMinerAlias,
-  getEdenRPCTxsForBlock,
   isFromEdenProducer,
   checkIfValidCache,
   getSlotDelegates,
@@ -27,9 +26,8 @@ export const getBlockInsight = async (_blockNumber) => {
   const uniqueSenders = makeArrayUnique(
     blockInfo.transactions.map((tx) => tx.from)
   );
-  const [stakersStake, edenRPCTxs, minerTipToTx] = await Promise.all([
+  const [stakersStake, minerTipToTx] = await Promise.all([
     getStakersStake(uniqueSenders, _blockNumber - 1),
-    getEdenRPCTxsForBlock(_blockNumber),
     getMinerTips(_blockNumber, blockInfo.miner),
   ]);
   const orderedStake = Object.values(stakersStake).sort((a, b) => b - a);
@@ -85,7 +83,7 @@ export const getBlockInsight = async (_blockNumber) => {
       toSlot: (toSlotDelegate !== undefined ? toSlotDelegate : false) as any,
       bundleIndex: bundledTx !== undefined ? bundledTx.bundleIndex : null,
       senderStake: stakersStake[tx.from.toLowerCase()] || 0,
-      viaEdenRPC: edenRPCTxs.result.includes(tx.hash),
+      viaEdenRPC: false,
       type: '',
     };
     if (minerReward !== null) labeledTx.minerReward = minerReward;

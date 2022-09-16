@@ -7,12 +7,10 @@ import {
   getLastSupportedBlock,
   getInternalTransfers,
   isFromEdenProducer,
-  getEthermineRPCTx,
   getSlotDelegates,
   getNextBaseFee,
   getStakerInfo,
   getBundledTxs,
-  getEdenRPCTx,
   getTxRequest,
   getTxReceipt,
 } from './getters';
@@ -77,20 +75,15 @@ const formatDecodedTxCalldata = (_decoded) => {
 
 export const getTransactionInfo = async (txHash) => {
   // Get general transaction info
-  const [txRequest, txReceipt, edenRPCInfoRes, etherminePoolInfo] =
-    await Promise.all([
-      getTxRequest(txHash),
-      getTxReceipt(txHash),
-      getEdenRPCTx(txHash),
-      getEthermineRPCTx(txHash),
-    ]);
-  const edenRPCInfo = edenRPCInfoRes.result;
+  const [txRequest, txReceipt] = await Promise.all([
+    getTxRequest(txHash),
+    getTxReceipt(txHash),
+  ]);
   const mined = txRequest !== null && txRequest.blockNumber !== null;
-  const viaEdenRPC = !!edenRPCInfo;
-  const viaEthermineRPC = etherminePoolInfo.status !== undefined;
-  const viaAggregator = viaEdenRPC && edenRPCInfo.agg;
+  const viaEdenRPC = false;
+  const viaAggregator = false;
   const pendingInEdenMempool = !mined && viaEdenRPC;
-  const pendingInEthermineMempool = !mined && viaEthermineRPC;
+  const pendingInEthermineMempool = !mined;
   const pendingInPublicMempool = !mined && txRequest !== null;
   const txState = mined
     ? txReceipt !== null
@@ -152,34 +145,11 @@ export const getTransactionInfo = async (txHash) => {
   // Submissions
   if (viaAggregator) {
     transactionInfo.submissions.push('agg');
-  } else {
-    if (viaEdenRPC) {
-      transactionInfo.submissions.push('eden');
-    }
-    if (viaEthermineRPC) {
-      transactionInfo.submissions.push('ethermine');
-    }
+  } else if (viaEdenRPC) {
+    transactionInfo.submissions.push('eden');
   }
 
-  if (pendingInEdenMempool) {
-    // use just eden rpc source
-    transactionInfo.to = getChecksumAddress(
-      edenRPCInfo.to || ethers.constants.AddressZero
-    );
-    transactionInfo.from = getChecksumAddress(edenRPCInfo.from);
-    transactionInfo.gasLimit = parseInt(edenRPCInfo.gas, 16);
-    transactionInfo.nonce = parseInt(edenRPCInfo.nonce, 10);
-    transactionInfo.value = weiToETH(edenRPCInfo.value);
-    transactionInfo.input = edenRPCInfo.input;
-    transactionInfo.hash = edenRPCInfo.hash;
-    if (edenRPCInfo.maxpriorityfeepergas) {
-      transactionInfo.priorityFee = weiToGwei(edenRPCInfo.maxpriorityfeepergas);
-      transactionInfo.baseFee =
-        weiToGwei(edenRPCInfo.maxfeepergas) - transactionInfo.priorityFee;
-    } else {
-      transactionInfo.gasPrice = weiToGwei(edenRPCInfo.gasprice);
-    }
-  } else if (txRequest !== null) {
+  if (txRequest !== null) {
     // use tx-request object
     transactionInfo.to = getChecksumAddress(
       txRequest.to || ethers.constants.AddressZero

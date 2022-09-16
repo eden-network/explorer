@@ -2,7 +2,6 @@ import { ethers } from 'ethers';
 
 import { getContractInfo } from './contract-info';
 import {
-  getEdenRPCTxsForAccount,
   getBlockInfoForBlocks,
   getTxCountForAccount,
   filterForEdenBlocks,
@@ -43,10 +42,9 @@ async function getEdenTxsForAccount(_account, _txPerPage, _page) {
   const blocksForAccount = txsForAccount
     .map((tx) => tx.blockNumber)
     .filter((b, i, a) => a.indexOf(b) === i); // Remove duplicates
-  const [edenBlocks, blockInfos, edenRPCTxs] = await Promise.all([
+  const [edenBlocks, blockInfos] = await Promise.all([
     filterForEdenBlocks(blocksForAccount),
     getBlockInfoForBlocks(blocksForAccount),
-    getEdenRPCTxsForAccount(_account),
   ]);
   // Filter out txs that were not mined in an Eden block
   const isEdenBlock = Object.fromEntries(
@@ -60,7 +58,7 @@ async function getEdenTxsForAccount(_account, _txPerPage, _page) {
     tx.blockTxCount = blockInfo.transactions.length;
     tx.baseFee = blockInfo.baseFeePerGas || 0;
     tx.fromEdenProducer = isEdenBlock[tx.blockNumber] ?? false;
-    tx.viaEdenRPC = edenRPCTxs.result.includes(tx.hash);
+    tx.viaEdenRPC = false;
     return tx;
   });
   return txsForAccountEnriched;

@@ -180,15 +180,15 @@ export default function LabeledTransactions({
                   labeledTxs.every((tx) => tx.minerReward !== undefined) ? (
                     <th
                       scope="col"
-                      className="px-2 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider"
+                      className="px-0 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider"
                     >
                       <TableSortLabel
                         active={orderBy === 'minerReward'}
                         direction={order}
                         onClick={() => handleRequestSort('minerReward')}
                       >
-                        <span data-tip data-for="MinerReward">
-                          <FontAwesomeIcon icon="question-circle" /> Miner
+                        <span data-tip data-for="ProducerReward">
+                          <FontAwesomeIcon icon="question-circle" /> Producer
                           Reward
                         </span>
                       </TableSortLabel>
@@ -421,13 +421,13 @@ export default function LabeledTransactions({
       </ReactToolTip>
       <ReactToolTip
         className="tooltip"
-        id="MinerReward"
+        id="ProducerReward"
         place="top"
         effect="solid"
         border
       >
-        ETH miner recieved from this transaction. Includes non-burned gas fees
-        and direct miner payments.
+        ETH reward producer recieved from this transaction. Includes non-burned
+        gas fees and direct payments to the producer.
       </ReactToolTip>
       <ReactToolTip
         className="tooltip"
