@@ -7,7 +7,6 @@ import {
   getLastSupportedBlock,
   getInternalTransfers,
   isFromEdenProducer,
-  getEthermineRPCTx,
   getSlotDelegates,
   getNextBaseFee,
   getStakerInfo,
@@ -77,20 +76,17 @@ const formatDecodedTxCalldata = (_decoded) => {
 
 export const getTransactionInfo = async (txHash) => {
   // Get general transaction info
-  const [txRequest, txReceipt, edenRPCInfoRes, etherminePoolInfo] =
-    await Promise.all([
-      getTxRequest(txHash),
-      getTxReceipt(txHash),
-      getEdenRPCTx(txHash),
-      getEthermineRPCTx(txHash),
-    ]);
+  const [txRequest, txReceipt, edenRPCInfoRes] = await Promise.all([
+    getTxRequest(txHash),
+    getTxReceipt(txHash),
+    getEdenRPCTx(txHash),
+  ]);
   const edenRPCInfo = edenRPCInfoRes.result;
   const mined = txRequest !== null && txRequest.blockNumber !== null;
   const viaEdenRPC = !!edenRPCInfo;
-  const viaEthermineRPC = etherminePoolInfo.status !== undefined;
   const viaAggregator = viaEdenRPC && edenRPCInfo.agg;
   const pendingInEdenMempool = !mined && viaEdenRPC;
-  const pendingInEthermineMempool = !mined && viaEthermineRPC;
+  const pendingInEthermineMempool = !mined;
   const pendingInPublicMempool = !mined && txRequest !== null;
   const txState = mined
     ? txReceipt !== null
@@ -152,13 +148,8 @@ export const getTransactionInfo = async (txHash) => {
   // Submissions
   if (viaAggregator) {
     transactionInfo.submissions.push('agg');
-  } else {
-    if (viaEdenRPC) {
-      transactionInfo.submissions.push('eden');
-    }
-    if (viaEthermineRPC) {
-      transactionInfo.submissions.push('ethermine');
-    }
+  } else if (viaEdenRPC) {
+    transactionInfo.submissions.push('eden');
   }
 
   if (pendingInEdenMempool) {
